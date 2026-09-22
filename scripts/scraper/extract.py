@@ -62,20 +62,32 @@ def price(value: Any) -> float | None:
         return None
 
 
+# Containers that wrap the real Product rather than being one. Tradeinn nests
+# its ProductGroup inside WebPage.mainEntity, so a parser that only looks at
+# top-level nodes sees an Organization and a WebPage and reports "no offers".
+_WRAPPERS = ("@graph", "mainEntity", "mainEntityOfPage", "itemListElement", "item")
+
+
 def _ld_nodes(html: str) -> Iterator[dict]:
-    """Yield every JSON-LD object, flattening @graph and arrays."""
+    """Yield every JSON-LD object, descending through the usual wrappers."""
     for m in LD_RE.finditer(html):
         try:
             data = json.loads(m.group(1).strip())
         except json.JSONDecodeError:
             continue
         stack = data if isinstance(data, list) else [data]
-        while stack:
+        seen = 0
+        while stack and seen < 2000:          # cheap guard against a cyclic graph
             node = stack.pop()
+            seen += 1
             if not isinstance(node, dict):
                 continue
-            if "@graph" in node and isinstance(node["@graph"], list):
-                stack.extend(node["@graph"])
+            for key in _WRAPPERS:
+                child = node.get(key)
+                if isinstance(child, list):
+                    stack.extend(c for c in child if isinstance(c, dict))
+                elif isinstance(child, dict):
+                    stack.append(child)
             yield node
 
 
