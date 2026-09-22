@@ -144,6 +144,40 @@ select, .chip{
 select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visible{
   outline:2px solid var(--accent); outline-offset:2px}
 .chip[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent)}
+.ms{position:relative}
+.ms-btn{
+  font-family:var(--sans); font-size:13px; font-weight:500; color:var(--ink);
+  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
+  padding:7px 11px; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+}
+.ms-btn:hover{border-color:var(--axis)}
+.ms-btn[aria-expanded="true"]{border-color:var(--accent)}
+.ms-btn .caret{color:var(--muted); font-size:10px}
+.ms-btn .n{
+  background:var(--accent); color:#fff; border-radius:999px;
+  font-size:11px; font-weight:700; padding:1px 6px; font-variant-numeric:tabular-nums;
+}
+.ms-pop{
+  position:absolute; top:calc(100% + 6px); left:0; z-index:40; min-width:230px;
+  max-height:320px; overflow-y:auto; background:var(--surface);
+  border:1px solid var(--rule); border-radius:10px; box-shadow:var(--shadow); padding:6px;
+}
+.ms-pop[hidden]{display:none}
+.ms-opt{
+  display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:7px;
+  font-size:13px; cursor:pointer; color:var(--ink); white-space:nowrap;
+}
+.ms-opt:hover{background:color-mix(in srgb, var(--accent) 9%, transparent)}
+.ms-opt input{accent-color:var(--accent); width:14px; height:14px; margin:0; cursor:pointer}
+.ms-opt .cnt{margin-left:auto; color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums}
+.ms-head{
+  display:flex; gap:8px; padding:4px 9px 8px; border-bottom:1px solid var(--rule); margin-bottom:4px;
+}
+.ms-head button{
+  font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--accent);
+  background:none; border:none; padding:0; cursor:pointer;
+}
+.ms-head button:hover{text-decoration:underline}
 .f-count{margin-left:auto; flex:none; font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .f-count b{color:var(--ink); font-weight:650}
 
@@ -215,8 +249,17 @@ td.prod-cell{padding:8px}
 }
 .badge.caro{background:color-mix(in srgb, var(--s2) 18%, transparent); color:var(--ink)}
 .badge.barato{background:color-mix(in srgb, var(--good) 18%, transparent); color:var(--ink)}
+/* Same price is its own state, not a weak win: blue, distinct from both. */
+.badge.igual{background:color-mix(in srgb, var(--s1) 20%, transparent); color:var(--ink)}
+tr.igual-row{background:color-mix(in srgb, var(--s1) 6%, transparent)}
+/* A model with several rivals reads as one product: the name prints once and a
+   heavier rule opens the group, so repeated rows are visibly continuations. */
+tr.grp-start td{border-top:1px solid var(--axis)}
+tr.grp-cont td.prod-cell{padding-left:70px}
+td.cont-mark{color:var(--muted); font-size:12px}
 .delta-up{color:var(--s2); font-weight:700}
 .delta-dn{color:var(--good); font-weight:700}
+.delta-eq{color:var(--s1); font-weight:700}
 .comp-note{
   font-size:12px; color:var(--muted); margin:12px 0 0; padding-top:10px;
   border-top:1px solid var(--rule);
@@ -331,7 +374,9 @@ const FIELDS = ["modelo","brand_code","marca","nombre_modelo","tipo_producto","t
 
 let ROWS = [];
 let COMP = [];                     // competitor comparison (public view only)
-const F = { marca:"", tipo:"", rebaja:false };
+// Sets, so each filter takes 1..n values. An empty set means "no restriction",
+// which keeps the default cheap: no membership test runs until something is picked.
+const F = { marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false };
 
 async function page(offset){
   const u = `${URL_}/rest/v1/v_modelos_detalle?select=${FIELDS}&order=modelo&limit=1000&offset=${offset}`;
@@ -368,10 +413,24 @@ async function load(){
     nivel_margen_orden:N(d.nivel_margen_orden), nivel_stock_orden:N(d.nivel_stock_orden)}));
 }
 
-const filtered = () => ROWS.filter(d =>
-  (!F.marca  || d.brand_code===F.marca) &&
-  (!F.tipo   || d.tipo_producto===F.tipo) &&
-  (!F.rebaja || d.en_rebaja));
+// Models carrying a price from each selected competitor. Selecting a competitor
+// narrows the whole page, not just the comparison table, so every chart and KPI
+// describes the same slice.
+const modelosDe = comps => {
+  if(!comps.size) return null;
+  const ok = new Set();
+  for(const c of COMP) if(comps.has(c.competidor)) ok.add(c.modelo);
+  return ok;
+};
+
+const filtered = () => {
+  const conComp = modelosDe(F.competidores);
+  return ROWS.filter(d =>
+    (!F.marcas.size || F.marcas.has(d.brand_code)) &&
+    (!F.tipos.size  || F.tipos.has(d.tipo_producto)) &&
+    (!F.rebaja      || d.en_rebaja) &&
+    (!conComp       || conComp.has(d.modelo)));
+};
 
 /* ── tooltip ──────────────────────────────────────────────────────────── */
 const tip = document.getElementById("tip");
@@ -492,6 +551,74 @@ function stacked(items,{fmt=nf.format}={}){
   return svg;
 }
 
+/* ── multi-select dropdown ────────────────────────────────────────────── */
+/* A native <select multiple> is unusable on touch and gives no counts, so this
+   is a button + checkbox popover. One open at a time; Escape and outside-click
+   close it. */
+let openPop = null;
+document.addEventListener("click", e => {
+  if(openPop && !openPop.root.contains(e.target)) close_();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape") close_(); });
+function close_(){
+  if(!openPop) return;
+  openPop.pop.hidden = true;
+  openPop.btn.setAttribute("aria-expanded", "false");
+  openPop = null;
+}
+
+function multiSelect({label, options, selected, onChange}){
+  const root = document.createElement("div"); root.className = "ms";
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "ms-btn";
+  btn.setAttribute("aria-haspopup", "true"); btn.setAttribute("aria-expanded", "false");
+  const pop = document.createElement("div"); pop.className = "ms-pop"; pop.hidden = true;
+
+  const paint = () => {
+    const n = selected.size;
+    btn.innerHTML = `<span>${label}</span>`
+      + (n ? `<span class="n">${n}</span>` : "")
+      + `<span class="caret">▾</span>`;
+  };
+  paint();
+
+  const head = document.createElement("div"); head.className = "ms-head";
+  head.innerHTML = `<button type="button" data-all>Todos</button>
+                    <button type="button" data-none>Ninguno</button>`;
+  pop.append(head);
+  head.querySelector("[data-all]").onclick = () => {
+    options.forEach(o => selected.add(o.value));
+    pop.querySelectorAll("input").forEach(i => i.checked = true); paint(); onChange();
+  };
+  head.querySelector("[data-none]").onclick = () => {
+    selected.clear();
+    pop.querySelectorAll("input").forEach(i => i.checked = false); paint(); onChange();
+  };
+
+  for(const o of options){
+    const row = document.createElement("label"); row.className = "ms-opt";
+    row.innerHTML = `<input type="checkbox"${selected.has(o.value) ? " checked" : ""}>
+      <span>${o.label}</span>${o.count != null ? `<span class="cnt">${nf.format(o.count)}</span>` : ""}`;
+    row.querySelector("input").onchange = e => {
+      e.target.checked ? selected.add(o.value) : selected.delete(o.value);
+      paint(); onChange();
+    };
+    pop.append(row);
+  }
+
+  btn.onclick = e => {
+    e.stopPropagation();
+    const wasOpen = openPop && openPop.pop === pop;
+    close_();
+    if(!wasOpen){
+      pop.hidden = false; btn.setAttribute("aria-expanded", "true");
+      openPop = {root, btn, pop};
+    }
+  };
+  root.append(btn, pop);
+  return root;
+}
+
 /* ── aggregation ──────────────────────────────────────────────────────── */
 const by=(rows,key)=>{const m=new Map();
   for(const r of rows){const k=key(r); m.set(k,(m.get(k)||0)+1);} return m;};
@@ -527,22 +654,44 @@ function render(){
   app.innerHTML="";
 
   /* filters ---------------------------------------------------------- */
-  const marcas=[...new Map(ROWS.map(r=>[r.brand_code,r.marca])).entries()].sort((a,b)=>a[1].localeCompare(b[1],"es"));
-  const tipos=[...new Set(ROWS.map(r=>r.tipo_producto))].sort();
-  const f=document.createElement("div"); f.className="filters";
-  f.innerHTML=`<span class="f-lab">Filtrar</span>
-    <select id="f-marca" aria-label="Marca"><option value="">Todas las marcas</option>
-      ${marcas.map(([c,n])=>`<option value="${c}"${F.marca===c?" selected":""}>${n}</option>`).join("")}</select>
-    <select id="f-tipo" aria-label="Tipo de producto"><option value="">Running y trail</option>
-      ${tipos.map(t=>`<option value="${t}"${F.tipo===t?" selected":""}>${t[0].toUpperCase()+t.slice(1)}</option>`).join("")}</select>
-    <button class="chip" id="f-reb" type="button" aria-pressed="${F.rebaja}">Solo en rebaja</button>
-    <button class="ghost" id="f-clr" type="button">Limpiar</button>
-    <span class="f-count"><b>${nf.format(rows.length)}</b> de ${nf.format(ROWS.length)} modelos</span>`;
+  const marcas = [...new Map(ROWS.map(r=>[r.brand_code, r.marca])).entries()]
+    .map(([code,name])=>({value:code, label:name,
+                          count:ROWS.filter(r=>r.brand_code===code).length}))
+    .sort((a,b)=>a.label.localeCompare(b.label,"es"));
+  const tipos = [...new Set(ROWS.map(r=>r.tipo_producto))].sort()
+    .map(t=>({value:t, label:t[0].toUpperCase()+t.slice(1),
+              count:ROWS.filter(r=>r.tipo_producto===t).length}));
+  const competidores = [...new Set(COMP.map(c=>c.competidor))].sort()
+    .map(n=>({value:n, label:n,
+              count:new Set(COMP.filter(c=>c.competidor===n).map(c=>c.modelo)).size}));
+
+  const f = document.createElement("div"); f.className="filters";
+  const lab = document.createElement("span"); lab.className="f-lab"; lab.textContent="Filtrar";
+  f.append(lab);
+  f.append(multiSelect({label:"Marca", options:marcas,
+                        selected:F.marcas, onChange:render}));
+  f.append(multiSelect({label:"Tipo", options:tipos,
+                        selected:F.tipos, onChange:render}));
+  if(competidores.length)
+    f.append(multiSelect({label:"Competidor", options:competidores,
+                          selected:F.competidores, onChange:render}));
+
+  const btnRebaja=document.createElement("button");
+  btnRebaja.className="chip"; btnRebaja.type="button"; btnRebaja.textContent="Solo en rebaja";
+  btnRebaja.setAttribute("aria-pressed", String(F.rebaja));
+  btnRebaja.onclick=()=>{F.rebaja=!F.rebaja; render();};
+  f.append(btnRebaja);
+
+  const btnClear=document.createElement("button");
+  btnClear.className="ghost"; btnClear.type="button"; btnClear.textContent="Limpiar";
+  btnClear.onclick=()=>{F.marcas.clear(); F.tipos.clear(); F.competidores.clear();
+                        F.rebaja=false; render();};
+  f.append(btnClear);
+
+  const cnt=document.createElement("span"); cnt.className="f-count";
+  cnt.innerHTML=`<b>${nf.format(rows.length)}</b> de ${nf.format(ROWS.length)} modelos`;
+  f.append(cnt);
   app.append(f);
-  f.querySelector("#f-marca").onchange=e=>{F.marca=e.target.value; render();};
-  f.querySelector("#f-tipo").onchange =e=>{F.tipo =e.target.value; render();};
-  f.querySelector("#f-reb").onclick   =()=>{F.rebaja=!F.rebaja; render();};
-  f.querySelector("#f-clr").onclick   =()=>{F.marca="";F.tipo="";F.rebaja=false; render();};
 
   if(!rows.length){
     app.insertAdjacentHTML("beforeend",
@@ -645,39 +794,67 @@ function render(){
   /* 2 · Frente a la competencia ------------------------------------------ */
   if(COMP.length){
     const ids = new Set(rows.map(r=>r.modelo));
-    const comp = COMP.filter(c=>ids.has(c.modelo))
-                     .sort((a,b)=>b.delta_pct-a.delta_pct);
+    // Three states, not two: an identical price is a match, not a narrow win.
+    // Compared on cents to avoid float noise making 0,00 € look like a win.
+    const comp = COMP
+      // Respect the competitor filter here too: picking "Nike" should show
+      // Nike's prices, not every price for the models Nike happens to carry.
+      .filter(c=>ids.has(c.modelo) &&
+                 (!F.competidores.size || F.competidores.has(c.competidor)))
+      .map(c=>{
+        const eq = Math.abs(c.delta_eur) < 0.005;
+        return {...c, eq,
+          cls:   eq ? "delta-eq" : (c.delta_eur>0 ? "delta-up" : "delta-dn"),
+          badge: eq ? "igual"    : (c.somos_mas_baratos ? "barato" : "caro"),
+          label: eq ? "igual"    : (c.somos_mas_baratos ? "más barato" : "más caro")};
+      })
+      .sort((a,b)=>b.delta_pct-a.delta_pct);
+    // Group by model, worst gap first, and within a model cheapest rival first.
+    const order = [...new Map(comp.map(c=>[c.modelo, c])).keys()];
+    const rank = new Map(order.map((m,i)=>[m,i]));
+    comp.sort((a,b)=> rank.get(a.modelo)-rank.get(b.modelo)
+                   || a.precio_comp-b.precio_comp);
+    const seen = new Set();
+    comp.forEach(c=>{ c.first = !seen.has(c.modelo); seen.add(c.modelo); });
+    const nComp = new Map();
+    comp.forEach(c=>nComp.set(c.modelo,(nComp.get(c.modelo)||0)+1));
+    comp.forEach(c=>{ c.rivals = nComp.get(c.modelo); });
     const c = document.createElement("section"); c.className="card wide";
     if(!comp.length){
       c.innerHTML=`<h2>Frente a la competencia</h2>
         <p class="sub">Ningún modelo del filtro actual tiene todavía datos de competencia.</p>`;
       grid.append(c); 
     } else {
-      const caros = comp.filter(x=>!x.somos_mas_baratos).length;
+      const caros   = comp.filter(x=>!x.eq && !x.somos_mas_baratos).length;
+      const iguales = comp.filter(x=>x.eq).length;
+      const modelos = new Set(comp.map(x=>x.modelo)).size;
+      const multi   = [...nComp.values()].filter(v=>v>1).length;
       const fuentes = [...new Set(comp.map(x=>x.competidor))];
       const fecha = new Date(Math.max(...comp.map(x=>+new Date(x.observed_at))));
       c.innerHTML=`<h2>Frente a la competencia</h2>
-        <p class="sub">${nf.format(comp.length)} modelos con precio observado en
+        <p class="sub">${nf.format(modelos)} modelos · ${nf.format(comp.length)} precios observados en
         ${fuentes.join(", ")}. Somos más caros en <strong>${nf.format(caros)}</strong>
-        de ${nf.format(comp.length)}. Ordenado por mayor diferencia en contra.</p>`;
+        de ${nf.format(comp.length)}${iguales?`, igualamos el precio en <strong>${nf.format(iguales)}</strong>`:""}${
+        multi?` · ${nf.format(multi)} modelos tienen más de un competidor`:""}.
+        Ordenado por mayor diferencia en contra.</p>`;
       const t=document.createElement("table");
       t.innerHTML=`<thead><tr><th>Modelo</th><th>Forum Sport</th><th>Competencia</th>
         <th>Dif.</th><th>Dif. %</th><th>Posición</th><th>Competidor</th></tr></thead>
-        <tbody>${comp.map(x=>`<tr>
-          <td class="prod-cell"><span class="prod">
+        <tbody>${comp.map(x=>`<tr class="${x.eq?"igual-row ":""}${x.first?"grp-start":"grp-cont"}">
+          ${x.first ? `<td class="prod-cell"><span class="prod">
             <img class="thumb" src="${x.img_thumb}" alt="" loading="lazy" decoding="async"
                  width="46" height="46"
                  onerror="this.setAttribute('data-failed','');this.removeAttribute('src')">
             <span class="prod-name">
               <a href="${x.url_fs}" target="_blank" rel="noopener">${x.nombre_modelo}</a>
-              <small>${x.marca}</small>
-            </span></span></td>
-          <td>${eur2.format(x.precio_fs)}</td>
+              <small>${x.marca}${x.rivals>1?` · ${x.rivals} competidores`:""}</small>
+            </span></span></td>`
+          : `<td class="prod-cell cont-mark">↳</td>`}
+          <td>${x.first?eur2.format(x.precio_fs):""}</td>
           <td><a href="${x.url_comp}" target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a></td>
-          <td class="${x.delta_eur>0?"delta-up":"delta-dn"}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
-          <td class="${x.delta_pct>0?"delta-up":"delta-dn"}">${x.delta_pct>0?"+":""}${nf1.format(x.delta_pct)} %</td>
-          <td><span class="badge ${x.somos_mas_baratos?"barato":"caro"}">${
-            x.somos_mas_baratos?"más barato":"más caro"}</span></td>
+          <td class="${x.cls}">${x.eq?"":(x.delta_eur>0?"+":"")}${eur2.format(x.delta_eur)}</td>
+          <td class="${x.cls}">${x.eq?"":(x.delta_pct>0?"+":"")}${nf1.format(x.delta_pct)} %</td>
+          <td><span class="badge ${x.badge}">${x.label}</span></td>
           <td>${x.competidor}</td></tr>`).join("")}</tbody>`;
       const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
       c.append(w);
