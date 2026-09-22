@@ -28,6 +28,14 @@ jobs:
   crawl:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    # One job per competitor, running concurrently. Different hosts share no
+    # rate limit, so total wall-clock becomes the slowest site rather than the
+    # sum of all of them — and Actions bills wall-clock per job either way.
+    # Never parallelise WITHIN a host: there the crawl delay is the contract.
+    strategy:
+      fail-fast: false
+      matrix:
+        competitor: [atmosfera-sport]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

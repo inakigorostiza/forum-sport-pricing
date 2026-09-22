@@ -26,6 +26,7 @@ neither is touched here. Only public product pages are fetched.
 
 from __future__ import annotations
 
+import pathlib
 import re
 import time
 
@@ -43,6 +44,7 @@ class AdidasFetcher:
         self._last: float | None = None
         self._ctx = None
         self._pw = None
+        self._page = None
         self.pages = 0
         self.errors = 0
         self.gaps: list[float] = []
@@ -61,6 +63,7 @@ class AdidasFetcher:
         self._ctx = self._pw.chromium.launch_persistent_context(
             user_data_dir=PROFILE, channel="chromium",
             headless=False, no_viewport=True, locale="es-ES")
+        self._page = self._ctx.new_page()
 
     def _wait(self):
         if self._last is not None:
@@ -70,10 +73,10 @@ class AdidasFetcher:
             self.gaps.append(round(time.monotonic() - self._last, 2))
         self._last = time.monotonic()
 
-    def get(self, url: str, *, settle_ms: int = 7000, timeout: int = 90000) -> str | None:
+    def get(self, url: str, *, settle_ms: int = 2000, timeout: int = 90000) -> str | None:
         self._start()
         self._wait()
-        pg = self._ctx.new_page()
+        pg = self._page
         try:
             pg.goto(url, wait_until="domcontentloaded", timeout=timeout)
             pg.wait_for_timeout(settle_ms)
@@ -86,22 +89,18 @@ class AdidasFetcher:
         except Exception:
             self.errors += 1
             return None
-        finally:
-            pg.close()
 
     def text(self, url: str, **kw) -> str | None:
         self._start()
         self._wait()
-        pg = self._ctx.new_page()
+        pg = self._page
         try:
             pg.goto(url, wait_until="domcontentloaded", timeout=kw.get("timeout", 90000))
-            pg.wait_for_timeout(kw.get("settle_ms", 6000))
+            pg.wait_for_timeout(kw.get("settle_ms", 3000))
             return pg.evaluate("document.body?.innerText || ''")
         except Exception:
             self.errors += 1
             return None
-        finally:
-            pg.close()
 
     def close(self):
         if self._ctx:
@@ -114,13 +113,25 @@ class AdidasFetcher:
         return round(min(self.gaps), 2) if self.gaps else None
 
 
+SITEMAP_CACHE = pathlib.Path("/tmp/adidas_sitemap.txt")
+SITEMAP_TTL_S = 12 * 3600
+
+
 def discover(fetcher: AdidasFetcher, our_refs: set[str]) -> dict[str, str]:
     """Return {article_code: url} for the products we actually stock.
 
     Their whole catalogue is irrelevant: we only want the intersection, which
     turns a 15.337-page crawl into a few dozen.
     """
-    txt = fetcher.text(SITEMAP)
+    # The sitemap is ~15s to fetch and changes at most daily; re-reading it on
+    # every run is pure overhead during development and repeated crawls.
+    txt = None
+    if SITEMAP_CACHE.exists() and (time.time() - SITEMAP_CACHE.stat().st_mtime) < SITEMAP_TTL_S:
+        txt = SITEMAP_CACHE.read_text(encoding="utf-8")
+    if not txt:
+        txt = fetcher.text(SITEMAP)
+        if txt:
+            SITEMAP_CACHE.write_text(txt, encoding="utf-8")
     if not txt:
         return {}
     found: dict[str, str] = {}
