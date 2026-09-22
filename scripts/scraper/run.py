@@ -55,11 +55,15 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
                  f"checking its crawl policy (robots_status={c['robots_status']}).")
 
     print(f"── {c['name']} · {phase} · delay {c['crawl_delay_s']}s · {c['strategy']}")
+    # Client-rendered shops need a real browser: plain HTTP returns the shell
+    # and the extractor correctly reports "no offers". Patchright is the only
+    # stack tested that is not detected.
     if c["strategy"] == "headless":
-        sys.exit("headless strategy not wired yet — see scraper/headless.py")
-
-    fetcher = PoliteFetcher(float(c["crawl_delay_s"]), ua=UA_HONEST,
-                            use_cache=not no_cache)
+        from scraper.sites.adidas import AdidasFetcher
+        fetcher = AdidasFetcher(float(c["crawl_delay_s"]))
+    else:
+        fetcher = PoliteFetcher(float(c["crawl_delay_s"]), ua=UA_HONEST,
+                                use_cache=not no_cache)
     gtins, mpn_index = load_catalogue(sb)
     print(f"   catalogue: {len(gtins):,} GTIN-13 · {len(mpn_index):,} ref_prov")
 
@@ -74,8 +78,10 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
         # Product URL shape is per shop; without it the crawler burns requests on
         # category pages (Atmósfera) or rejects everything (bergfreunde, /p/, ...).
         pat = re.compile(c["product_url_re"]) if c.get("product_url_re") else None
+        need_brand = c.get("classification") != "Marca"
         urls = [u for u in dict.fromkeys(all_urls)
-                if discover.is_candidate(u, brands, product_re=pat)]
+                if discover.is_candidate(u, brands, product_re=pat,
+                                         require_brand=need_brand)]
         print(f"   sitemap: {len(all_urls):,} URLs → {len(urls):,} candidates")
     else:
         known = sb.select("competitor_products",
@@ -117,9 +123,16 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
             print(f"   {i:>5}/{len(urls)}  matched {len(matched_urls):>4} pages · "
                   f"{len(offers):>5} offers · {el/60:.1f} min", flush=True)
 
-    st = fetcher.stats
-    print(f"   fetched {st.pages} · cached {st.from_cache} · errors {st.errors} · "
-          f"min gap {st.min_gap}s (configured {c['crawl_delay_s']}s)")
+    st = fetcher.stats if hasattr(fetcher, "stats") else None
+    if st is not None:
+        print(f"   fetched {st.pages} · cached {st.from_cache} · errors {st.errors} · "
+              f"min gap {st.min_gap}s (configured {c['crawl_delay_s']}s)")
+    else:                       # the browser fetcher keeps its counters inline
+        print(f"   fetched {fetcher.pages} · errors {fetcher.errors} · "
+              f"min gap {fetcher.min_gap}s (configured {c['crawl_delay_s']}s)")
+        class _S: pass
+        st = _S(); st.pages = fetcher.pages; st.errors = fetcher.errors
+        st.from_cache = 0; st.min_gap = fetcher.min_gap
     print(f"   offers matched {len(offers)} · unmatched discarded {unmatched_offers}")
 
     if dry_run:
@@ -154,6 +167,9 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
     # Rebuild the narrow public slice the landing page reads. Doing it here
     # means the page never joins across the whole offer history, and never
     # needs read access to the private competitor tables.
+    if hasattr(fetcher, "close"):
+        try: fetcher.close()
+        except Exception: pass
     n = sb.rpc("refresh_comparativa_publica")
     print(f"   public comparison refreshed: {n} models")
     return 0

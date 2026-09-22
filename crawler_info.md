@@ -208,6 +208,40 @@ Measured 2026-09-22 by `scripts/scraper/evaluate.py`. "Offers", "GTIN" and
 | Tennis Point | NO SHOE URLS | 7 | 0 | 0 | 0 | 0 | 0 |
 | Helly Hansen | BLOCKED | 0 | 0 | 0 | 0 | 0 | 0 |
 | Puma | BLOCKED | 0 | 0 | 0 | 0 | 0 | 0 |
+### Re-test with a browser (2026-09-23)
+
+`NO STRUCTURED DATA` means *we could not read it*, not *it is not there* — the
+Tradeinn case proved that. So all seven were re-tested with patchright against
+real product pages. One was rescued:
+
+| Site | Rendered result | Conclusion |
+|---|---|---|
+| **Under Armour** | **60 offers, 60 gtin13, 60 mpn** | verdict was wrong — it is client-rendered |
+| Wala | 11 offers, 0 gtin, 0 mpn | reclassify as NO MATCH KEY |
+| RunningXpert | 0 offers | not a rendering problem |
+| Foot Locker | 0 offers | not a rendering problem |
+| Décimas | 0 offers | not a rendering problem |
+| Running Warehouse | 0 offers | not a rendering problem |
+| El Corte Inglés | sitemap unreadable | never got that far |
+
+Under Armour was then crawled in full: 45 candidate pages, **954 offers
+extracted, 0 matched**. Their Spanish store lists training shoes, not the seven
+UA running models we stock. Disabled — the crawl works, the catalogue does not
+overlap.
+
+> **Lesson.** "It renders" and "it is useful" are different results. Rendering
+> fixed the extraction for Under Armour and changed nothing about whether the
+> data was worth having.
+
+Two fixes came out of wiring it up, both general:
+
+- `run.py` now supports `strategy='headless'`, so a client-rendered shop is a
+  configuration change rather than a new module.
+- `is_candidate` no longer requires one of our brand names in the URL when the
+  competitor is a `Marca`. On a brand's own store every product is that brand
+  and the name is usually absent from the path, so the filter was rejecting the
+  entire catalogue — 7.425 sitemap URLs reduced to 0 candidates.
+
 ### What the verdicts mean, and what to do next
 
 | Verdict | Meaning | Next step |

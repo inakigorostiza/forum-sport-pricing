@@ -68,7 +68,8 @@ PRODUCT_URL_RE = re.compile(r"-\d{3,}\.html?$", re.I)
 
 
 def is_candidate(url: str, brands: set[str],
-                 product_re: re.Pattern | None = PRODUCT_URL_RE) -> bool:
+                 product_re: re.Pattern | None = PRODUCT_URL_RE,
+                 require_brand: bool = True) -> bool:
     """Cheap pre-filter: does this URL look like a men's running/trail shoe of a
     brand we actually stock? Wrong guesses cost only one wasted fetch; the EAN
     match later is the real arbiter."""
@@ -79,6 +80,10 @@ def is_candidate(url: str, brands: set[str],
         return False
     if any(w in s for w in EXCLUDE):
         return False
+    # On a brand's own store every product is that brand, and the brand name is
+    # often absent from the path, so requiring it rejects the whole catalogue.
+    if not require_brand:
+        return True
     return any(b in s for b in brands)
 
 
