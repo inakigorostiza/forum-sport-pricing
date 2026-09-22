@@ -20,7 +20,7 @@ each one teaches.
 | `supabase/migrations/` | schema, RLS, views, hardening, image URLs |
 | `index.html` | the landing page (no build step, no dependencies) |
 | `API.md` | endpoints, with responses captured from the live project |
-| `competitors.md` | the competitive landscape, generated from the source list |
+| `competitors.md` | competitor list, transcribed from the source spreadsheet |
 
 ## The data
 
