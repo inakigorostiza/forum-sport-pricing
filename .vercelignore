@@ -1,0 +1,20 @@
+# Vercel serves every file in the deployment, so a static deploy of this repo
+# would publish the whole thing. Only the landing page should be public.
+#
+# The spreadsheet holds Forum Sport's margins, net prices and stock coverage —
+# it must never be downloadable from the deployment URL.
+dataset/
+data/
+
+# Server-side code and schema: no reason to ship them to the browser.
+scripts/
+supabase/
+
+# Project notes and docs stay in the (private) repo.
+*.md
+!index.html
+
+# Local tooling and credential templates.
+.claude/
+.mcp.json
+.env*
