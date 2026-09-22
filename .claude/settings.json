@@ -1,7 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 scripts/extract_dataset.py)"
+      "Bash(python3 scripts/extract_dataset.py)",
+      "Bash(curl -s -L --max-time 20 -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/149.0.0.0 Safari/537.36' https://www.sportsshoes.com/robots.txt)",
+      "Bash(curl -s -L --max-time 20 -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/149.0.0.0 Safari/537.36' https://www.tradeinn.com/robots.txt)",
+      "Bash(grep -nB6 \"^Disallow: /$\")",
+      "Bash(grep -iE \"^user-agent|^disallow: /$|crawl-delay\")",
+      "Bash(curl -s -L --max-time 25 -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/149.0.0.0 Safari/537.36' https://www.atmosferasport.es/1_index_sitemap.xml)",
+      "Bash(curl -s -L --max-time 30 -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/149.0.0.0 Safari/537.36' https://www.atmosferasport.es/1_es_0_sitemap.xml)",
+      "Bash(curl -s -L --max-time 40 -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/149.0.0.0 Safari/537.36' https://www.atmosferasport.es/1_es_1_sitemap.xml)",
+      "Bash(curl -s -L --max-time 40 -A 'Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/149.0.0.0 Safari/537.36' https://www.atmosferasport.es/1_es_0_sitemap.xml)",
+      "Bash(grep -E \"\\\\-[0-9]{4,}$\")",
+      "Bash(shuf -n 12 /tmp/urls.txt)",
+      "Bash(awk '{print length\": \"$0}' /tmp/urls.txt)",
+      "Bash(python3 -c ' *)"
     ]
   }
 }

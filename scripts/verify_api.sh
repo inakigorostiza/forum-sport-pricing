@@ -60,6 +60,25 @@ w "models?modelo=eq.1001142170" PATCH '{"precio":1}'
 w "brands" DELETE
 
 echo
+echo "== Competitor data must NOT be public (anon) =="
+priv() {
+  local status
+  status=$(curl -s -o /dev/null -w '%{http_code}' "${AUTH[@]}" "${SUPABASE_URL}/rest/v1/$1?select=*&limit=1")
+  case "$status" in
+    401|403|404) printf 'PASS  %-30s private [%s]\n' "$1" "$status" ;;
+    *) printf 'FAIL  %-30s READABLE BY ANON [%s]\n' "$1" "$status"; fails=$((fails + 1)) ;;
+  esac
+}
+priv competitors
+priv competitor_products
+priv competitor_offers
+priv crawl_log
+priv v_comparativa_precios
+priv v_posicion_precio
+priv v_precio_actual_competencia
+priv v_cobertura_competencia
+
+echo
 echo "== Data must be unchanged after those attempts =="
 num() { sed -n "s/.*\"$1\":\([0-9][0-9]*\).*/\1/p" <<<"$2" | head -n1; }
 kpis=$(curl -s "${AUTH[@]}" "${SUPABASE_URL}/rest/v1/v_kpis")

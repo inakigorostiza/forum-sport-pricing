@@ -1,0 +1,64 @@
+name: Competitor price monitoring
+
+# Two phases, because a daily full crawl does not fit the Actions allowance
+# (a full Atmósfera sitemap pass is ~1.000 minutes; the budget is 2.000/month):
+#   discover — weekly, walks the sitemap and finds which pages match our catalogue
+#   refresh  — daily, re-fetches only those known-relevant pages (~1 minute each)
+on:
+  schedule:
+    - cron: "0 4 * * 1"     # Mondays 04:00 UTC — discover
+    - cron: "0 5 * * *"     # daily 05:00 UTC   — refresh
+  workflow_dispatch:
+    inputs:
+      competitor:
+        description: Competitor slug
+        default: atmosfera-sport
+      phase:
+        description: discover | refresh
+        default: refresh
+      limit:
+        description: Max pages (blank = no limit)
+        default: ""
+
+concurrency:
+  group: scrape-${{ github.ref }}
+  cancel-in-progress: false      # never run two crawls at the same host at once
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet certifi openpyxl
+
+      - name: Decide phase
+        id: cfg
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "phase=${{ inputs.phase }}"            >> "$GITHUB_OUTPUT"
+            echo "competitor=${{ inputs.competitor }}"  >> "$GITHUB_OUTPUT"
+            echo "limit=${{ inputs.limit }}"            >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 4 * * 1" ]; then
+            echo "phase=discover"       >> "$GITHUB_OUTPUT"
+            echo "competitor=atmosfera-sport" >> "$GITHUB_OUTPUT"
+            echo "limit=1200"           >> "$GITHUB_OUTPUT"
+          else
+            echo "phase=refresh"        >> "$GITHUB_OUTPUT"
+            echo "competitor=atmosfera-sport" >> "$GITHUB_OUTPUT"
+            echo "limit="               >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Crawl
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python3 scripts/scraper/run.py \
+            --competitor "${{ steps.cfg.outputs.competitor }}" \
+            --phase "${{ steps.cfg.outputs.phase }}" \
+            --no-cache \
+            ${{ steps.cfg.outputs.limit && format('--limit {0}', steps.cfg.outputs.limit) || '' }}

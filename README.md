@@ -19,6 +19,8 @@ each one teaches.
 | `scripts/verify_api.sh` | REST + RLS checks with the public key |
 | `supabase/migrations/` | schema, RLS, views, hardening, image URLs |
 | `index.html` | the landing page (no build step, no dependencies) |
+| `scripts/scraper/` | competitor price-scraping agent |
+| `SCRAPING.md` | what is crawled, how politely, and how to add a site |
 | `API.md` | endpoints, with responses captured from the live project |
 | `competitors.md` | competitor list, transcribed from the source spreadsheet |
 

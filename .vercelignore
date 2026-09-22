@@ -18,3 +18,4 @@ supabase/
 .claude/
 .mcp.json
 .env*
+.github/
