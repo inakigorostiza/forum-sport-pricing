@@ -17,6 +17,7 @@ the price history stays intact and any repricing decision is traceable.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -70,7 +71,11 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
             sys.exit(f"{competitor} has no sitemap_url configured.")
         all_urls = discover.sitemap_urls(fetcher, c["sitemap_url"])
         brands = discover.brand_slugs([b["name"] for b in sb.select("brands", select="name")])
-        urls = [u for u in dict.fromkeys(all_urls) if discover.is_candidate(u, brands)]
+        # Product URL shape is per shop; without it the crawler burns requests on
+        # category pages (Atmósfera) or rejects everything (bergfreunde, /p/, ...).
+        pat = re.compile(c["product_url_re"]) if c.get("product_url_re") else None
+        urls = [u for u in dict.fromkeys(all_urls)
+                if discover.is_candidate(u, brands, product_re=pat)]
         print(f"   sitemap: {len(all_urls):,} URLs → {len(urls):,} candidates")
     else:
         known = sb.select("competitor_products",

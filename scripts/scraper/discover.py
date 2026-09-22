@@ -8,8 +8,10 @@ or trail shoe before any product page is fetched.
 
 from __future__ import annotations
 
+import gzip
 import re
 import unicodedata
+import urllib.request
 
 # Sitemap <loc> values, whether or not wrapped in CDATA.
 LOC_RE = re.compile(r"<loc>\s*(?:<!\[CDATA\[)?\s*(.*?)\s*(?:\]\]>)?\s*</loc>", re.S | re.I)
@@ -28,9 +30,22 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s)
 
 
+def _read(fetcher, url: str) -> str | None:
+    """Sitemaps are often gzipped, which the HTML fetcher cannot decode."""
+    if url.endswith(".gz"):
+        from .fetch import SSL, UA_BROWSER
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA_BROWSER})
+            with urllib.request.urlopen(req, timeout=40, context=SSL) as r:
+                return gzip.decompress(r.read()).decode("utf-8", "ignore")
+        except Exception:
+            return None
+    return fetcher.get(url, timeout=60)
+
+
 def sitemap_urls(fetcher, sitemap_url: str, *, max_children: int = 12) -> list[str]:
     """Walk a sitemap (or sitemap index) and return every <loc> found."""
-    xml = fetcher.get(sitemap_url)
+    xml = _read(fetcher, sitemap_url)
     if not xml:
         return []
     locs = [m.group(1).strip() for m in LOC_RE.finditer(xml)]
@@ -39,7 +54,7 @@ def sitemap_urls(fetcher, sitemap_url: str, *, max_children: int = 12) -> list[s
 
     out: list[str] = []
     for child in [u for u in locs if u.endswith((".xml", ".xml.gz"))][:max_children]:
-        child_xml = fetcher.get(child)
+        child_xml = _read(fetcher, child)
         if child_xml:
             out.extend(m.group(1).strip() for m in LOC_RE.finditer(child_xml))
     return out

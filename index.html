@@ -122,6 +122,11 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 @media(min-width:700px){ .kpis{grid-template-columns:repeat(3,1fr)} }
 @media(min-width:1050px){ .kpis{grid-template-columns:repeat(6,1fr)} }
 .kpi{background:var(--surface); padding:16px 16px 18px}
+/* Secondary row: same grid, quieter, for the catalogue context beneath the
+   competitive headline. */
+.kpis-sec{margin-top:-22px; margin-bottom:34px}
+.kpis-sec .k-val{font-size:20px; font-weight:600}
+.kpis-sec .k-label{font-size:10px}
 .kpi .k-label{font-size:11px; letter-spacing:.07em; text-transform:uppercase;
   color:var(--muted); font-weight:650; margin:0 0 7px}
 .kpi .k-val{font-size:27px; font-weight:600; letter-spacing:-.02em; margin:0; color:var(--ink)}
@@ -855,33 +860,92 @@ function render(){
         F.q?` · búsqueda «${F.q}»`:""}.</div>`); return;
   }
 
-  /* hero + kpis ------------------------------------------------------ */
-  const reb=rows.filter(r=>r.en_rebaja);
-  const stockBajo=rows.filter(r=>r.nivel_stock==="muy bajo"||r.nivel_stock==="bajo");
-  const pctReb=reb.length/rows.length*100;
+  /* hero + kpis · Forum Sport frente a la competencia ------------------ */
+  // Compared at MODEL level against the cheapest rival for that model, so a
+  // product watched at three shops counts once, not three times.
+  const ids0 = new Set(rows.map(r=>r.modelo));
+  const barato = new Map();
+  for(const c of COMP){
+    if(!ids0.has(c.modelo)) continue;
+    if(!F.competidores.size || F.competidores.has(c.competidor)){
+      const prev = barato.get(c.modelo);
+      if(!prev || c.precio_comp < prev.precio_comp) barato.set(c.modelo, c);
+    }
+  }
+  const vs        = [...barato.values()];
+  const esIgual   = x => Math.abs(x.delta_eur) < 0.005;
+  const caros     = vs.filter(x=>!esIgual(x) && x.delta_eur > 0);
+  const baratos   = vs.filter(x=>!esIgual(x) && x.delta_eur < 0);
+  const iguales0  = vs.filter(esIgual);
+  const rivales   = new Set(vs.map(x=>x.competidor)).size;
+  const gapMedio  = vs.length ? vs.reduce((s,x)=>s+x.delta_pct,0)/vs.length : 0;
+  const peor      = vs.length ? vs.reduce((a,b)=>b.delta_pct>a.delta_pct?b:a) : null;
+
   const hero=document.createElement("div"); hero.className="hero";
-  hero.innerHTML=`<p class="hero-fig">${nf1.format(pctReb)} %</p>
-    <div class="hero-cap">
-      <p class="lede">de los modelos se venden por debajo de su PVP.</p>
-      <p>Al mismo tiempo <strong>${pct(stockBajo.length/rows.length*100)}</strong> del catálogo
-      está en nivel de stock bajo o muy bajo. Rebajar lo que apenas queda en almacén es margen
-      regalado: ahí empieza el trabajo de una calculadora de precio dinámico.</p>
-    </div>`;
+  if(vs.length){
+    const pctCaros = caros.length/vs.length*100;
+    hero.innerHTML=`<p class="hero-fig">${nf1.format(pctCaros)} %</p>
+      <div class="hero-cap">
+        <p class="lede">de los modelos comparados son más caros en Forum Sport
+        que en el competidor más barato.</p>
+        <p>Sobre <strong>${nf.format(vs.length)}</strong> modelos con precio observado en
+        <strong>${nf.format(rivales)}</strong> competidor${rivales===1?"":"es"}, la diferencia media es de
+        <strong>${gapMedio>0?"+":""}${nf1.format(gapMedio)} %</strong>${peor&&peor.delta_pct>0?
+        ` y la mayor brecha es <strong>${peor.nombre_modelo}</strong>, ${nf1.format(peor.delta_pct)} %
+        por encima de ${peor.competidor}`:""}. Ahí es donde una calculadora de precio dinámico
+        tiene margen para actuar.</p>
+      </div>`;
+  } else {
+    // Nothing crawled for this slice: fall back to the catalogue story.
+    const pctReb0 = rows.filter(r=>r.en_rebaja).length/rows.length*100;
+    hero.innerHTML=`<p class="hero-fig">${nf1.format(pctReb0)} %</p>
+      <div class="hero-cap">
+        <p class="lede">de los modelos se venden por debajo de su PVP.</p>
+        <p>Todavía no hay precios de competencia para este filtro, así que la
+        comparativa no puede calcularse sobre esta selección.</p>
+      </div>`;
+  }
   app.append(hero);
 
-  const margenMedio=avg(rows,r=>r.margen);
-  const kpis=[
+  const reb=rows.filter(r=>r.en_rebaja);
+  const share = n => vs.length ? pct(n/vs.length*100) : "—";
+  const kpis = vs.length ? [
+    ["Modelos comparados", nf.format(vs.length),
+     `${pct(vs.length/rows.length*100)} del catálogo filtrado`],
+    ["Competidores", nf.format(rivales), "con precio observado"],
+    ["Más caros", nf.format(caros.length), share(caros.length)],
+    ["Más baratos", nf.format(baratos.length), share(baratos.length)],
+    ["Mismo precio", nf.format(iguales0.length), share(iguales0.length)],
+    ["Diferencia media", `${gapMedio>0?"+":""}${nf1.format(gapMedio)} %`,
+     "frente al más barato"],
+  ] : [
     ["Modelos", nf.format(rows.length), `${nf.format(rows.reduce((s,r)=>s+r.num_skus,0))} SKU`],
     ["Marcas", nf.format(new Set(rows.map(r=>r.brand_code)).size), "en el catálogo"],
     ["PVP medio", eur.format(avg(rows,r=>r.precio)), "precio de tarifa"],
     ["Precio medio real", eur.format(avg(rows,r=>r.precio_rebaja)), "tras rebaja"],
     ["Descuento medio", reb.length?pct(avg(reb,r=>r.descuento_pct)):"—", "de los rebajados"],
-    ["Margen medio", pct(margenMedio*100), "sintético"],
+    ["Margen medio", pct(avg(rows,r=>r.margen)*100), "sintético"],
   ];
   const k=document.createElement("div"); k.className="kpis";
-  k.innerHTML=kpis.map(([l,v,s])=>
-    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${s}</p></div>`).join("");
+  k.innerHTML=kpis.map(([l,v,sub])=>
+    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
   app.append(k);
+
+  // The catalogue figures the competitive view replaced, kept as a second row:
+  // they are the context for every chart below.
+  const cat=document.createElement("div"); cat.className="kpis kpis-sec";
+  cat.innerHTML=[
+    ["Modelos", nf.format(rows.length), `${nf.format(rows.reduce((s,r)=>s+r.num_skus,0))} SKU`],
+    ["PVP medio", eur.format(avg(rows,r=>r.precio)), "precio de tarifa"],
+    ["Precio medio real", eur.format(avg(rows,r=>r.precio_rebaja)), "tras rebaja"],
+    ["En rebaja", pct(reb.length/rows.length*100), `${nf.format(reb.length)} modelos`],
+    ["Margen medio", pct(avg(rows,r=>r.margen)*100), "sintético"],
+    ["Stock bajo o muy bajo",
+     pct(rows.filter(r=>r.nivel_stock==="muy bajo"||r.nivel_stock==="bajo").length/rows.length*100),
+     "del catálogo"],
+  ].map(([l,v,sub])=>
+    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
+  if(vs.length) app.append(cat);
 
   const grid=document.createElement("div"); grid.className="grid"; app.append(grid);
 
