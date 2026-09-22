@@ -51,6 +51,20 @@ POLICY = {
                             notes="robots.txt allows crawling; Cloudflare challenges everything else. "
                                   "Headless passes for HTML, but sitemap_*.xml.gz stays 403 and product "
                                   "links are JS-rendered. Needs a custom discovery module before enabling."),
+    # adidas: Akamai Bot Manager. Tested 2026-09-22 — plain HTTP, real Chrome,
+    # and Chrome + puppeteer stealth ALL get 403 on product pages, including on
+    # URLs taken from adidas's own product sitemap. Their robots.txt actually
+    # ALLOWS product pages (`Allow: /*/*.html*`); the WAF is what refuses.
+    # What IS reachable: the sitemap index and the product sitemap (15.337 URLs),
+    # so the catalogue can be enumerated even though prices cannot be read.
+    # Do not escalate evasion — use an affiliate feed or a data provider instead.
+    "adidas":          dict(strategy="headless", crawl_delay_s=10.0,
+                            robots_status="akamai_waf",
+                            sitemap_url="https://www.adidas.es/glass/sitemaps/adidas/ES/es/sitemap-index.xml",
+                            notes="Akamai WAF blocks product pages from any automated browser "
+                                  "(stealth included). robots.txt permits them; the WAF does not. "
+                                  "Sitemap is readable. Prices need an affiliate feed or a "
+                                  "commercial data provider, not scraping."),
     "i-run":           dict(strategy="headless", crawl_delay_s=6.0, robots_status="blocked_403",
                             notes="Returns 403 on robots.txt itself. Headless per client decision; keep volume minimal."),
 }
