@@ -264,7 +264,11 @@ th,td{text-align:right; padding:7px 8px; border-bottom:1px solid var(--rule);
   font-variant-numeric:tabular-nums}
 th:first-child,td:first-child{text-align:left; font-variant-numeric:normal}
 th{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
-  font-weight:650; border-bottom:1px solid var(--axis)}
+  font-weight:650; border-bottom:1px solid var(--axis);
+  /* "Dif. %" and the currency cells were breaking across two lines. */
+  white-space:nowrap}
+td{white-space:nowrap}
+td.prod-cell{white-space:normal}
 tbody tr:hover{background:color-mix(in srgb, var(--accent) 6%, transparent)}
 td a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--axis)}
 td a:hover{color:var(--accent); border-color:var(--accent)}
@@ -301,6 +305,9 @@ td.cont-mark{color:var(--muted); font-size:12px}
 .delta-up{color:var(--s2); font-weight:700}
 .delta-dn{color:var(--good); font-weight:700}
 .delta-eq{color:var(--s1); font-weight:700}
+/* Marks the cheapest price for a product, across us and every rival. */
+.star{color:var(--s2); font-weight:700; margin-right:4px; font-size:13px}
+td.best{font-weight:700}
 .edad{color:var(--muted); font-size:12px; white-space:nowrap}
 .edad.stale{color:var(--s2)}
 .comp-note{
@@ -1040,6 +1047,18 @@ function render(){
     const nComp = new Map();
     comp.forEach(c=>nComp.set(c.modelo,(nComp.get(c.modelo)||0)+1));
     comp.forEach(c=>{ c.rivals = nComp.get(c.modelo); });
+    // The star marks the cheapest price for that product across us AND every
+    // rival — so it answers "who is actually cheapest", not "which rival is".
+    const mejorComp = new Map();
+    comp.forEach(c=>{
+      const prev = mejorComp.get(c.modelo);
+      if(prev === undefined || c.precio_comp < prev) mejorComp.set(c.modelo, c.precio_comp);
+    });
+    comp.forEach(c=>{
+      const mc = mejorComp.get(c.modelo);
+      c.fsGana   = c.precio_fs <= mc;                              // we are cheapest
+      c.compGana = !c.fsGana && Math.abs(c.precio_comp - mc) < 0.005; // this rival is
+    });
     const c = document.createElement("section"); c.className="card wide";
     if(!comp.length){
       c.innerHTML=`<h2>Frente a la competencia</h2>
@@ -1072,8 +1091,12 @@ function render(){
               <small>${x.marca}${x.rivals>1?` · ${x.rivals} competidores`:""}</small>
             </span></span></td>`
           : `<td class="prod-cell cont-mark">↳</td>`}
-          <td>${x.first?eur2.format(x.precio_fs):""}</td>
-          <td><a href="${x.url_comp}" target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a></td>
+          <td class="${x.first&&x.fsGana?"best":""}">${x.first
+            ? `${x.fsGana?'<span class="star" title="Precio más bajo">★</span>':""}${eur2.format(x.precio_fs)}`
+            : ""}</td>
+          <td class="${x.compGana?"best":""}">${x.compGana
+            ? '<span class="star" title="Precio más bajo">★</span>':""}<a href="${x.url_comp}"
+            target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a></td>
           <td class="${x.cls}">${x.eq?"":(x.delta_eur>0?"+":"")}${eur2.format(x.delta_eur)}</td>
           <td class="${x.cls}">${x.eq?"":(x.delta_pct>0?"+":"")}${nf1.format(x.delta_pct)} %</td>
           <td><span class="badge ${x.badge}">${x.label}</span></td>
@@ -1083,7 +1106,8 @@ function render(){
       const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
       c.append(w);
       const note=document.createElement("p"); note.className="comp-note";
-      note.textContent=`Precio más bajo observado por modelo. Última lectura: `
+      note.textContent=`★ marca el precio más bajo de cada producto, contando el nuestro. `
+        + `Precio más bajo observado por competidor. Última lectura: `
         + fecha.toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"})
         + `. El precio de la competencia enlaza a su ficha.`;
       c.append(note);
