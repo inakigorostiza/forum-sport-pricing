@@ -73,12 +73,15 @@ class AdidasFetcher:
             self.gaps.append(round(time.monotonic() - self._last, 2))
         self._last = time.monotonic()
 
-    def get(self, url: str, *, settle_ms: int = 2000, timeout: int = 90000) -> str | None:
+    def get(self, url: str, *, settle_ms: int = 2000, timeout: int = 90) -> str | None:
+        """`timeout` is SECONDS, matching PoliteFetcher. Playwright wants
+        milliseconds; keeping its unit here made discover.sitemap_urls (which
+        passes timeout=60) time out after 60 ms and report an empty sitemap."""
         self._start()
         self._wait()
         pg = self._page
         try:
-            pg.goto(url, wait_until="domcontentloaded", timeout=timeout)
+            pg.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
             pg.wait_for_timeout(settle_ms)
             html = pg.content()
             if re.search(r"WAFfailover|problema de seguridad|Error de referencia", html, re.I):
@@ -95,7 +98,7 @@ class AdidasFetcher:
         self._wait()
         pg = self._page
         try:
-            pg.goto(url, wait_until="domcontentloaded", timeout=kw.get("timeout", 90000))
+            pg.goto(url, wait_until="domcontentloaded", timeout=kw.get("timeout", 90) * 1000)
             pg.wait_for_timeout(kw.get("settle_ms", 3000))
             return pg.evaluate("document.body?.innerText || ''")
         except Exception:

@@ -1,145 +1,228 @@
-# Crawler info · guía por competidor
+# Crawler info — a per-competitor guide
 
-Cómo se rastrea cada competidor, por qué de esa forma, y qué hace falta para
-repetirlo. Escrito para que otra persona —o el mismo proceso dentro de seis
-meses, cuando un sitio haya cambiado— pueda reproducir o reparar el rastreo sin
-volver a investigarlo desde cero.
+How each competitor is crawled, why that way, and what it takes to repeat it.
+Written so that someone else — or this same project in six months, once a site
+has changed — can reproduce or repair a crawl without researching it again.
 
-> Estado de los datos y resultados por competidor: ver la tabla al final.
-> El detalle de accesibilidad y políticas está en [SCRAPING.md](SCRAPING.md).
+Access policies and politeness rules live in [SCRAPING.md](SCRAPING.md); the
+build narrative is in [activities.md](activities.md).
 
 ---
 
-## El procedimiento, en cinco preguntas
+## The procedure: five questions
 
-Cada sitio se evalúa con las mismas cinco preguntas, en este orden. Está
-automatizado en `scripts/scraper/evaluate.py`, que escribe el resultado en
-`data/evaluation.json`.
+Every site is assessed with the same five questions, in this order. It is
+automated in `scripts/scraper/evaluate.py`, which writes `data/evaluation.json`.
 
 ```bash
-python3 scripts/scraper/evaluate.py                    # todos los pendientes
-python3 scripts/scraper/evaluate.py --only wala,base   # concretos
+python3 scripts/scraper/evaluate.py                    # every unevaluated site
+python3 scripts/scraper/evaluate.py --only wala,base   # named sites
+python3 scripts/scraper/evaluate.py --no-browser       # skip the patchright retry
 ```
 
-| # | Pregunta | Cómo se responde | Si falla |
+| # | Question | How it is answered | Verdict if it fails |
 |---|---|---|---|
-| 1 | ¿Responde `robots.txt` a un cliente HTTP? | GET con User-Agent de navegador | reintento con patchright; si tampoco, `BLOQUEADO` |
-| 2 | ¿Declara sitemap y se puede leer? | líneas `Sitemap:` de robots.txt | `SIN SITEMAP` → habría que descubrir por categorías |
-| 3 | ¿Hay URLs que parezcan zapatillas? | filtro por palabras en el slug | `SIN CANDIDATOS` |
-| 4 | ¿La ficha lleva datos estructurados? | `extract.py` sobre 6 fichas | `SIN DATOS ESTRUCTURADOS` (suele ser JS) |
-| 5 | ¿Algo empareja con nuestro catálogo? | `gtin13` ∈ EANs, o `mpn` base ∈ `ref_prov` | `SIN CLAVE` o `sin coincidencias` |
+| 1 | Does `robots.txt` come back to an HTTP client? | GET with a browser User-Agent | retry with patchright, else `BLOCKED` |
+| 2 | Does it declare a readable sitemap? | `Sitemap:` lines in robots.txt | `NO SITEMAP` / `SITEMAP UNREADABLE` |
+| 3 | Are there URLs that look like running shoes? | keyword filter on the slug | `NO SHOE URLS` |
+| 4 | Does a product page carry structured data? | `extract.py` over 6 pages | `NO STRUCTURED DATA` |
+| 5 | Does anything match our catalogue? | `gtin13` ∈ our EANs, or `mpn` base ∈ `ref_prov` | `NO MATCH KEY` / `no matches in sample` |
 
-**El orden importa.** Cada paso es más caro que el anterior, así que un sitio
-que falla en el paso 1 nunca llega a costar una descarga de sitemap de 24 MB.
+**The order matters.** Each step costs more than the last, so a site that fails
+at step 1 never triggers a 24 MB sitemap download.
 
----
-
-## Las dos claves de emparejamiento
-
-Todo el sistema depende de poder decir «este producto suyo es este producto
-nuestro». Hay exactamente dos formas, y conviene no confundirlas.
-
-### EAN / GTIN-13 — exacta, a nivel de talla
-
-La preferida. 24.108 de nuestros 24.109 SKU llevan un código GS1 resoluble, y
-la mayoría de tiendas publican `gtin13` en su JSON-LD.
-
-**La trampa que lo rompe todo en silencio:** el 50,7 % de nuestros EAN están
-guardados como UPC de 12 dígitos y el resto como EAN de 13. Los competidores
-publican 13. Un `join` directo perdería la mitad del catálogo sin dar ningún
-error. Por eso ambos lados se normalizan a 13 dígitos —`skus.gtin13` es una
-columna generada, y `extract.py:gtin13()` hace lo mismo con lo rastreado.
-
-> En el primer rastreo real, **20 de 26 modelos emparejados vinieron por EAN de
-> 12 dígitos**. Sin el relleno habrían sido 6.
-
-### Código de artículo — a nivel de modelo
-
-Para marcas que no publican GTIN (adidas, Nike). El código del fabricante
-—`GW4139`, `HV8116`— coincide con nuestro `models.ref_prov`.
-
-- **adidas:** el código es el último segmento de la URL
-  (`/zapatilla-galaxy-6/GW4139.html`). Permite filtrar *antes* de descargar.
-- **Nike:** la URL no lo lleva (slugs opacos). El `mpn` del JSON-LD es
-  `estilo-color` (`HV8116-001`); se corta por el guion. Una ficha de Nike lista
-  varios colores, así que una descarga puede emparejar varios modelos nuestros.
-
-La vista `v_ofertas_emparejadas` guarda `match_method` en cada oferta, para que
-una coincidencia a nivel de modelo no se confunda nunca con una exacta por talla.
+**Never judge a site on a small sample.** See the lessons below: two sites I
+declared dead on 5 pages are now the second and fifth largest data sources.
 
 ---
 
-## Dos formas de descargar
+## The two matching keys
+
+Everything depends on being able to say *this product of theirs is this product
+of ours*. There are exactly two ways, and they must not be confused.
+
+### EAN / GTIN-13 — exact, at size level
+
+The preferred key. 24.108 of our 24.109 SKUs carry a resolvable GS1 code, and
+most shops publish `gtin13` in their JSON-LD.
+
+**The trap that breaks everything silently:** 50,7 % of our EANs are stored as
+12-digit UPCs and the rest as 13-digit EANs, while competitors publish 13. A
+direct join would drop half the catalogue without raising a single error. Both
+sides are normalised to 13 digits — `skus.gtin13` is a generated column, and
+`extract.py:gtin13()` does the same to scraped values.
+
+> In the first real crawl, **20 of 26 matched models came through 12-digit
+> EANs**. Without the padding it would have been 6.
+
+### Article code — model level
+
+For brands that publish no GTIN (adidas, Nike). The manufacturer code —
+`GW4139`, `HV8116` — is what our catalogue stores as `models.ref_prov`.
+
+- **adidas:** the code is the last path segment of the URL
+  (`/zapatilla-galaxy-6/GW4139.html`), so the crawl set can be narrowed to our
+  catalogue *before* fetching anything — 66 pages instead of 15.337.
+- **Nike:** the URL carries no code (opaque slugs). The JSON-LD `mpn` is
+  `style-colour` (`HV8116-001`), split at the dash. One Nike page lists every
+  colourway of a style, so a single fetch can match several of our models.
+
+`v_ofertas_emparejadas` records `match_method` on every offer, so a model-level
+article-code match is never silently conflated with a size-exact GTIN match.
+
+---
+
+## The two fetchers
 
 ### Plain HTTP — `scraper/fetch.py`
 
-Por defecto. Un request cada vez por host, nunca más rápido que `crawl_delay_s`,
-`robots.txt` respetado, User-Agent identificable, y cada error registrado (nunca
-silenciado: un fallo tragado es indistinguible de «esta ficha no tenía ofertas»).
+The default, and what most sites need. One request at a time per host, never
+faster than `crawl_delay_s`, `robots.txt` honoured, an identifiable User-Agent,
+and every failure recorded — never swallowed, because a silent error is
+indistinguishable from "this page had no offers".
 
 ### Patchright — `scraper/sites/adidas.py`
 
-Solo donde hace falta. Playwright normal **es detectado**; patchright lanzado
-como contexto persistente sin flags de automatización, no.
+Only where it is required. Ordinary Playwright **is detected**; patchright
+launched as a persistent context with no automation flags is not.
 
 ```bash
 pip install patchright && python3 -m patchright install chromium
 ```
 
-Probado contra adidas: HTTP plano, Chrome headless real y Chrome con el plugin
-stealth de puppeteer **los tres reciben 403**; patchright pasa.
+Tested against adidas: plain HTTP, real headless Chrome, and Chrome with
+puppeteer's stealth plugin **all receive 403**; patchright passes.
+
+> `timeout` is in **seconds** in both fetchers. Playwright natively wants
+> milliseconds, and keeping its unit here made `discover.sitemap_urls` — which
+> passes `timeout=60` — time out after 60 ms and report every sitemap as
+> unreachable. That single unit mismatch produced 28 wrong verdicts.
 
 ---
 
-## Lecciones que costaron tiempo
+## Per-competitor configuration
 
-**Un sitio no se descarta con 5 páginas de muestra.** Di por descartados
-Bergfreunde y Top4Running con 0 coincidencias en 5 fichas. A 300 páginas son el
-segundo y el quinto competidor con más datos (1.120 y 769 ofertas). **Mínimo
-100 páginas antes de concluir nada.** Viladomat sí está descartado: 0 de 300.
+Everything that differs per shop lives in the `competitors` table, so adding a
+site is configuration rather than code:
 
-**«Sin datos estructurados» era un bug mío.** `_ld_nodes` solo aplanaba
-`@graph`, así que un `Product` anidado en `WebPage.mainEntity` era invisible.
-Es exactamente como publica Tradeinn —el competidor más grande de la lista— que
-pasó de «no tiene datos» a 9 ofertas con 9 GTIN al arreglarlo. Ahora también
-desciende por `mainEntity`, `mainEntityOfPage`, `itemListElement` e `item`.
+| Column | Purpose |
+|---|---|
+| `sitemap_url` | the sitemap **robots.txt actually declares** — never a guess |
+| `product_url_re` | regex a URL must match to be a product page |
+| `crawl_delay_s` | minimum gap between requests; honours published `Crawl-delay` |
+| `strategy` | `sitemap_jsonld` (plain HTTP) or `headless` (patchright) |
+| `enabled` | opt-in; a site is never crawled until deliberately switched on |
 
-**`robots.txt` legible no significa sitio accesible.** Decathlon publica un
-`robots.txt` permisivo con `Crawl-delay` y devuelve 403 en la portada. La
-política declarada y lo que el WAF permite son cosas distintas.
+URL shapes differ more than expected, which is why `product_url_re` exists:
 
-**El volumen de la lista de origen no predice nada.** Atmósfera tiene 10.461
-registros y da 26 modelos; Bergfreunde tiene 1.808 y da 73.
+| Shop | Product URL shape | Pattern |
+|---|---|---|
+| Atmósfera Sport | `/brand/slug-99173.html` | `-\d{3,}\.html?$` |
+| Tradeinn | `/runnerinn/es/slug/143155557/p` | `/\d+/p$` |
+| Top4Running, 11teamsports | `/p/slug` | `/p/` |
+| Bergfreunde | `/slug/` | `^https://www\.bergfreunde\.es/[^/]+/$` |
+| i-Run | `/…/Trailtalon-Speed_fiche_143095.html` | `_fiche_\d+\.html$` |
+| Viladomat | `/es/product/slug` | `/product/` |
 
-**Cada tienda da forma distinta a sus URLs de ficha.** Por eso existe
-`competitors.product_url_re`: sin él el rastreador descarga páginas de categoría
-(Atmósfera) o rechaza todo (`/p/`, `/product/`, barra final).
-
----
-
-## Cómo añadir un competidor nuevo
-
-1. `python3 scripts/scraper/evaluate.py --only <slug>` y leer el veredicto.
-2. Anotar la política en `scripts/seed_competitors.py:POLICY` y re-sembrar.
-3. Configurar en la tabla `competitors`: `sitemap_url` (el que declara
-   robots.txt, no uno adivinado), `product_url_re`, `crawl_delay_s`, `strategy`.
-4. Guardar una ficha en `scraper/fixtures/` y añadir un caso a `test_extract.py`,
-   para que el extractor quede cubierto sin red.
-5. `--limit 8 --dry-run`, revisar, y solo entonces `enabled = true`.
-6. Primer rastreo real con `--limit 300` y medir la tasa de coincidencia.
+Without it the crawler either burns requests on category pages (Atmósfera) or
+rejects everything (`/p/`, trailing slash).
 
 ---
 
-## Coste
+## Adding a competitor
 
-| | Páginas | A 2 s |
-|---|--:|--:|
-| Sitemap completo de Atmósfera | 31.393 | ~1.046 min |
-| Subconjunto running/trail | ~2.000 | ~70 min |
-| Solo lo que empareja (refresco diario) | ~600 | ~20 min |
+1. `python3 scripts/scraper/evaluate.py --only <slug>` and read the verdict.
+2. Record the policy in `scripts/seed_competitors.py:POLICY`, then re-seed.
+3. Configure `sitemap_url`, `product_url_re`, `crawl_delay_s`, `strategy`.
+4. Save a page under `scraper/fixtures/` and add a case to `test_extract.py`,
+   so the extractor is covered without touching the network.
+5. `--limit 8 --dry-run`, inspect, and only then set `enabled = true`.
+6. First real crawl at `--limit 300`, and measure the match rate.
 
-De ahí las dos fases: `discover` semanal reduce el sitemap a candidatos y marca
-`is_relevant`; `refresh` diario solo vuelve a por esos. GitHub Actions da 2.000
-min/mes en repo privado, y la matriz del workflow rastrea competidores en
-paralelo —hosts distintos no comparten límite—. **Nunca en paralelo dentro de un
-mismo host: ahí el `crawl_delay` es justamente el compromiso.**
+---
+
+## Lessons that cost time
+
+**A 5-page sample proves nothing.** I wrote off Bergfreunde and Top4Running on
+5 pages with 0 matches. At 300 pages they are the second and fifth largest
+sources (1.120 and 769 offers). **Use at least 100 pages before concluding
+anything.** Viladomat is genuinely dead — 0 from 300.
+
+**"No structured data" was my own bug.** `_ld_nodes` only flattened `@graph`, so
+a `Product` nested inside `WebPage.mainEntity` was invisible. That is exactly how
+Tradeinn publishes — the largest competitor on the list — which went from "no
+data" to 9 offers with 9 GTINs the moment it was fixed. It now also descends
+through `mainEntity`, `mainEntityOfPage`, `itemListElement` and `item`.
+
+**A fallback that can overwrite a better answer is worse than no fallback.**
+The patchright retry replaced successful HTTP results with its own failures:
+Wala went from 102.493 URLs to "sitemap unreadable". The retry is now only
+accepted when it moves *up* the verdict ranking.
+
+**One `curl` to a homepage is not an access test.** I reported i-Run,
+Deporvillage and Sprinter as "403 blocked". None of them are: i-Run is fully
+crawlable and already matching, Deporvillage serves 129.330 sitemap URLs and
+Sprinter 46.187, both with real prices.
+
+**A readable `robots.txt` does not mean an accessible site.** Decathlon
+publishes a permissive `robots.txt` with `Crawl-delay` and returns 403 on its
+homepage. Declared policy and what the WAF allows are different things.
+
+**Source-list volume predicts nothing.** Atmósfera has 10.461 records and yields
+26 models; Bergfreunde has 1.808 and yields 73.
+
+---
+
+## Evaluation results
+
+Measured 2026-09-22 by `scripts/scraper/evaluate.py`. "Offers", "GTIN" and
+"Matched" come from a sample of up to 6 product pages, so a zero there means
+*not found in the sample*, not *impossible*.
+| Competitor | Verdict | Sitemap URLs | Shoe candidates | Offers | GTIN | MPN | Matched |
+|---|---|--:|--:|--:|--:|--:|--:|
+| i-Run | VIABLE · matches found | 9.500 | 678 | 31 | 31 | 0 | 11 |
+| Alltricks | VIABLE · no matches in sample | 5.420 | 4 | 4 | 4 | 4 | 0 |
+| Nencini Sport | VIABLE · no matches in sample | 7.973 | 56 | 6 | 0 | 6 | 0 |
+| The North Face | VIABLE · no matches in sample | 4.034 | 41 | 41 | 31 | 3 | 0 |
+| 11teamsports | VIABLE · no matches in sample | 26.904 | 187 | 87 | 87 | 0 | 0 |
+| Deporvillage | NO MATCH KEY | 129.330 | 386 | 80 | 0 | 0 | 0 |
+| Sprinter | NO MATCH KEY | 46.187 | 356 | 92 | 0 | 0 | 0 |
+| Decathlon | NO MATCH KEY | 86.943 | 312 | 6 | 0 | 0 | 0 |
+| JD Sports | NO MATCH KEY | 17.680 | 246 | 6 | 0 | 0 | 0 |
+| Barrabés | NO MATCH KEY | 30.586 | 94 | 6 | 0 | 0 | 0 |
+| El Corte Inglés | NO STRUCTURED DATA | 12.020 | 16 | 0 | 0 | 0 | 0 |
+| RunningXpert | NO STRUCTURED DATA | 11.902 | 317 | 0 | 0 | 0 | 0 |
+| Wala | NO STRUCTURED DATA | 102.493 | 63 | 0 | 0 | 0 | 0 |
+| Foot Locker | NO STRUCTURED DATA | 2.896 | 133 | 0 | 0 | 0 | 0 |
+| Running Warehouse | NO STRUCTURED DATA | 466 | 3 | 0 | 0 | 0 | 0 |
+| Under Armour | NO STRUCTURED DATA | 6.063 | 10 | 0 | 0 | 0 | 0 |
+| Décimas | NO STRUCTURED DATA | 13.204 | 155 | 0 | 0 | 0 | 0 |
+| SportsShoes | NO SITEMAP | 0 | 0 | 0 | 0 | 0 | 0 |
+| Running Emotion | NO SITEMAP | 0 | 0 | 0 | 0 | 0 | 0 |
+| Fútbol Emotion | NO SITEMAP | 0 | 0 | 0 | 0 | 0 | 0 |
+| Salomon | NO SITEMAP | 0 | 0 | 0 | 0 | 0 | 0 |
+| Basketball Emotion | NO SITEMAP | 0 | 0 | 0 | 0 | 0 | 0 |
+| Ekosport | SITEMAP UNREADABLE | 0 | 0 | 0 | 0 | 0 | 0 |
+| Bike24 | SITEMAP UNREADABLE | 0 | 0 | 0 | 0 | 0 | 0 |
+| Base | NO SHOE URLS | 6 | 0 | 0 | 0 | 0 | 0 |
+| Tennis Point | NO SHOE URLS | 7 | 0 | 0 | 0 | 0 | 0 |
+| Helly Hansen | BLOCKED | 0 | 0 | 0 | 0 | 0 | 0 |
+| Puma | BLOCKED | 0 | 0 | 0 | 0 | 0 | 0 |
+### What the verdicts mean, and what to do next
+
+| Verdict | Meaning | Next step |
+|---|---|---|
+| **VIABLE · matches found** | Works end to end today | Configure and crawl |
+| **VIABLE · no matches in sample** | Publishes a match key; catalogue may not overlap | Crawl 300 pages before judging |
+| **NO MATCH KEY** | Prices, but no `gtin13` and no `mpn` | Check whether the EAN sits in a spec table outside the JSON-LD |
+| **NO STRUCTURED DATA** | No usable JSON-LD; likely client-rendered | Retry with patchright; then a per-site CSS parser |
+| **NO SITEMAP** | `robots.txt` declares none | Discovery via category pages |
+| **SITEMAP UNREADABLE** | Sitemap declared but refused | Usually a WAF; patchright |
+| **NO SHOE URLS** | Sitemap has only a handful of URLs | Nothing to do — not a real catalogue feed |
+| **BLOCKED** | `robots.txt` itself refused, browser included | Affiliate feed or a data provider |
+
+The dominant obstacle is **not access — it is missing identifiers**. Five large
+retailers (Deporvillage, Sprinter, Decathlon, JD Sports, Barrabés) serve big
+sitemaps and real prices but publish neither `gtin13` nor `mpn`, so there is
+nothing to join on. Solving that one problem would unlock more coverage than any
+amount of additional bot evasion.

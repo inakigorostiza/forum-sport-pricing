@@ -68,14 +68,14 @@ def probe(slug: str, comp: dict, gtins: set, refs: set, use_browser: bool) -> di
         robots = text(base + "/robots.txt")
         if not robots or "<html" in robots[:400].lower():
             r["robots"] = "blocked"
-            r["verdict"] = "BLOQUEADO" if not use_browser else "BLOQUEADO (incluso con navegador)"
+            r["verdict"] = "BLOCKED" if not use_browser else "BLOCKED (even with browser)"
             return r
         r["robots"] = "ok"
         sms = [l.split(":", 1)[1].strip() for l in robots.splitlines()
                if l.lower().startswith("sitemap")]
         if not sms:
-            r["verdict"] = "SIN SITEMAP"
-            r["note"] = "robots.txt no declara sitemap; haría falta descubrir por categorías"
+            r["verdict"] = "NO SITEMAP"
+            r["note"] = "no sitemap declared; discovery would have to go via category pages"
             return r
         r["sitemap"] = sms[0]
 
@@ -88,8 +88,8 @@ def probe(slug: str, comp: dict, gtins: set, refs: set, use_browser: bool) -> di
         if not urls:
             # robots.txt was served but the sitemap itself was refused: that is a
             # block, not an empty catalogue, and must not read as "no candidates".
-            r["verdict"] = "SITEMAP INACCESIBLE"
-            r["note"] = f"robots.txt declara {len(sms)} sitemap(s) pero ninguno devuelve URLs"
+            r["verdict"] = "SITEMAP UNREADABLE"
+            r["note"] = f"robots.txt declares {len(sms)} sitemap(s) but none returns URLs"
             return r
         cands = [u for u in dict.fromkeys(urls)
                  if SHOE.search(u) and RUN.search(u) and not EXCL.search(u)]
@@ -97,8 +97,8 @@ def probe(slug: str, comp: dict, gtins: set, refs: set, use_browser: bool) -> di
             cands = [u for u in dict.fromkeys(urls) if SHOE.search(u) and not EXCL.search(u)]
         r["candidates"] = len(cands)
         if not cands:
-            r["verdict"] = "SIN CANDIDATOS"
-            r["note"] = f"{len(urls)} URLs en sitemap, ninguna parece zapatilla"
+            r["verdict"] = "NO SHOE URLS"
+            r["note"] = f"{len(urls)} sitemap URLs, none looks like a shoe"
             return r
 
         for u in cands[:6]:
@@ -121,16 +121,16 @@ def probe(slug: str, comp: dict, gtins: set, refs: set, use_browser: bool) -> di
                 break
 
         if r["matched"]:
-            r["verdict"] = "VIABLE · con coincidencias"
+            r["verdict"] = "VIABLE · matches found"
         elif r["with_gtin"] or r["with_mpn"]:
-            r["verdict"] = "VIABLE · sin coincidencias en la muestra"
-            r["note"] = "publica clave de emparejamiento; el catálogo puede no solaparse"
+            r["verdict"] = "VIABLE · no matches in sample"
+            r["note"] = "publishes a match key; the catalogue may simply not overlap"
         elif r["offers"]:
-            r["verdict"] = "SIN CLAVE"
-            r["note"] = "hay precios pero ni gtin13 ni mpn: no se puede emparejar"
+            r["verdict"] = "NO MATCH KEY"
+            r["note"] = "prices present but neither gtin13 nor mpn: nothing to join on"
         else:
-            r["verdict"] = "SIN DATOS ESTRUCTURADOS"
-            r["note"] = "sin JSON-LD utilizable; probablemente renderizado por JS"
+            r["verdict"] = "NO STRUCTURED DATA"
+            r["note"] = "no usable JSON-LD; most likely rendered client-side"
     except Exception as e:
         r["verdict"] = "ERROR"
         r["note"] = f"{type(e).__name__}: {str(e)[:120]}"
@@ -139,6 +139,15 @@ def probe(slug: str, comp: dict, gtins: set, refs: set, use_browser: bool) -> di
             try: f.close()
             except Exception: pass
     return r
+
+
+# Best to worst. The browser retry is only accepted when it moves UP this list:
+# otherwise a failed browser attempt silently buries a good HTTP result.
+RANK = ["VIABLE · matches found", "VIABLE · no matches in sample",
+        "NO MATCH KEY", "NO STRUCTURED DATA", "NO SHOE URLS",
+        "SITEMAP UNREADABLE", "NO SITEMAP", "BLOCKED",
+        "BLOCKED (even with browser)", "ERROR"]
+rank = lambda v: RANK.index(v) if v in RANK else len(RANK)
 
 
 def main(only: list[str] | None, retry_browser: bool) -> int:
@@ -152,17 +161,19 @@ def main(only: list[str] | None, retry_browser: bool) -> int:
     if only:
         todo = [s for s in todo if s in only] or [s for s in comps if s in only]
     todo.sort(key=lambda s: -(comps[s].get("records_ref") or 0))
-    print(f"evaluando {len(todo)} competidores\n")
+    print(f"evaluating {len(todo)} competitors\n")
 
     results = []
     for i, slug in enumerate(todo, 1):
         r = probe(slug, comps[slug], gtins, refs, use_browser=False)
         if retry_browser and r["verdict"] in (
-                "BLOQUEADO", "SIN DATOS ESTRUCTURADOS", "SITEMAP INACCESIBLE"):
+                "BLOCKED", "NO STRUCTURED DATA", "SITEMAP UNREADABLE"):
             r2 = probe(slug, comps[slug], gtins, refs, use_browser=True)
-            if r2["verdict"] not in ("BLOQUEADO (incluso con navegador)", "ERROR"):
-                r2["note"] = (r2["note"] + " · requiere navegador").strip(" ·")
+            if rank(r2["verdict"]) < rank(r["verdict"]):
+                r2["note"] = (r2["note"] + " · needs a browser").strip(" ·")
                 r = r2
+            else:
+                r["note"] = (r["note"] + " · browser did not help").strip(" ·")
         results.append(r)
         print(f"{i:>2}/{len(todo)} {r['name'][:30]:32} {r['verdict']:38} "
               f"urls={r['urls']:>6} cand={r['candidates']:>5} "
@@ -170,7 +181,7 @@ def main(only: list[str] | None, retry_browser: bool) -> int:
               flush=True)
         OUT.parent.mkdir(exist_ok=True)
         OUT.write_text(json.dumps(results, indent=1, ensure_ascii=False), encoding="utf-8")
-    print(f"\nescrito {OUT}")
+    print(f"\nwrote {OUT}")
     return 0
 
 

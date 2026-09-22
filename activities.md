@@ -26,9 +26,10 @@ on top of it, a Dynamic Pricing Calculator with a landing page.
 | 4 | Provision Supabase + load the data | Done |
 | 5 | Verify against ground truth | Done — 43/43 SQL + all API checks |
 | 6 | Document the API for the frontend | Done — `API.md` |
-| 7 | Landing page de visualización | Done |
-| 8 | GitHub + despliegue en Vercel | Done |
-| 9 | Dynamic Pricing Calculator | Not started |
+| 7 | Landing page | Done |
+| 8 | GitHub and Vercel deployment | Done |
+| 9 | Competitor price scraping | Done — 6 competitors live |
+| 10 | Dynamic Pricing Calculator | Not started |
 
 ---
 
@@ -746,7 +747,132 @@ loaded 1.483 models, 7 cards, 43 marks and 12 thumbnails with zero errors.
 > a bot-protection layer and a `403` from your own API look identical in a log
 > and mean completely different things.
 
-## Phase 9 — Dynamic Pricing Calculator (not started)
+## Phase 9 — Competitor price scraping
+
+The catalogue answers *what we charge*. This phase answers *what everyone else
+charges*, which is the half the pricing question actually turns on.
+
+Full operational detail is in [crawler_info.md](crawler_info.md) and
+[SCRAPING.md](SCRAPING.md); this is what was learned.
+
+### 9.1 The EAN is the whole design
+
+24.108 of our 24.109 SKUs carry a globally resolvable GS1 code, and most shops
+publish `gtin13` in their structured data. So matching is exact — no fuzzy name
+comparison, no manual mapping.
+
+The trap is that **50,7 % of our EANs are stored as 12-digit UPCs** while
+competitors publish 13 digits. A direct join loses half the catalogue and raises
+no error at all. Both sides are normalised to 13 digits. In the first real
+crawl, **20 of 26 matched models came through 12-digit EANs** — without the
+padding, 6.
+
+> **Lesson.** The dangerous data bugs are the ones that return a plausible
+> answer. A join that silently halves your data looks exactly like a join that
+> works.
+
+### 9.2 Brands need a second key
+
+adidas and Nike publish **no GTIN at all**, so the EAN path cannot work for
+them. What they do expose is the manufacturer article code, which is exactly
+what our catalogue stores as `ref_prov` — 230 of our 231 adidas models carry an
+adidas-shaped code.
+
+adidas puts it in the URL, so their catalogue can be intersected with ours
+*before* fetching: 66 pages instead of 15.337. Nike hides it behind opaque
+slugs, so the match is decided after fetching, and its `mpn` carries a colour
+suffix (`HV8116-001` → `HV8116`).
+
+Both are **model-level** matches, while a GTIN match is **size-exact**. The
+database records `match_method` on every offer so the two are never conflated.
+
+> **Lesson.** One identifier is a design; two identifiers with different
+> precision is a design decision that has to be written down, or someone will
+> average them together later.
+
+### 9.3 Bot protection, and where the line is
+
+| Site | Plain HTTP | Headless Chrome | Chrome + stealth | Patchright |
+|---|---|---|---|---|
+| adidas | 403 | 403 | 403 | **passes** |
+| Nike | 403 | — | — | **passes** |
+| Tradeinn | **passes** | — | — | not needed |
+
+adidas's `robots.txt` explicitly *allows* product pages; it is the Akamai WAF,
+not the stated policy, that refuses. That distinction was worth establishing
+before deciding anything.
+
+> **Lesson.** Check what a site's policy says separately from what its
+> infrastructure does. They disagree more often than you would expect, in both
+> directions — Decathlon publishes a permissive `robots.txt` and 403s its own
+> homepage.
+
+### 9.4 The bug that hid the biggest competitor
+
+`_ld_nodes` only flattened `@graph`, so a `Product` nested inside
+`WebPage.mainEntity` was invisible and the page reported "no offers". That is
+exactly how **Tradeinn** publishes — the largest seller on the list, 69.368
+records. One fix turned it from "no structured data" into 9 offers with 9 GTINs,
+over plain HTTP, no browser needed.
+
+It also invalidated five earlier verdicts I had recorded as findings about those
+sites.
+
+> **Lesson.** When a whole class of sites fails the same way, suspect the
+> parser before the sites.
+
+### 9.5 Judging a site on too little evidence
+
+I declared Bergfreunde and Top4Running dead on 5-page samples with 0 matches. At
+300 pages they are the second and fifth largest sources — **1.120 and 769
+offers**. Viladomat, tested the same way, really is dead: 0 from 300.
+
+I also reported i-Run, Deporvillage and Sprinter as "403 blocked" on the
+strength of a single homepage `curl`. None of them are blocked. i-Run is fully
+crawlable and matching; Deporvillage serves 129.330 sitemap URLs and Sprinter
+46.187, both with real prices.
+
+> **Lesson.** A negative result needs at least as much evidence as a positive
+> one. "I tried and it didn't work" is not a finding until you have tried enough
+> to distinguish *doesn't work* from *didn't look hard enough*.
+
+### 9.6 A fallback that made things worse
+
+The evaluator retries blocked sites with patchright. When the browser attempt
+failed on a site whose HTTP attempt had **succeeded**, the failure replaced the
+success — Wala went from 102.493 sitemap URLs to "sitemap unreadable". All 28
+evaluations came back empty, which is what made it obvious.
+
+The cause was a unit mismatch: `timeout` was seconds in one fetcher and
+milliseconds in the other, so `timeout=60` gave the browser 60 ms. The retry is
+now only accepted when it moves *up* the verdict ranking.
+
+> **Lesson.** A fallback must never be able to overwrite a better answer, or its
+> failures masquerade as findings about the thing you were measuring.
+
+### 9.7 What the data says
+
+Six competitors live, **312 models compared**:
+
+| Competitor | Models | We are cheaper | Average gap |
+|---|--:|--:|--:|
+| Nike | 93 | 23 | +6,5 % |
+| Bergfreunde | 73 | 10 | +10,8 % |
+| adidas | 66 | **54** | **−5,9 %** |
+| Tradeinn | 52 | 8 | **+21,2 %** |
+| Top4Running | 42 | 10 | +12,6 % |
+| Atmósfera Sport | 26 | 5 | +7,2 % |
+
+Every competitor added made the picture worse — the headline gap moved **+1,8 %
+→ +5,9 % → +8,0 %** against us. adidas was flattering the average: it is the
+only seller we systematically undercut, which is what you would expect of a
+stockist against the brand's own RRP.
+
+The remaining obstacle is **not access — it is missing identifiers**. Five large
+retailers serve big sitemaps and real prices but publish neither `gtin13` nor
+`mpn`. Solving that unlocks more coverage than any further bot evasion.
+
+## Phase 10 — Dynamic Pricing Calculator (not started)
 
 Everything is in place: `margen`, `neto`, `descuento_pct`, `nivel_stock` and
 `cobertura_stock` are the levers, and the landing page already frames the

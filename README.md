@@ -21,6 +21,7 @@ each one teaches.
 | `index.html` | the landing page (no build step, no dependencies) |
 | `scripts/scraper/` | competitor price-scraping agent |
 | `SCRAPING.md` | what is crawled, how politely, and how to add a site |
+| `crawler_info.md` | per-competitor crawling guide and evaluation results |
 | `API.md` | endpoints, with responses captured from the live project |
 | `competitors.md` | competitor list, transcribed from the source spreadsheet |
 
