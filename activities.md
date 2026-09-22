@@ -27,7 +27,8 @@ on top of it, a Dynamic Pricing Calculator with a landing page.
 | 5 | Verify against ground truth | Done — 43/43 SQL + all API checks |
 | 6 | Document the API for the frontend | Done — `API.md` |
 | 7 | Landing page de visualización | Done |
-| 8 | Dynamic Pricing Calculator | Not started |
+| 8 | GitHub + despliegue en Vercel | Done |
+| 9 | Dynamic Pricing Calculator | Not started |
 
 ---
 
@@ -656,7 +657,70 @@ project's rule that derived values live in the database.
 > load-bearing. Copying the example verbatim would have worked — and taught
 > nothing about what happens for the other 1.482 models.
 
-## Phase 8 — Dynamic Pricing Calculator (not started)
+## Phase 8 — GitHub and Vercel
+
+Repo: **private** `inakigorostiza/forum-sport-pricing` · live at
+**https://forum-sport-pricing.vercel.app**
+
+### 8.1 Private, on purpose
+
+The dataset holds a real retailer's margins, net prices and stock coverage.
+A public repo would publish a competitor's dream document, permanently — git
+history keeps it even if the file is deleted later. Private was the default
+before anything was pushed.
+
+Before the first commit the staged files were scanned for credentials. The only
+JWTs present decode to `role=anon`, which is safe by design; `.env.local` and
+the generated `data/` were correctly excluded by `.gitignore`.
+
+> **Lesson.** Check what you are about to publish *before* the first push, not
+> after. Git history is not an undo button.
+
+### 8.2 The deploy that undid the privacy
+
+The first Vercel deployment went live, and the repo was private — so the data
+was safe. It was not:
+
+```
+GET /dataset/Dataset_FS_pricing_dinámico.xlsx   200   3.571.537 b
+GET /supabase/migrations/001_schema.sql         200       5.824 b
+GET /scripts/load_supabase.py                   200       4.124 b
+```
+
+**A static Vercel deployment serves every file in the repository.** The entire
+commercial spreadsheet was downloadable by anyone with the URL. Repository
+visibility and deployment visibility are two completely different controls, and
+only the first had been set.
+
+`.vercelignore` now limits the deployment to the landing page. Re-verified:
+
+```
+/dataset/...xlsx  404     /scripts/load_supabase.py  404
+/activities.md    404     /                          200
+```
+
+The exposure lasted about 46 seconds on the production alias. The older
+per-deployment URL turned out to be SSO-protected, so the window was limited to
+that alias.
+
+> **Lesson (the one to teach).** "The repo is private" says nothing about what
+> your deployment serves. After every first deploy, *request the files you
+> expect to be secret* and confirm they 404. Assume a static host publishes
+> everything unless you tell it otherwise.
+
+### 8.3 A 403 that was not a bug
+
+The live site was tested with a headless browser and rendered nothing, with two
+`403`s. The body explained it: **"Vercel Security Checkpoint"** — bot protection
+reacting to the headless fingerprint, not a fault in the page. `curl` had
+returned `200` all along. Re-run with an ordinary user agent, the live site
+loaded 1.483 models, 7 cards, 43 marks and 12 thumbnails with zero errors.
+
+> **Lesson.** Read the error body before believing the status code. A `403` from
+> a bot-protection layer and a `403` from your own API look identical in a log
+> and mean completely different things.
+
+## Phase 9 — Dynamic Pricing Calculator (not started)
 
 Everything is in place: `margen`, `neto`, `descuento_pct`, `nivel_stock` and
 `cobertura_stock` are the levers, and the landing page already frames the
