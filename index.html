@@ -144,6 +144,42 @@ select, .chip{
 select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visible{
   outline:2px solid var(--accent); outline-offset:2px}
 .chip[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent)}
+.search{position:relative; flex:1 1 210px; min-width:170px; max-width:320px}
+.search-in{
+  font-family:var(--sans); font-size:13px; color:var(--ink); width:100%;
+  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
+  padding:7px 28px 7px 30px;
+}
+.search-in::placeholder{color:var(--muted)}
+/* type=search draws its own clear button in WebKit, which would sit beside ours. */
+.search-in::-webkit-search-cancel-button,
+.search-in::-webkit-search-decoration{-webkit-appearance:none; appearance:none}
+.search-in:focus{outline:none; border-color:var(--accent)}
+.search .ico{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  color:var(--muted); font-size:12px; pointer-events:none;
+}
+.search .clr{
+  position:absolute; right:7px; top:50%; transform:translateY(-50%);
+  background:none; border:none; color:var(--muted); cursor:pointer;
+  font-size:15px; line-height:1; padding:2px 4px;
+}
+.search .clr:hover{color:var(--ink)}
+.ac{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:45;
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  box-shadow:var(--shadow); padding:5px; max-height:300px; overflow-y:auto;
+}
+.ac[hidden]{display:none}
+.ac-opt{
+  display:flex; align-items:baseline; gap:8px; padding:7px 9px; border-radius:7px;
+  font-size:13px; cursor:pointer; color:var(--ink);
+}
+.ac-opt[aria-selected="true"],.ac-opt:hover{background:color-mix(in srgb, var(--accent) 11%, transparent)}
+.ac-opt mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inherit; border-radius:3px}
+.ac-opt .br{color:var(--muted); font-size:11.5px}
+.ac-opt .cnt{margin-left:auto; color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums}
+.ac-none{padding:9px; font-size:12.5px; color:var(--muted)}
 .ms{position:relative}
 .ms-btn{
   font-family:var(--sans); font-size:13px; font-weight:500; color:var(--ink);
@@ -260,6 +296,8 @@ td.cont-mark{color:var(--muted); font-size:12px}
 .delta-up{color:var(--s2); font-weight:700}
 .delta-dn{color:var(--good); font-weight:700}
 .delta-eq{color:var(--s1); font-weight:700}
+.edad{color:var(--muted); font-size:12px; white-space:nowrap}
+.edad.stale{color:var(--s2)}
 .comp-note{
   font-size:12px; color:var(--muted); margin:12px 0 0; padding-top:10px;
   border-top:1px solid var(--rule);
@@ -354,6 +392,23 @@ const eur2= new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",minim
 const pct = v => nf1.format(v)+" %";
 const N   = v => v===null||v===undefined ? null : Number(v);   // PostgREST sends numeric as string
 
+/* How old a price is matters more than when it was taken, so recent readings
+   are relative and older ones fall back to a date. */
+const rtf = new Intl.RelativeTimeFormat("es-ES", {numeric:"auto"});
+const fechaCorta = new Intl.DateTimeFormat("es-ES",{day:"numeric",month:"short"});
+const fechaLarga = new Intl.DateTimeFormat("es-ES",
+  {dateStyle:"long", timeStyle:"short"});
+function antiguedad(iso){
+  if(!iso) return {txt:"—", full:"", stale:false};
+  const d = new Date(iso), mins = Math.round((Date.now() - d) / 60000);
+  const txt = mins < 1      ? "ahora"
+            : mins < 60     ? rtf.format(-mins, "minute")
+            : mins < 1440   ? rtf.format(-Math.round(mins/60), "hour")
+            : mins < 10080  ? rtf.format(-Math.round(mins/1440), "day")
+            : fechaCorta.format(d);
+  return {txt, full: fechaLarga.format(d), stale: mins > 10080};
+}
+
 /* ── theme ────────────────────────────────────────────────────────────── */
 const root = document.documentElement;
 try{ const t=localStorage.getItem("fs-theme"); if(t) root.dataset.theme=t; }catch{}
@@ -376,7 +431,14 @@ let ROWS = [];
 let COMP = [];                     // competitor comparison (public view only)
 // Sets, so each filter takes 1..n values. An empty set means "no restriction",
 // which keeps the default cheap: no membership test runs until something is picked.
-const F = { marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false };
+const F = { q:"", marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false };
+
+// Accent- and case-insensitive: "galaxy" must find "GALAXY", "peregrine" must
+// find "PEREGRINE GORE-TEX", and an accented query must not miss its own match.
+const norm = str => (str||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+
+// render() rebuilds the filter row on every keystroke, so focus and caret are
+// re-read from the DOM at the top of render() rather than tracked in a flag.
 
 async function page(offset){
   const u = `${URL_}/rest/v1/v_modelos_detalle?select=${FIELDS}&order=modelo&limit=1000&offset=${offset}`;
@@ -425,7 +487,9 @@ const modelosDe = comps => {
 
 const filtered = () => {
   const conComp = modelosDe(F.competidores);
+  const q = norm(F.q);
   return ROWS.filter(d =>
+    (!q || norm(d.nombre_modelo).includes(q) || norm(d.marca).includes(q)) &&
     (!F.marcas.size || F.marcas.has(d.brand_code)) &&
     (!F.tipos.size  || F.tipos.has(d.tipo_producto)) &&
     (!F.rebaja      || d.en_rebaja) &&
@@ -567,6 +631,82 @@ function close_(){
   openPop = null;
 }
 
+/* Search box with autocomplete over product names.
+   The text itself filters live; the dropdown is a shortcut to an exact name. */
+function searchBox(rows, onChange){
+  const root = document.createElement("div"); root.className = "search";
+  root.innerHTML = `<span class="ico">⌕</span>
+    <input class="search-in" type="search" placeholder="Buscar modelo…"
+           autocomplete="off" role="combobox" aria-expanded="false"
+           aria-autocomplete="list" aria-label="Buscar modelo o marca">
+    <button class="clr" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+    <div class="ac" role="listbox" hidden></div>`;
+  const input = root.querySelector("input");
+  const ac    = root.querySelector(".ac");
+  const clr   = root.querySelector(".clr");
+  input.value = F.q;
+  clr.hidden  = !F.q;
+  let cursor = -1, items = [];
+
+  // One entry per distinct product name, with its brand and how many models
+  // share it — a name like GALAXY 7 covers several colourways.
+  const index = [...rows.reduce((m, r) => {
+    const k = r.nombre_modelo + "|" + r.marca;
+    m.set(k, m.get(k) ? {...m.get(k), n: m.get(k).n + 1}
+                      : {name: r.nombre_modelo, marca: r.marca, n: 1});
+    return m;
+  }, new Map()).values()];
+
+  const hide = () => { ac.hidden = true; input.setAttribute("aria-expanded","false"); cursor = -1; };
+
+  const mark = (text, q) => {
+    const i = norm(text).indexOf(q);
+    if (i < 0) return text;
+    return text.slice(0,i) + "<mark>" + text.slice(i, i+q.length) + "</mark>" + text.slice(i+q.length);
+  };
+
+  const paint = () => {
+    const q = norm(input.value);
+    if (q.length < 2) return hide();
+    // Names that start with the query rank above names that merely contain it.
+    items = index.filter(e => norm(e.name).includes(q) || norm(e.marca).includes(q))
+      .sort((a,b) => (norm(b.name).startsWith(q) - norm(a.name).startsWith(q))
+                  || a.name.localeCompare(b.name,"es"))
+      .slice(0, 8);
+    ac.innerHTML = items.length
+      ? items.map((e,i) => `<div class="ac-opt" role="option" data-i="${i}"
+           aria-selected="${i===cursor}"><span>${mark(e.name,q)}</span>
+           <span class="br">${e.marca}</span>
+           <span class="cnt">${e.n}</span></div>`).join("")
+      : `<div class="ac-none">Ningún modelo coincide con «${input.value}»</div>`;
+    ac.hidden = false; input.setAttribute("aria-expanded","true");
+    ac.querySelectorAll(".ac-opt").forEach(el =>
+      el.onmousedown = ev => { ev.preventDefault(); choose(items[+el.dataset.i]); });
+  };
+
+  const choose = e => { if(!e) return; F.q = e.name; hide(); onChange(); };
+
+  input.oninput = () => {
+    F.q = input.value; clr.hidden = !F.q;
+    cursor = -1; onChange();   // rebuilds the row; the new input repaints on focus
+
+  };
+  input.onfocus = () => paint();
+  input.onblur  = () => setTimeout(hide, 120);
+  input.onkeydown = ev => {
+    if (ac.hidden || !items.length) { if (ev.key === "Escape") { F.q=""; input.value=""; onChange(); } return; }
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+      ev.preventDefault();
+      cursor = (cursor + (ev.key === "ArrowDown" ? 1 : items.length - 1)) % items.length;
+      ac.querySelectorAll(".ac-opt").forEach((el,i) => el.setAttribute("aria-selected", String(i===cursor)));
+      ac.querySelector('[aria-selected="true"]')?.scrollIntoView({block:"nearest"});
+    } else if (ev.key === "Enter") { ev.preventDefault(); choose(items[cursor >= 0 ? cursor : 0]); }
+    else if (ev.key === "Escape") { hide(); }
+  };
+  clr.onclick = () => { F.q = ""; input.value = ""; clr.hidden = true; hide(); onChange(); };
+  return {root, input, paint};
+}
+
 function multiSelect({label, options, selected, onChange}){
   const root = document.createElement("div"); root.className = "ms";
   const btn = document.createElement("button");
@@ -651,6 +791,12 @@ function card(title,sub,node,tbl,wide=false){
 /* ── render ───────────────────────────────────────────────────────────── */
 function render(){
   const rows=filtered(), app=document.getElementById("app");
+  // Capture focus BEFORE wiping: clearing the DOM fires the outgoing input's
+  // blur handler, so any flag it maintains is already stale by the time the new
+  // row is built.
+  const active = document.activeElement;
+  const keepFocus = !!(active && active.classList && active.classList.contains("search-in"));
+  const caret = keepFocus ? (active.selectionStart ?? active.value.length) : 0;
   app.innerHTML="";
 
   /* filters ---------------------------------------------------------- */
@@ -668,6 +814,8 @@ function render(){
   const f = document.createElement("div"); f.className="filters";
   const lab = document.createElement("span"); lab.className="f-lab"; lab.textContent="Filtrar";
   f.append(lab);
+  const sb = searchBox(ROWS, render);
+  f.append(sb.root);
   f.append(multiSelect({label:"Marca", options:marcas,
                         selected:F.marcas, onChange:render}));
   f.append(multiSelect({label:"Tipo", options:tipos,
@@ -684,7 +832,7 @@ function render(){
 
   const btnClear=document.createElement("button");
   btnClear.className="ghost"; btnClear.type="button"; btnClear.textContent="Limpiar";
-  btnClear.onclick=()=>{F.marcas.clear(); F.tipos.clear(); F.competidores.clear();
+  btnClear.onclick=()=>{F.q=""; F.marcas.clear(); F.tipos.clear(); F.competidores.clear();
                         F.rebaja=false; render();};
   f.append(btnClear);
 
@@ -693,9 +841,18 @@ function render(){
   f.append(cnt);
   app.append(f);
 
+  // The row above was just rebuilt, so the input the user is typing in is a new
+  // element. Restore focus and caret, or every keystroke would drop the cursor.
+  if(keepFocus){
+    sb.input.focus();
+    try{ sb.input.setSelectionRange(caret, caret); }catch{}
+    sb.paint();
+  }
+
   if(!rows.length){
     app.insertAdjacentHTML("beforeend",
-      `<div class="state">Ningún modelo cumple estos filtros.</div>`); return;
+      `<div class="state">Ningún modelo cumple estos filtros${
+        F.q?` · búsqueda «${F.q}»`:""}.</div>`); return;
   }
 
   /* hero + kpis ------------------------------------------------------ */
@@ -803,7 +960,7 @@ function render(){
                  (!F.competidores.size || F.competidores.has(c.competidor)))
       .map(c=>{
         const eq = Math.abs(c.delta_eur) < 0.005;
-        return {...c, eq,
+        return {...c, eq, edad: antiguedad(c.observed_at),
           cls:   eq ? "delta-eq" : (c.delta_eur>0 ? "delta-up" : "delta-dn"),
           badge: eq ? "igual"    : (c.somos_mas_baratos ? "barato" : "caro"),
           label: eq ? "igual"    : (c.somos_mas_baratos ? "más barato" : "más caro")};
@@ -839,7 +996,8 @@ function render(){
         Ordenado por mayor diferencia en contra.</p>`;
       const t=document.createElement("table");
       t.innerHTML=`<thead><tr><th>Modelo</th><th>Forum Sport</th><th>Competencia</th>
-        <th>Dif.</th><th>Dif. %</th><th>Posición</th><th>Competidor</th></tr></thead>
+        <th>Dif.</th><th>Dif. %</th><th>Posición</th><th>Competidor</th>
+        <th>Actualizado</th></tr></thead>
         <tbody>${comp.map(x=>`<tr class="${x.eq?"igual-row ":""}${x.first?"grp-start":"grp-cont"}">
           ${x.first ? `<td class="prod-cell"><span class="prod">
             <img class="thumb" src="${x.img_thumb}" alt="" loading="lazy" decoding="async"
@@ -855,7 +1013,9 @@ function render(){
           <td class="${x.cls}">${x.eq?"":(x.delta_eur>0?"+":"")}${eur2.format(x.delta_eur)}</td>
           <td class="${x.cls}">${x.eq?"":(x.delta_pct>0?"+":"")}${nf1.format(x.delta_pct)} %</td>
           <td><span class="badge ${x.badge}">${x.label}</span></td>
-          <td>${x.competidor}</td></tr>`).join("")}</tbody>`;
+          <td><a href="${x.url_comp}" target="_blank" rel="noopener"
+                 title="Ver ${x.nombre_modelo} en ${x.competidor}">${x.competidor}</a></td>
+          <td class="edad${x.edad.stale?" stale":""}" title="${x.edad.full}">${x.edad.txt}</td></tr>`).join("")}</tbody>`;
       const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
       c.append(w);
       const note=document.createElement("p"); note.className="comp-note";
