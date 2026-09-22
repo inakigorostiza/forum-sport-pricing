@@ -41,6 +41,16 @@ POLICY = {
                             notes="Returns 403 on robots.txt itself. Headless per client decision; keep volume minimal."),
     "sprinter":        dict(strategy="headless", crawl_delay_s=6.0, robots_status="blocked_403",
                             notes="Returns 403 on robots.txt itself. Headless per client decision; keep volume minimal."),
+    # robots.txt is readable and permissive, but every other path sits behind a
+    # Cloudflare interstitial. Headless clears it for ordinary HTML pages, yet
+    # the gzipped sitemaps still return 403 and the catalogue is JS-rendered, so
+    # product discovery needs a bespoke path rather than the sitemap walker.
+    "ekosport":        dict(strategy="headless", crawl_delay_s=6.0,
+                            robots_status="cloudflare_challenge",
+                            sitemap_url="https://www.ekosport.es/sitemap_es.xml",
+                            notes="robots.txt allows crawling; Cloudflare challenges everything else. "
+                                  "Headless passes for HTML, but sitemap_*.xml.gz stays 403 and product "
+                                  "links are JS-rendered. Needs a custom discovery module before enabling."),
     "i-run":           dict(strategy="headless", crawl_delay_s=6.0, robots_status="blocked_403",
                             notes="Returns 403 on robots.txt itself. Headless per client decision; keep volume minimal."),
 }
