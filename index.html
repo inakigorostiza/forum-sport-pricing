@@ -209,6 +209,22 @@ td a:hover{color:var(--accent); border-color:var(--accent)}
   display:flex; align-items:center; gap:0}
 .prod-name a{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:34ch}
 td.prod-cell{padding:8px}
+.pager{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  margin-top:14px; padding-top:13px; border-top:1px solid var(--rule);
+}
+.pager .range{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.pager .grow{margin-left:auto}
+.pager select{padding:5px 8px; font-size:12.5px}
+button.pg{
+  font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--ink-2);
+  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
+  min-width:34px; height:32px; padding:0 11px; cursor:pointer; transition:.15s;
+}
+button.pg:hover:not(:disabled){color:var(--ink); border-color:var(--axis)}
+button.pg:disabled{opacity:.3; cursor:not-allowed}
+.pager .of{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums;
+  padding:0 4px; min-width:66px; text-align:center}
 .tag{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em;
   padding:2px 6px; border-radius:5px; background:color-mix(in srgb, var(--s2) 16%, transparent);
   color:var(--ink); margin-left:6px}
@@ -655,33 +671,84 @@ function render(){
         items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"])), true));
   }
 
-  /* 7 · Mayores descuentos ---------------------------------------------- */
+  /* 7 · Catálogo paginado ------------------------------------------------ */
   {
-    const top=[...rows].filter(r=>r.en_rebaja)
-      .sort((a,b)=>b.descuento_pct-a.descuento_pct).slice(0,12);
+    // The whole filtered slice, not a top-N: paging is what makes 1.483 rows
+    // browsable. Still ordered by discount, so the head of the table is the
+    // same "mayores descuentos" view it replaces.
+    const all=[...rows].sort((a,b)=>
+      b.descuento_pct-a.descuento_pct || a.nombre_modelo.localeCompare(b.nombre_modelo,"es"));
+    let per=12, page=0;
+    const pages=()=>Math.max(1,Math.ceil(all.length/per));
+
+    const row=r=>`<tr>
+      <td class="prod-cell"><span class="prod">
+        <img class="thumb" src="${r.img_thumb}" alt="" loading="lazy" decoding="async"
+             width="46" height="46"
+             onerror="this.setAttribute('data-failed','');this.removeAttribute('src')">
+        <span class="prod-name">
+          <a href="${r.url}" target="_blank" rel="noopener">${r.nombre_modelo}</a>
+          <small>${r.marca}${r.outlet?'<span class="tag">outlet</span>':""}</small>
+        </span></span></td>
+      <td>${eur2.format(r.precio)}</td>
+      <td>${r.en_rebaja?eur2.format(r.precio_rebaja):"—"}</td>
+      <td>${r.en_rebaja?`<b>${nf1.format(r.descuento_pct)} %</b>`:'<span class="t-k">—</span>'}</td>
+      <td>${eur2.format(r.precio_rebaja*(1-r.margen))}</td>
+      <td>${r.nivel_stock}</td></tr>`;
+
     const t=document.createElement("table");
     t.innerHTML=`<thead><tr><th>Modelo</th><th>PVP</th><th>Precio</th>
-      <th>Dto.</th><th>Neto</th><th>Stock</th></tr></thead><tbody>${
-      top.map(r=>`<tr>
-        <td class="prod-cell"><span class="prod">
-          <img class="thumb" src="${r.img_thumb}" alt="" loading="lazy" decoding="async"
-               width="46" height="46"
-               onerror="this.setAttribute('data-failed','');this.removeAttribute('src')">
-          <span class="prod-name">
-            <a href="${r.url}" target="_blank" rel="noopener">${r.nombre_modelo}</a>
-            <small>${r.marca}${r.outlet?'<span class="tag">outlet</span>':""}</small>
-          </span></span></td>
-        <td>${eur2.format(r.precio)}</td>
-        <td>${eur2.format(r.precio_rebaja)}</td>
-        <td><b>${nf1.format(r.descuento_pct)} %</b></td>
-        <td>${eur2.format(r.precio_rebaja*(1-r.margen))}</td>
-        <td>${r.nivel_stock}</td></tr>`).join("")}</tbody>`;
+      <th>Dto.</th><th>Neto</th><th>Stock</th></tr></thead><tbody></tbody>`;
+    const tbody=t.querySelector("tbody");
+
+    const pager=document.createElement("div"); pager.className="pager";
+    pager.innerHTML=`
+      <button class="pg" data-go="first" type="button" aria-label="Primera página">«</button>
+      <button class="pg" data-go="prev"  type="button" aria-label="Página anterior">‹</button>
+      <span class="of" aria-hidden="true"></span>
+      <button class="pg" data-go="next"  type="button" aria-label="Página siguiente">›</button>
+      <button class="pg" data-go="last"  type="button" aria-label="Última página">»</button>
+      <span class="range grow" role="status" aria-live="polite"></span>
+      <label class="range" for="per">Por página</label>
+      <select id="per" aria-label="Filas por página">
+        <option value="12">12</option><option value="25">25</option>
+        <option value="50">50</option><option value="100">100</option>
+      </select>`;
+    const of=pager.querySelector(".of"), range=pager.querySelector(".range");
+    const btn=k=>pager.querySelector(`[data-go="${k}"]`);
+
+    function draw(){
+      page=Math.min(page,pages()-1);
+      const start=page*per, slice=all.slice(start,start+per);
+      tbody.innerHTML=slice.map(row).join("");
+      of.textContent=`${page+1} / ${nf.format(pages())}`;
+      range.textContent=all.length
+        ? `${nf.format(start+1)}–${nf.format(start+slice.length)} de ${nf.format(all.length)} modelos`
+        : "Sin resultados";
+      btn("first").disabled=btn("prev").disabled = page===0;
+      btn("last").disabled =btn("next").disabled = page>=pages()-1;
+    }
+    const go=k=>{ const last=pages()-1;
+      page = k==="first"?0 : k==="prev"?Math.max(0,page-1)
+           : k==="next" ?Math.min(last,page+1) : last;
+      draw();
+      // Keep the table head in view when paging from further down the row list.
+      t.scrollIntoView({block:"nearest", behavior:"smooth"});
+    };
+    pager.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+    pager.querySelector("#per").onchange=e=>{
+      const firstRow=page*per;            // keep the reader roughly where they were
+      per=Number(e.target.value); page=Math.floor(firstRow/per); draw();
+    };
+
     const c=document.createElement("section"); c.className="card wide";
-    c.innerHTML=`<h2>Mayores descuentos</h2>
-      <p class="sub">Los 12 modelos con mayor rebaja sobre PVP. «Neto» es el ingreso tras margen,
-      calculado en la base de datos. El nombre enlaza a la ficha pública.</p>`;
+    c.innerHTML=`<h2>Catálogo</h2>
+      <p class="sub">Todos los modelos del filtro, ordenados por descuento sobre PVP.
+      «Neto» es el ingreso tras margen, calculado en la base de datos.
+      El nombre enlaza a la ficha pública.</p>`;
     const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
-    c.append(w); grid.append(c);
+    c.append(w, pager); grid.append(c);
+    draw();
   }
 
   document.getElementById("state")?.remove();

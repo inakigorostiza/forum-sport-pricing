@@ -627,7 +627,33 @@ it — the page now fits and the table scrolls inside its own card.
 
 > **Lesson.** Almost every "my grid won't shrink" bug is `min-width:auto`.
 
-### 7.5 Product images, reverse-engineered
+### 7.5 Pagination: the table became the catalogue
+
+The table listed the top 12 discounts. Paginating 12 rows means nothing, so the
+table now holds **every model in the current filter** — 1.483 by default, 124
+pages — still ordered by discount, so the first page is the same "mayores
+descuentos" view it replaced.
+
+The paging state lives inside the table's own closure and redraws only the
+`tbody` and the pager, not the page. That matters because `render()` rebuilds
+everything from scratch: had the page number lived in the global filter state,
+every click would have re-derived all six charts to change twelve rows.
+
+Edge cases were tested rather than assumed, and each one is a real bug if left:
+
+| Case | Expected | Result |
+|---|---|---|
+| Last page of 1.483 at 12/page | 7 rows, `next` disabled | 124/124, 1477–1483 |
+| Click `next` on the last page | no movement | clamped |
+| Change 50 → 12 per page | keep roughly the same rows | page 2 → page 5 |
+| Filter to 4 results | 1 page, both buttons off | `1 / 1`, both disabled |
+| Filter while on page 7 | reset to page 1 | reset |
+
+> **Lesson.** Pagination is four lines of arithmetic and about six edge cases.
+> The arithmetic is never what breaks — an off-by-one on the last page, or a
+> stale page number after a filter shrinks the result set, is what ships.
+
+### 7.6 Product images, reverse-engineered
 
 From one example URL, tested rather than assumed:
 
