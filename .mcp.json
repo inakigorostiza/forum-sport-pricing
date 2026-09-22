@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "stdio",
+      "command": "sh",
+      "args": [
+        "-c",
+        "set -a; [ -f \"$0\" ] && . \"$0\"; set +a; for d in \"$HOME\"/.nvm/versions/node/*/bin; do [ -x \"$d/node\" ] && { PATH=\"$d:$PATH\"; break; }; done; export PATH; exec npx -y @supabase/mcp-server-supabase@latest",
+        "/Users/igorostiza/forum/.env.local"
+      ]
+    }
+  }
+}
