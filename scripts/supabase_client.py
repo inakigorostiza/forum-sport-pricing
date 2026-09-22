@@ -128,6 +128,11 @@ class Supabase:
                 out.extend(got)
         return out
 
+    def rpc(self, fn: str, **args):
+        """Call a Postgres function. Used to rebuild the public comparison
+        table, so that logic lives in SQL rather than being duplicated here."""
+        return self._request("POST", f"rpc/{fn}", body=args or {})
+
     def update(self, table: str, values: dict, **filters) -> None:
         q = urllib.parse.urlencode(filters)
         self._request("PATCH", f"{table}?{q}", body=values,

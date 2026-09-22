@@ -89,6 +89,25 @@ individual prices are public on the rivals' own sites, but this assembled view
 of them is Forum Sport's commercial analysis. Only the `service_role` key reads
 them. Verified: `anon` gets `401` on all four.
 
+### The one public surface
+
+`comparativa_publica` is a **table**, refreshed by `refresh_comparativa_publica()`
+at the end of every crawl, and it is the only thing the landing page reads. It
+carries the two prices and the difference between them — what a shopper could
+work out by opening both websites — and deliberately **no margin, cost, coverage
+or `margen_si_igualamos`**.
+
+It is a table rather than a view on purpose: a view over the private tables would
+need `SECURITY DEFINER` to bypass their RLS, which Supabase's linter flags as an
+ERROR, and rightly — it is a standing hole that reads whatever the definition
+happens to select. A table needs no privilege escalation: `service_role` writes
+it, `anon` reads it under an ordinary policy, and the column list is fixed at
+write time. It also makes the page cheaper: one small read instead of a join
+across the whole offer history.
+
+Verified: `anon` reads `comparativa_publica` (200) but gets `401` on every
+private table, every strategy view, and on the refresh function itself.
+
 ## Adding a competitor
 
 1. Check its `robots.txt` by hand and record the finding in

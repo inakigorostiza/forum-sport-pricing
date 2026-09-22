@@ -209,6 +209,18 @@ td a:hover{color:var(--accent); border-color:var(--accent)}
   display:flex; align-items:center; gap:0}
 .prod-name a{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:34ch}
 td.prod-cell{padding:8px}
+.badge{
+  display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em;
+  padding:3px 8px; border-radius:6px; white-space:nowrap;
+}
+.badge.caro{background:color-mix(in srgb, var(--s2) 18%, transparent); color:var(--ink)}
+.badge.barato{background:color-mix(in srgb, var(--good) 18%, transparent); color:var(--ink)}
+.delta-up{color:var(--s2); font-weight:700}
+.delta-dn{color:var(--good); font-weight:700}
+.comp-note{
+  font-size:12px; color:var(--muted); margin:12px 0 0; padding-top:10px;
+  border-top:1px solid var(--rule);
+}
 .pager{
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
   margin-top:14px; padding-top:13px; border-top:1px solid var(--rule);
@@ -318,6 +330,7 @@ const FIELDS = ["modelo","brand_code","marca","nombre_modelo","tipo_producto","t
   "exclusivo_online","num_skus","url","img_thumb"].join(",");
 
 let ROWS = [];
+let COMP = [];                     // competitor comparison (public view only)
 const F = { marca:"", tipo:"", rebaja:false };
 
 async function page(offset){
@@ -325,6 +338,23 @@ async function page(offset){
   const r = await fetch(u,{headers:{apikey:ANON, Authorization:`Bearer ${ANON}`}});
   if(!r.ok) throw new Error(`${r.status} ${r.statusText} — ${(await r.text()).slice(0,160)}`);
   return r.json();
+}
+
+async function loadComparison(){
+  // comparativa_publica is a narrow, public table refreshed by the scraper:
+  // prices and the difference between them. Margin and cost stay private.
+  const u = `${URL_}/rest/v1/comparativa_publica`
+    + `?select=modelo,marca,nombre_modelo,img_thumb,url_fs,precio_fs,pvp,`
+    + `competidor,precio_comp,url_comp,delta_eur,delta_pct,somos_mas_baratos,`
+    + `nivel_stock,skus_vistos,skus_disponibles,promo,observed_at`
+    + `&order=delta_pct.desc`;
+  try{
+    const r = await fetch(u,{headers:{apikey:ANON, Authorization:`Bearer ${ANON}`}});
+    if(!r.ok) return [];                       // no comparison yet is not an error
+    return (await r.json()).map(d=>({...d,
+      precio_fs:N(d.precio_fs), pvp:N(d.pvp), precio_comp:N(d.precio_comp),
+      delta_eur:N(d.delta_eur), delta_pct:N(d.delta_pct)}));
+  }catch{ return []; }
 }
 
 async function load(){
@@ -611,7 +641,56 @@ function render(){
       true));
   }
 
-  /* 2 · Modelos por marca ------------------------------------------------ */
+
+  /* 2 · Frente a la competencia ------------------------------------------ */
+  if(COMP.length){
+    const ids = new Set(rows.map(r=>r.modelo));
+    const comp = COMP.filter(c=>ids.has(c.modelo))
+                     .sort((a,b)=>b.delta_pct-a.delta_pct);
+    const c = document.createElement("section"); c.className="card wide";
+    if(!comp.length){
+      c.innerHTML=`<h2>Frente a la competencia</h2>
+        <p class="sub">Ningún modelo del filtro actual tiene todavía datos de competencia.</p>`;
+      grid.append(c); 
+    } else {
+      const caros = comp.filter(x=>!x.somos_mas_baratos).length;
+      const fuentes = [...new Set(comp.map(x=>x.competidor))];
+      const fecha = new Date(Math.max(...comp.map(x=>+new Date(x.observed_at))));
+      c.innerHTML=`<h2>Frente a la competencia</h2>
+        <p class="sub">${nf.format(comp.length)} modelos con precio observado en
+        ${fuentes.join(", ")}. Somos más caros en <strong>${nf.format(caros)}</strong>
+        de ${nf.format(comp.length)}. Ordenado por mayor diferencia en contra.</p>`;
+      const t=document.createElement("table");
+      t.innerHTML=`<thead><tr><th>Modelo</th><th>Forum Sport</th><th>Competencia</th>
+        <th>Dif.</th><th>Dif. %</th><th>Posición</th><th>Competidor</th></tr></thead>
+        <tbody>${comp.map(x=>`<tr>
+          <td class="prod-cell"><span class="prod">
+            <img class="thumb" src="${x.img_thumb}" alt="" loading="lazy" decoding="async"
+                 width="46" height="46"
+                 onerror="this.setAttribute('data-failed','');this.removeAttribute('src')">
+            <span class="prod-name">
+              <a href="${x.url_fs}" target="_blank" rel="noopener">${x.nombre_modelo}</a>
+              <small>${x.marca}</small>
+            </span></span></td>
+          <td>${eur2.format(x.precio_fs)}</td>
+          <td><a href="${x.url_comp}" target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a></td>
+          <td class="${x.delta_eur>0?"delta-up":"delta-dn"}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
+          <td class="${x.delta_pct>0?"delta-up":"delta-dn"}">${x.delta_pct>0?"+":""}${nf1.format(x.delta_pct)} %</td>
+          <td><span class="badge ${x.somos_mas_baratos?"barato":"caro"}">${
+            x.somos_mas_baratos?"más barato":"más caro"}</span></td>
+          <td>${x.competidor}</td></tr>`).join("")}</tbody>`;
+      const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
+      c.append(w);
+      const note=document.createElement("p"); note.className="comp-note";
+      note.textContent=`Precio más bajo observado por modelo. Última lectura: `
+        + fecha.toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"})
+        + `. El precio de la competencia enlaza a su ficha.`;
+      c.append(note);
+      grid.append(c);
+    }
+  }
+
+  /* 3 · Modelos por marca ------------------------------------------------ */
   {
     const m=[...by(rows,r=>r.marca).entries()].sort((a,b)=>b[1]-a[1]);
     const top=m.slice(0,12).map(([k,v])=>({k,v}));
@@ -623,7 +702,7 @@ function render(){
       tableFor(["Marca","Modelos"], m.map(([k,v])=>[k,nf.format(v)]))));
   }
 
-  /* 3 · Bandas de precio ------------------------------------------------- */
+  /* 4 · Bandas de precio ------------------------------------------------- */
   {
     const items=BANDS.map(([lo,hi,k])=>({k,v:rows.filter(r=>r.precio>=lo&&r.precio<hi).length}))
       .filter(d=>d.v);
@@ -633,7 +712,7 @@ function render(){
       tableFor(["Banda (€)","Modelos"], items.map(d=>[d.k,nf.format(d.v)]))));
   }
 
-  /* 4 · Nivel de margen (ordinal ramp) ----------------------------------- */
+  /* 5 · Nivel de margen (ordinal ramp) ----------------------------------- */
   {
     const items=ORD_MARGEN.map(k=>({k,v:rows.filter(r=>r.nivel_margen===k).length}))
       .filter(d=>d.v);
@@ -645,7 +724,7 @@ function render(){
         items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"]))));
   }
 
-  /* 5 · Nivel de stock (ordinal ramp) ------------------------------------ */
+  /* 6 · Nivel de stock (ordinal ramp) ------------------------------------ */
   {
     const items=ORD_STOCK.map(k=>({k,v:rows.filter(r=>r.nivel_stock===k).length}))
       .filter(d=>d.v);
@@ -657,7 +736,7 @@ function render(){
         items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"]))));
   }
 
-  /* 6 · Running vs trail ------------------------------------------------- */
+  /* 7 · Running vs trail ------------------------------------------------- */
   {
     const items=[...by(rows,r=>r.tipo_producto).entries()]
       .sort((a,b)=>b[1]-a[1])
@@ -671,7 +750,7 @@ function render(){
         items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"])), true));
   }
 
-  /* 7 · Catálogo paginado ------------------------------------------------ */
+  /* 8 · Catálogo paginado ------------------------------------------------ */
   {
     // The whole filtered slice, not a top-N: paging is what makes 1.483 rows
     // browsable. Still ordered by discount, so the head of the table is the
@@ -757,7 +836,8 @@ function render(){
 /* ── boot ─────────────────────────────────────────────────────────────── */
 (async () => {
   try{
-    ROWS = await load();
+    const [rows_, comp_] = await Promise.all([load(), loadComparison()]);
+    ROWS = rows_; COMP = comp_;
     const skus = ROWS.reduce((s,r)=>s+r.num_skus,0);
     document.getElementById("meta").innerHTML =
       `<b>${nf.format(ROWS.length)}</b> modelos <span class="dot"></span>`+

@@ -145,6 +145,12 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
         "notes": f"{len(matched_urls)} relevant pages of {len(urls)} crawled",
     }])
     print(f"   wrote {len(saved)} products · {len(payload)} offers")
+
+    # Rebuild the narrow public slice the landing page reads. Doing it here
+    # means the page never joins across the whole offer history, and never
+    # needs read access to the private competitor tables.
+    n = sb.rpc("refresh_comparativa_publica")
+    print(f"   public comparison refreshed: {n} models")
     return 0
 
 
