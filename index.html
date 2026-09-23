@@ -24,6 +24,11 @@
   --accent:#2a78d6;
   --s1:#2a78d6; --s2:#eb6834;              /* categorical slots 1,2 (validated) */
   --o1:#86b6ef; --o2:#5598e7; --o3:#2a78d6; --o4:#1c5cab; --o5:#104281; /* ordinal */
+  /* Diverging, for price position: blue = cheaper, gray = level, orange = dearer.
+     Each arm validated as an ordinal ramp; the midpoint is neutral by design. */
+  --dv-c3:#1c5cab; --dv-c2:#2a78d6; --dv-c1:#86b6ef;
+  --dv-mid:#b9b7ae;
+  --dv-d1:#f09a72; --dv-d2:#eb6834; --dv-d3:#a83c15;
   --good:#006300;
   --shadow:0 1px 2px rgba(11,11,11,.04), 0 8px 24px -12px rgba(11,11,11,.10);
   --serif:"Instrument Serif", Georgia, serif;
@@ -38,6 +43,9 @@
     --accent:#3987e5;
     --s1:#3987e5; --s2:#d95926;
     --o1:#9ec5f4; --o2:#6da7ec; --o3:#3987e5; --o4:#256abf; --o5:#184f95;
+    --dv-c3:#1c5cab; --dv-c2:#3987e5; --dv-c1:#9ec5f4;
+    --dv-mid:#6f6d66;
+    --dv-d1:#f0a07c; --dv-d2:#d95926; --dv-d3:#9c3a14;
     --good:#0ca30c;
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.6);
   }
@@ -50,6 +58,9 @@
   --accent:#3987e5;
   --s1:#3987e5; --s2:#d95926;
   --o1:#9ec5f4; --o2:#6da7ec; --o3:#3987e5; --o4:#256abf; --o5:#184f95;
+  --dv-c3:#1c5cab; --dv-c2:#3987e5; --dv-c1:#9ec5f4;
+  --dv-mid:#6f6d66;
+  --dv-d1:#f0a07c; --dv-d2:#d95926; --dv-d3:#9c3a14;
   --good:#0ca30c;
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.6);
 }
@@ -956,68 +967,70 @@ function render(){
 
   const grid=document.createElement("div"); grid.className="grid"; app.append(grid);
 
-  /* 1 · Rebaja frente a stock — the chart the whole project points at ----
-     100% stacked: every row is the same length, so bar length and the printed
-     figure both encode share. Absolute counts ride the tooltip and the table,
-     where they can't be confused with the percentage. */
-  {
-    const items=ORD_STOCK.map(lvl=>{
-      const g=rows.filter(r=>r.nivel_stock===lvl);
-      const r_=g.filter(x=>x.en_rebaja).length;
-      return {k:lvl, n:g.length, reb:r_, full:g.length-r_, pct:g.length?r_/g.length*100:0};
-    }).filter(d=>d.n);
-    const mediaPct = rows.filter(r=>r.en_rebaja).length/rows.length*100;
+  /* 1 · Posición de precio frente a la competencia ----------------------
+     Distribución de los modelos comparados según cuánto nos separamos del
+     competidor más barato. Divergente y centrada en la paridad: a la izquierda
+     somos más baratos, a la derecha más caros, y la altura dice cuántos
+     modelos hay en cada situación. */
+  if(COMP.length){
+    const ids1 = new Set(rows.map(r=>r.modelo));
+    const mejor = new Map();
+    for(const c of COMP){
+      if(!ids1.has(c.modelo)) continue;
+      if(F.competidores.size && !F.competidores.has(c.competidor)) continue;
+      const prev = mejor.get(c.modelo);
+      if(!prev || c.precio_comp < prev.precio_comp) mejor.set(c.modelo, c);
+    }
+    const vs1 = [...mejor.values()];
 
-    const W=640, BAR=26, GAP=18, LAB=92, PADR=84, sw=W-LAB-PADR;
-    const H=items.length*(BAR+GAP)+20;
-    const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img",
-      "aria-label":"Porcentaje de modelos en rebaja dentro de cada nivel de stock"});
-    [0,25,50,75,100].forEach((tv,i)=>{ const x=LAB+sw*tv/100;
-      svg.append(el("line",{x1:x,x2:x,y1:0,y2:H-20,class:i?"gridline":"axis"}));
-      const t=el("text",{x,y:H-5,class:"tick","text-anchor":"middle"}); t.textContent=tv+" %"; svg.append(t);
+    const BANDAS = [
+      {k:"−20 % o más", lo:-1e9, hi:-20,  c:"var(--dv-c3)"},
+      {k:"−20 a −10 %", lo:-20,  hi:-10,  c:"var(--dv-c2)"},
+      {k:"−10 a −2 %",  lo:-10,  hi:-2,   c:"var(--dv-c1)"},
+      {k:"±2 % igual",  lo:-2,   hi:2,    c:"var(--dv-mid)"},
+      {k:"+2 a +10 %",  lo:2,    hi:10,   c:"var(--dv-d1)"},
+      {k:"+10 a +20 %", lo:10,   hi:20,   c:"var(--dv-d2)"},
+      {k:"+20 % o más", lo:20,   hi:1e9,  c:"var(--dv-d3)"},
+    ];
+    const items = BANDAS.map(b=>{
+      const inB = vs1.filter(x=>x.delta_pct >= b.lo && x.delta_pct < b.hi);
+      return {k:b.k, v:inB.length, c:b.c,
+              note:inB.length
+                ? `<span class="t-k">${inB.length===1?"modelo":"modelos"}:</span> ${nf.format(inB.length)}`
+                  + `<br><span class="t-k">ejemplo:</span> ${inB[0].nombre_modelo}`
+                : ""};
     });
-    items.forEach((d,i)=>{
-      const y=i*(BAR+GAP)+2, wR=sw*d.pct/100, wF=sw-wR;
-      const g=el("g",{class:"row"});
-      const lb=el("text",{x:LAB-10,y:y+BAR/2+4,class:"cat","text-anchor":"end"});
-      lb.textContent=d.k; g.append(lb);
-      // 2px surface gap does the separating — no stroke around the marks.
-      g.append(el("path",{d:hbarPath(LAB,y,Math.max(0,wR-(wF>2?2:0)),BAR,wF>2?0:4),
-        fill:"var(--s2)",class:"mark"}));
-      if(wF>0) g.append(el("path",{d:hbarPath(LAB+wR,y,wF,BAR),fill:"var(--s1)",class:"mark"}));
-      // Label inside the mark only when it fits with padding.
-      if(wR>52){
-        const t=el("text",{x:LAB+10,y:y+BAR/2+4,class:"val on-light"});
-        t.textContent=nf1.format(d.pct)+" %"; g.append(t);
-      }
-      const nt=el("text",{x:LAB+sw+10,y:y+BAR/2+4,class:"tick"});
-      nt.textContent="n = "+nf.format(d.n); g.append(nt);
-      const hit=el("rect",{x:0,y:y-GAP/2,width:W,height:BAR+GAP,class:"hit",tabindex:"0",
-        role:"img","aria-label":`Stock ${d.k}: ${nf1.format(d.pct)} por ciento en rebaja, ${nf.format(d.reb)} de ${nf.format(d.n)} modelos`});
-      bindTip(hit,`<b>Stock ${d.k}</b><br><b>${nf1.format(d.pct)} %</b> en rebaja`
-        +`<br><span class="t-k">rebajados:</span> ${nf.format(d.reb)}`
-        +`<br><span class="t-k">precio completo:</span> ${nf.format(d.full)}`
-        +`<br><span class="t-k">modelos:</span> ${nf.format(d.n)}`);
-      g.append(hit); svg.append(g);
-    });
-    // Catalogue average, as a solid hairline reference (never dashed).
-    const mx=LAB+sw*mediaPct/100;
-    svg.append(el("line",{x1:mx,x2:mx,y1:-4,y2:H-20,stroke:"var(--ink-2)","stroke-width":1}));
-    const mt=el("text",{x:mx,y:-9,class:"tick","text-anchor":"middle",fill:"var(--ink-2)"});
-    mt.textContent="media "+nf1.format(mediaPct)+" %"; svg.append(mt);
 
-    const leg=document.createElement("div"); leg.className="legend";
-    leg.innerHTML=`<span><i class="swatch" style="background:var(--s2)"></i>En rebaja</span>
-      <span><i class="swatch" style="background:var(--s1)"></i>Precio completo</span>`;
-    const box=document.createElement("div"); box.style.paddingTop="14px"; box.append(leg,svg);
-    grid.append(card("Rebaja frente a stock",
-      "Qué proporción de cada nivel de stock se vende rebajada. Todas las barras miden lo mismo: lo que cambia es el reparto.",
-      box,
-      tableFor(["Nivel de stock","Modelos","En rebaja","Precio completo","% rebajado"],
-        items.map(d=>[d.k,nf.format(d.n),nf.format(d.reb),nf.format(d.full),nf1.format(d.pct)+" %"])),
-      true));
+    const c = document.createElement("section"); c.className="card wide";
+    if(!vs1.length){
+      c.innerHTML=`<h2>Posición de precio</h2>
+        <p class="sub">Ningún modelo del filtro actual tiene precio de competencia.</p>`;
+      grid.append(c);
+    } else {
+      const baratos = vs1.filter(x=>x.delta_pct < -2).length;
+      const igual   = vs1.filter(x=>x.delta_pct >= -2 && x.delta_pct < 2).length;
+      const caros   = vs1.filter(x=>x.delta_pct >= 2).length;
+      c.innerHTML=`<h2>Posición de precio frente a la competencia</h2>
+        <p class="sub">Cada modelo comparado con el competidor más barato que lo vende.
+        A la izquierda ganamos, a la derecha perdemos.
+        <strong>${nf.format(baratos)}</strong> más baratos ·
+        <strong>${nf.format(igual)}</strong> al mismo precio ·
+        <strong>${nf.format(caros)}</strong> más caros de ${nf.format(vs1.length)}.</p>`;
+      const box=document.createElement("div");
+      const leg=document.createElement("div"); leg.className="legend";
+      leg.innerHTML=`<span><i class="swatch" style="background:var(--dv-c2)"></i>Somos más baratos</span>
+        <span><i class="swatch" style="background:var(--dv-mid)"></i>Mismo precio (±2 %)</span>
+        <span><i class="swatch" style="background:var(--dv-d2)"></i>Somos más caros</span>`;
+      box.append(leg, columns(items, {colorOf:d=>d.c, unit:"modelos", rotate:true}));
+      c.append(box);
+      c.append(...[tableFor(["Diferencia frente al más barato","Modelos","% del comparado"],
+        items.map(d=>[d.k, nf.format(d.v),
+                      nf1.format(vs1.length?d.v/vs1.length*100:0)+" %"]))].map(t=>{
+        const det=document.createElement("details");
+        det.innerHTML="<summary>Ver los datos como tabla</summary>"; det.append(t); return det;}));
+      grid.append(c);
+    }
   }
-
 
   /* 2 · Frente a la competencia ------------------------------------------ */
   if(COMP.length){
