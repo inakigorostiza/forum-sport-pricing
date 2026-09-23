@@ -31,7 +31,11 @@ def _slug(s: str) -> str:
 
 
 def _read(fetcher, url: str) -> str | None:
-    """Sitemaps are often gzipped, which the HTML fetcher cannot decode."""
+    """Sitemaps are often gzipped, which the HTML fetcher cannot decode.
+
+    Direct gzip first; if the CDN refuses it (El Corte Inglés answers 403 to any
+    plain client on its sitemap path) fall back to the fetcher, because a real
+    browser decompresses gzip transparently and is not refused."""
     if url.endswith(".gz"):
         from .fetch import SSL, UA_BROWSER
         try:
@@ -39,7 +43,7 @@ def _read(fetcher, url: str) -> str | None:
             with urllib.request.urlopen(req, timeout=40, context=SSL) as r:
                 return gzip.decompress(r.read()).decode("utf-8", "ignore")
         except Exception:
-            return None
+            pass                       # fall through to the fetcher
     return fetcher.get(url, timeout=60)
 
 

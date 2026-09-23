@@ -110,6 +110,94 @@ def _brand(node: dict) -> str | None:
     return b if isinstance(b, str) else None
 
 
+# ── embedded application state ────────────────────────────────────────────
+# Modern storefronts serialise their data store into the page and leave JSON-LD
+# as a thin SEO stub. JD Sports is the clear case: its JSON-LD carries one
+# generic offer with no identifier, while __NEXT_DATA__ holds ean, size and
+# price for every variant. Parsing only JSON-LD reports "no offers" on a page
+# that is actually complete.
+
+STATE_RE = re.compile(
+    r'<script[^>]*\btype=["\']application/json["\'][^>]*>(.*?)</script>', re.S | re.I)
+
+# Keys a shop might use for the barcode and for the money.
+_EAN_KEYS = ("ean", "gtin13", "gtin", "gtin12", "gtin14", "barcode", "upc")
+_PRICE_KEYS = ("price", "currentprice", "saleprice", "finalprice", "amount")
+_SIZE_KEYS = ("size", "sizelabel", "talla", "variantsize")
+
+
+def _walk(node, depth: int = 0):
+    """Yield every dict in a parsed JSON tree, depth-capped against cycles."""
+    if depth > 30:
+        return
+    if isinstance(node, dict):
+        yield node
+        for v in node.values():
+            yield from _walk(v, depth + 1)
+    elif isinstance(node, list):
+        for v in node:
+            yield from _walk(v, depth + 1)
+
+
+def _money(v):
+    """Accept 60, '60,00 €', or {'centAmount': 6000} / {'value': 60}."""
+    if isinstance(v, dict):
+        if "centAmount" in v:                       # minor units
+            try:
+                return round(float(v["centAmount"]) / 100, 2)
+            except (TypeError, ValueError):
+                return None
+        for k in ("value", "amount", "formattedValue", "price"):
+            if k in v:
+                return _money(v[k])
+        return None
+    return price(v)
+
+
+def _lower_keys(d: dict) -> dict:
+    return {str(k).lower(): v for k, v in d.items()}
+
+
+def extract_state(html: str) -> list[dict]:
+    """Offers found in embedded JSON state: any object carrying a barcode and a
+    price. Deliberately shape-agnostic — it looks for the pair, not for a
+    particular site's schema."""
+    out: list[dict] = []
+    for m in STATE_RE.finditer(html):
+        try:
+            data = json.loads(m.group(1).strip())
+        except (json.JSONDecodeError, ValueError):
+            continue
+        for node in _walk(data):
+            low = _lower_keys(node)
+            code = next((low[k] for k in _EAN_KEYS if low.get(k)), None)
+            g = gtin13(code)
+            if not g:
+                continue
+            amount = next((_money(low[k]) for k in _PRICE_KEYS
+                           if low.get(k) is not None and _money(low[k])), None)
+            if amount is None:
+                continue
+            size = next((low[k] for k in _SIZE_KEYS if low.get(k)), None)
+            avail = low.get("availability") or low.get("stockstatus") or low.get("instock")
+            out.append({
+                "gtin13": g, "mpn": low.get("mpn") or low.get("manufacturersku"),
+                "size_raw": str(size) if size is not None else None,
+                "price": amount, "list_price": None, "currency": "EUR",
+                "availability": ("https://schema.org/InStock"
+                                 if avail in (True, "IN_STOCK", "InStock", "inStock")
+                                 else (str(avail) if avail is not None else None)),
+                "promo_text": None, "url": None, "raw": node,
+            })
+    # one entry per barcode: the same variant often appears in several branches
+    seen, uniq = set(), []
+    for o in out:
+        if o["gtin13"] not in seen:
+            seen.add(o["gtin13"])
+            uniq.append(o)
+    return uniq
+
+
 def extract(html: str, url: str) -> dict:
     """Return {product: {...}, offers: [...]} from a product page.
 
@@ -164,6 +252,16 @@ def extract(html: str, url: str) -> dict:
                 "mpn": product["mpn"] or node.get("mpn"),
             })
             add(node)
+
+    # JSON-LD gave prices but no identifier — the page may still carry the
+    # real per-variant data in its embedded state.
+    if not any(o["gtin13"] for o in offers):
+        from_state = extract_state(html)
+        if from_state:
+            for o in from_state:
+                o["url"] = o["url"] or url
+                o["promo_text"] = promo_page
+            offers = from_state
 
     # De-duplicate: the same variant can appear in both a ProductGroup and a
     # standalone Product node on the same page.
