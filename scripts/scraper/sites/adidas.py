@@ -73,7 +73,8 @@ class AdidasFetcher:
             self.gaps.append(round(time.monotonic() - self._last, 2))
         self._last = time.monotonic()
 
-    def get(self, url: str, *, settle_ms: int = 2000, timeout: int = 90) -> str | None:
+    def get(self, url: str, *, settle_ms: int = 2000, timeout: int = 90,
+            expect_in_url: str | None = None) -> str | None:
         """`timeout` is SECONDS, matching PoliteFetcher. Playwright wants
         milliseconds; keeping its unit here made discover.sitemap_urls (which
         passes timeout=60) time out after 60 ms and report an empty sitemap."""
@@ -86,6 +87,14 @@ class AdidasFetcher:
             html = pg.content()
             if re.search(r"WAFfailover|problema de seguridad|Error de referencia", html, re.I):
                 self.errors += 1
+                return None
+            # A delisted article silently 302s to a category page which still
+            # returns 200, 1.2 MB and valid JSON-LD — for a DIFFERENT product.
+            # Measured: 19 of 20 delisted codes do this, one landing on a futsal
+            # boot at 45 EUR. Without this check those prices enter the database
+            # looking perfectly healthy.
+            if expect_in_url and expect_in_url.upper() not in (pg.url or "").upper():
+                self.redirected = getattr(self, "redirected", 0) + 1
                 return None
             self.pages += 1
             return html

@@ -260,3 +260,119 @@ retailers (Deporvillage, Sprinter, Decathlon, JD Sports, Barrabés) serve big
 sitemaps and real prices but publish neither `gtin13` nor `mpn`, so there is
 nothing to join on. Solving that one problem would unlock more coverage than any
 amount of additional bot evasion.
+
+---
+
+## Why the remaining competitors could not be scraped — and what would fix it
+
+Five distinct root causes, not one. They need different solutions, and they are
+worth very different amounts.
+
+### A · The data is in embedded page state, not JSON-LD  *(highest value)*
+
+**JD Sports, and probably Deporvillage, Sprinter and Decathlon.**
+
+These sites were recorded as `NO MATCH KEY` — prices present, no identifier.
+That verdict was wrong for JD Sports, and the reason matters. Its JSON-LD
+carries a single generic offer with no `gtin13`:
+
+```json
+{ "@type": "Product", "sku": "E49788E6-…",
+  "offers": { "price": 60, "priceCurrency": "EUR" } }
+```
+
+while the real per-size data sits in an embedded GraphQL state elsewhere in the
+page:
+
+```json
+"variants": [{ "sku": "E49788E6-…", "size": "36",
+               "ean": "4067889138770",
+               "price": { "centAmount": 6000, "formattedValue": "60,00€" } }]
+```
+
+EAN **and** price **and** size, per variant — everything the pipeline needs,
+in a place the extractor never looked. This is the modern default: Next.js,
+Nuxt and Apollo apps serialise their store into the page, and JSON-LD becomes a
+thin SEO stub.
+
+There is also a **second identifier hiding in plain sight**: JD Sports' image
+URLs contain `jd_IH7759`, the adidas article code, which matches our `ref_prov`.
+Several shops leak the manufacturer reference through image paths.
+
+> **Fix:** an `extract_state()` pass alongside the JSON-LD one — find
+> `<script>` blocks holding JSON (`__NEXT_DATA__`, `__NUXT__`, `__APOLLO_STATE__`,
+> or any large object literal), walk them for objects carrying an `ean`/`gtin`
+> and a price, and normalise into the same offer shape. Site-agnostic: one
+> parser, many shops.
+>
+> **Effort:** roughly a day. **Unlocks:** potentially the five largest Spanish
+> retailers still missing — Deporvillage (129.330 sitemap URLs), Decathlon
+> (86.943), Sprinter (46.187), JD Sports (17.680), Barrabés (30.586).
+
+### B · Genuinely no identifier published
+
+**Barrabés.** Only an internal `sku` (`107725`), no EAN and no manufacturer
+reference anywhere on the page. Nothing to join on, and no parser fixes that.
+
+> **Fix:** fuzzy matching on brand + model name, with a confidence score and
+> manual review of anything below threshold. Accept that it will be wrong
+> sometimes, and never feed it into an automated repricing rule.
+>
+> **Effort:** 2–3 days including a review UI. **Only worth it for a large seller.**
+
+### C · Client-rendered with nothing extractable
+
+**RunningXpert, Foot Locker, Décimas, Running Warehouse, Wala.**
+
+Re-tested with patchright against real product pages: the JavaScript runs, the
+page grows, and still no offers — except Wala, which renders 11 offers with no
+identifier and therefore belongs in group A or B.
+
+> **Fix:** per-site CSS parsers reading price and identifier from specific
+> elements. Works anywhere; breaks on every redesign, which is exactly why
+> structured data is preferred.
+>
+> **Effort:** 2–4 h per site, plus ongoing maintenance. **Low priority** — these
+> are small sellers.
+
+### D · No sitemap declared
+
+**SportsShoes, Running Emotion, Fútbol Emotion, Salomon, Basketball Emotion.**
+
+`robots.txt` is served and permissive, but advertises no sitemap, so there is
+nothing to enumerate.
+
+> **Fix:** category-page discovery — walk the shop's own navigation, follow
+> pagination, collect product links. A second discovery strategy alongside
+> `sitemap_urls()`, reusable across all five.
+>
+> **Effort:** roughly a day. **Note:** SportsShoes and Running Emotion are
+> running specialists, so their catalogue overlap should be high.
+
+### E · Hard-blocked
+
+**Helly Hansen and Puma** refuse even patchright. **Ekosport** clears Cloudflare
+but its sitemaps stay 403 and its catalogue is client-rendered. **Bike24**
+declares a sitemap that never returns URLs.
+
+> **Fix:** not a scraping problem. An affiliate feed (both brands run programmes
+> through Awin in Spain), a commercial data provider (Minderest, Netrivals —
+> both Spanish and already tracking these sites), or Google Merchant Center's
+> price-competitiveness report, which keys on the same EANs we already match on.
+
+### Recommended order
+
+| # | Action | Effort | Unlocks |
+|---|---|---|---|
+| 1 | **Embedded-state extractor** (group A) | ~1 day | up to 5 of the largest Spanish retailers |
+| 2 | **Category-page discovery** (group D) | ~1 day | 5 sellers, 2 of them running specialists |
+| 3 | Manufacturer code from image URLs | ~2 h | a second matching key where EANs are absent |
+| 4 | Per-site CSS parsers (group C) | 2–4 h each | small sellers, ongoing maintenance |
+| 5 | Fuzzy name matching (group B) | 2–3 days | last resort, needs human review |
+
+Steps 1 and 2 are two days of work for most of the remaining Spanish market.
+Everything below them costs more and returns less.
+
+> **The precondition for all of it:** none of this is worth doing while the
+> crawls are not scheduled. A wider stale dataset is worth less than a narrower
+> fresh one.
