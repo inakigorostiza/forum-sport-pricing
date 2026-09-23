@@ -270,6 +270,24 @@ summary::before{content:"▸ "; color:var(--axis)}
 details[open] summary::before{content:"▾ "}
 summary:hover{color:var(--ink-2)}
 .t-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%}
+/* position:sticky resolves against the nearest SCROLL CONTAINER, and the
+   horizontal wrapper is one — so a sticky <th> inside it would never stick to
+   the viewport. Above the width where the table fits, drop the wrapper's
+   scrolling so the header can stick to the page instead. Narrow screens keep
+   horizontal scrolling, where it matters more than a pinned header. */
+@media (min-width:1000px){ .t-wrap{overflow:visible} }
+thead th{
+  position:sticky;
+  /* sits directly under the filter bar, whose height JS measures at runtime */
+  top:var(--filters-h, 58px);
+  z-index:6;
+  background:var(--surface);
+}
+/* The sticky row needs its own rule, since border-bottom does not travel with it. */
+thead th::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px;
+  background:var(--axis);
+}
 table{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; min-width:420px}
 th,td{text-align:right; padding:7px 8px; border-bottom:1px solid var(--rule);
   font-variant-numeric:tabular-nums}
@@ -863,6 +881,13 @@ function render(){
   cnt.innerHTML=`<b>${nf.format(rows.length)}</b> de ${nf.format(ROWS.length)} modelos`;
   f.append(cnt);
   app.append(f);
+
+  // Park the sticky table headers directly under the filter bar. Measured
+  // rather than hard-coded: the bar wraps to two lines on narrow screens.
+  requestAnimationFrame(()=>{
+    const h = f.getBoundingClientRect().height;
+    if(h) document.documentElement.style.setProperty("--filters-h", `${Math.round(h)}px`);
+  });
 
   // The row above was just rebuilt, so the input the user is typing in is a new
   // element. Restore focus and caret, or every keystroke would drop the cursor.
