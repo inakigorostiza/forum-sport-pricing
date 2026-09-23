@@ -270,7 +270,20 @@ worth very different amounts.
 
 ### A · The data is in embedded page state, not JSON-LD  *(highest value)*
 
-**JD Sports, and probably Deporvillage, Sprinter and Decathlon.**
+**JD Sports — and, tested afterwards, only JD Sports.**
+
+> **Correction.** This section first claimed the pattern probably extended to
+> Deporvillage, Sprinter and Decathlon. It was tested and it does not. Sprinter
+> and Decathlon render fully under patchright and publish **neither an EAN in
+> their embedded state nor a manufacturer code anywhere on the page** — four
+> sampled product pages each, zero matches against our `ref_prov`. Decathlon
+> additionally sells mostly its own brands (Kalenji, Kiprun), which we do not
+> stock at all, so even solved matching would yield little. Deporvillage still
+> refuses product pages outright.
+>
+> The extractor is still worth building — it unlocks JD Sports and is the right
+> shape for the modern web — but the "five largest Spanish retailers" figure was
+> wrong. It unlocks **one**.
 
 These sites were recorded as `NO MATCH KEY` — prices present, no identifier.
 That verdict was wrong for JD Sports, and the reason matters. Its JSON-LD
@@ -364,14 +377,16 @@ declares a sitemap that never returns URLs.
 
 | # | Action | Effort | Unlocks |
 |---|---|---|---|
-| 1 | **Embedded-state extractor** (group A) | ~1 day | up to 5 of the largest Spanish retailers |
+| 1 | **Fix the 11teamsports sitemap** | ~1 h | 1 seller, already enabled, 87 GTIN offers seen |
 | 2 | **Category-page discovery** (group D) | ~1 day | 5 sellers, 2 of them running specialists |
-| 3 | Manufacturer code from image URLs | ~2 h | a second matching key where EANs are absent |
-| 4 | Per-site CSS parsers (group C) | 2–4 h each | small sellers, ongoing maintenance |
-| 5 | Fuzzy name matching (group B) | 2–3 days | last resort, needs human review |
+| 3 | **Embedded-state extractor** (group A) | ~1 day | JD Sports only — see the correction above |
+| 4 | Manufacturer code from image URLs | ~2 h | a second key where EANs are absent (JD Sports leaks `jd_IH7759`) |
+| 5 | Per-site CSS parsers (group C) | 2–4 h each | small sellers, ongoing maintenance |
+| 6 | Fuzzy name matching (group B) | 2–3 days | last resort, needs human review |
 
-Steps 1 and 2 are two days of work for most of the remaining Spanish market.
-Everything below them costs more and returns less.
+Steps 1–3 are about two days and add **three** sellers, not five. Sprinter,
+Decathlon and Deporvillage are not reachable by any of them: the first two
+publish no usable identifier, and the third refuses product pages.
 
 > **The precondition for all of it:** none of this is worth doing while the
 > crawls are not scheduled. A wider stale dataset is worth less than a narrower
