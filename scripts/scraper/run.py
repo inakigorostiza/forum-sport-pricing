@@ -43,6 +43,19 @@ def load_catalogue(sb: Supabase) -> tuple[set[str], dict[str, str]]:
     return gtins, mpn
 
 
+def _code_match(offer: dict, mpn_index: dict) -> bool:
+    """Does this offer's article code name one of our models?
+
+    Accept the full code and the part before the first hyphen, because the two
+    sides carry colour differently: our Saucony ref_prov keeps the suffix
+    (S29101-01) while our Nike ref_prov does not (CD4371). Matching only the
+    base loses the first; matching only the full value loses the second.
+    """
+    code = (offer.get("mpn") or "").upper().strip()
+    return bool(code) and (code in mpn_index
+                           or code.split("-")[0] in mpn_index)
+
+
 def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
         no_cache: bool) -> int:
     sb = Supabase()
@@ -62,8 +75,10 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
         from scraper.sites.adidas import AdidasFetcher
         fetcher = AdidasFetcher(float(c["crawl_delay_s"]))
     else:
-        fetcher = PoliteFetcher(float(c["crawl_delay_s"]), ua=UA_HONEST,
-                                use_cache=not no_cache)
+        fetcher = PoliteFetcher(
+            float(c["crawl_delay_s"]),
+            ua=UA_BROWSER if c.get("user_agent") == "browser" else UA_HONEST,
+            use_cache=not no_cache)
     gtins, mpn_index = load_catalogue(sb)
     print(f"   catalogue: {len(gtins):,} GTIN-13 · {len(mpn_index):,} ref_prov")
 
@@ -73,7 +88,9 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
     if phase == "discover":
         if not c.get("sitemap_url"):
             sys.exit(f"{competitor} has no sitemap_url configured.")
-        all_urls = discover.sitemap_urls(fetcher, c["sitemap_url"])
+        all_urls = discover.sitemap_urls(
+            fetcher, c["sitemap_url"],
+            max_children=c.get("sitemap_max_children") or 12)
         brands = discover.brand_slugs([b["name"] for b in sb.select("brands", select="name")])
         # Product URL shape is per shop; without it the crawler burns requests on
         # category pages (Atmósfera) or rejects everything (bergfreunde, /p/, ...).
@@ -105,9 +122,17 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
         if not html:
             continue
         r = ex.extract(html, url)
-        page_offers = [o for o in r["offers"] if o["gtin13"] in gtins]
-        unmatched_offers += len(r["offers"]) - len(page_offers)
         p = r["product"]
+        # Shops that publish no GTIN still publish the manufacturer style code:
+        # the Emotion family exposes it as JSON-LD "sku" ("DJ7883-114"), whose
+        # base is exactly our ref_prov. Carry it onto the offer so the stored
+        # row keeps the key it matched on.
+        for o in r["offers"]:
+            if not o.get("mpn") and p.get("ext_id"):
+                o["mpn"] = p["ext_id"]
+        page_offers = [o for o in r["offers"]
+                       if o["gtin13"] in gtins or _code_match(o, mpn_index)]
+        unmatched_offers += len(r["offers"]) - len(page_offers)
         products.append({
             "competitor_slug": competitor, "url": url,
             "ext_id": p["ext_id"], "title": p["title"],

@@ -28,8 +28,9 @@ on top of it, a Dynamic Pricing Calculator with a landing page.
 | 6 | Document the API for the frontend | Done — `API.md` |
 | 7 | Landing page | Done |
 | 8 | GitHub and Vercel deployment | Done |
-| 9 | Competitor price scraping | Done — 6 competitors live |
-| 10 | Dynamic Pricing Calculator | Not started |
+| 9 | Competitor price scraping | Done — 10 competitors live |
+| 10 | Re-examining the "unscrapable" sellers | Done — 16 live, 38,5 % of catalogue |
+| 11 | Dynamic Pricing Calculator | Not started |
 
 ---
 
@@ -872,7 +873,69 @@ The remaining obstacle is **not access — it is missing identifiers**. Five lar
 retailers serve big sitemaps and real prices but publish neither `gtin13` nor
 `mpn`. Solving that unlocks more coverage than any further bot evasion.
 
-## Phase 10 — Dynamic Pricing Calculator (not started)
+## Phase 10 — Re-examining the sellers that "could not" be scraped
+
+Fourteen sellers had been written off across earlier passes. Re-testing them
+with the tools built since — undeclared-sitemap probing, a gzip→browser
+fallback, and the embedded-state extractor — took coverage from **10
+competitors / 406 models to 16 / 571**, which is **38,5 % of the catalogue**.
+
+**Six were recovered. Every one failed for a reason inside our crawler.**
+
+| Seller | Models | The actual defect |
+|---|--:|---|
+| Running Emotion | 283 | sitemap walker recursed only into `.xml` children |
+| Fútbol Emotion | 182 | same, plus the domain name tripped our own EXCLUDE filter |
+| Basketball Emotion | 53 | same, plus an article-code match that was too strict |
+| Décimas | 20 | a CDATA wrapper broke `json.loads` on a payload full of EANs |
+| Viladomat | 14 | `--limit` sampled the head of a brand-grouped sitemap |
+| The North Face | 3 | global sitemap never reached `/es-es/`; 403s our honest UA |
+
+> **Lesson — a negative result about someone else is usually a bug in your own
+> code.** Not one of these six was blocked, rate-limited or missing data. Each
+> had published everything we needed the whole time. The earlier verdicts —
+> "client-rendered with nothing extractable", "no sitemap declared", "genuinely
+> dead, 0 from 300" — were all descriptions of our parser, phrased as facts
+> about the shop. **Before recording a negative, prove the failure is theirs.**
+
+> **Lesson — where you sample decides what you find.** Viladomat was declared
+> dead on 300 pages. `--limit` takes the *head* of the candidate list, sitemaps
+> are grouped by brand, and those 300 pages were brands we do not stock. A
+> stride across the same list hit 16 matches in 10 pages. Sample with a stride,
+> never from the head.
+
+> **Lesson — a silent `continue` destroys a diagnosis.** The probe discarded
+> failed fetches with `if not html: continue`, so "blocked by the WAF" and
+> "publishes no structured data" produced an identical verdict. Nine of ten
+> "dead" sites had failed at discovery; only one was truly blocked. **Never let
+> two different causes share one error path.**
+
+### A defect this surfaced
+
+The crawler accepted an offer when the part of the competitor's article code
+before the first hyphen matched our `ref_prov`, but `v_ofertas_emparejadas`
+required the two to be *equal*. Offers were stored and then silently dropped
+before reaching the landing page — Basketball Emotion wrote 10 Nike offers and
+produced zero comparison rows.
+
+Neither rule alone is correct, because the two sides carry colour differently:
+
+| Brand | Our `ref_prov` | Their `mpn` | Needs |
+|---|---|---|---|
+| NIKE | `CD4371` | `FQ7262-103` | base match |
+| SAUCONY | `S29101-01` | `S29101-01` | exact match |
+
+Migration `016` accepts either. That one change took the comparison from **641
+to 1.054** model-competitor pairs — it had been suppressing matches for every
+`ref_prov` seller, not just the new ones. Verified against brand agreement: of
+2.536 code matches, the 342 flagged as "different brand" are all naming
+variants (`Novedades Nike` vs `NIKE`) with model names in exact agreement.
+
+> **Lesson — when two components apply the "same" rule, test that they agree.**
+> The crawler and the view had each been reviewed and each was defensible. The
+> bug lived in the gap between them, and it cost 40 % of the matches.
+
+## Phase 11 — Dynamic Pricing Calculator (not started)
 
 Everything is in place: `margen`, `neto`, `descuento_pct`, `nivel_stock` and
 `cobertura_stock` are the levers, and the landing page already frames the

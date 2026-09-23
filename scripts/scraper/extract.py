@@ -126,6 +126,34 @@ _PRICE_KEYS = ("price", "currentprice", "saleprice", "finalprice", "amount")
 _SIZE_KEYS = ("size", "sizelabel", "talla", "variantsize")
 
 
+# Some shops wrap their JSON payload in CDATA (Décimas: <script id="zandman-data"
+# type="application/json"><![CDATA[{...}]]>). json.loads rejects the wrapper, so
+# the page looks like it carries no state at all when it actually carries an EAN
+# for every size.
+def _uncdata(text: str) -> str:
+    """Strip a CDATA wrapper, tolerating a missing or displaced closing marker.
+
+    Anchoring on a matching ]]> at end-of-string is not safe: Décimas emits
+    1,3 MB of state whose closing marker is followed by trailing whitespace and
+    markup, so a strict match leaves the wrapper in place and json.loads fails
+    on the very page that carries every size's EAN.
+    """
+    t = text.strip()
+    if t.startswith("<![CDATA["):
+        t = t[len("<![CDATA["):]
+    return t.strip()
+
+
+def _loads_prefix(text: str):
+    """Parse the leading JSON value and ignore whatever trails it.
+
+    Décimas closes its 1,3 MB payload with a CDATA marker that survives the
+    opening strip, and json.loads rejects the whole document over those two
+    trailing characters. raw_decode reads the object and stops.
+    """
+    return json.JSONDecoder().raw_decode(text)[0]
+
+
 def _walk(node, depth: int = 0):
     """Yield every dict in a parsed JSON tree, depth-capped against cycles."""
     if depth > 30:
@@ -165,7 +193,7 @@ def extract_state(html: str) -> list[dict]:
     out: list[dict] = []
     for m in STATE_RE.finditer(html):
         try:
-            data = json.loads(m.group(1).strip())
+            data = _loads_prefix(_uncdata(m.group(1)))
         except (json.JSONDecodeError, ValueError):
             continue
         for node in _walk(data):

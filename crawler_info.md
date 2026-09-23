@@ -9,6 +9,60 @@ build narrative is in [activities.md](activities.md).
 
 ---
 
+## Where the data stands (2026-09-23)
+
+**16 competitors live · 571 of 1.483 models covered (38,5 %) · 1.054
+model-competitor pairs.** On average we are **+7,4 %** above the competition and
+cheaper on **34,6 %** of comparisons.
+
+| Competitor | Models | Avg. Δ vs us | Matching key |
+|---|--:|--:|---|
+| Running Emotion | 283 | +10,2 % | ref_prov |
+| Fútbol Emotion | 182 | +6,5 % | ref_prov |
+| Nike | 93 | +4,2 % | ref_prov |
+| Bergfreunde | 73 | +10,8 % | gtin13 |
+| adidas | 66 | −5,9 % | ref_prov |
+| i-Run | 63 | +10,2 % | gtin13 |
+| Basketball Emotion | 53 | +8,1 % | ref_prov |
+| Tradeinn | 52 | +21,2 % | gtin13 |
+| El Corte Inglés | 47 | +1,0 % | gtin13 |
+| Top4Running | 42 | +12,6 % | gtin13 |
+| Salomon | 27 | −1,4 % | ref_prov |
+| Atmósfera Sport | 26 | +7,2 % | gtin13 |
+| Décimas | 20 | −7,1 % | gtin13 |
+| Viladomat | 14 | +15,3 % | gtin13 |
+| JD Sports | 10 | −6,6 % | gtin13 |
+| The North Face | 3 | 0,0 % | gtin13 |
+
+The four sellers we undercut — adidas, Décimas, JD Sports, Salomon — are two
+brand stores and two discounters. Against every specialist retailer we are the
+more expensive option.
+
+### The 14 sellers re-examined on 2026-09-23
+
+| Seller | Outcome | What was actually wrong |
+|---|---|---|
+| Running Emotion | ✅ 283 models | sitemap recursion stopped at non-`.xml` children |
+| Fútbol Emotion | ✅ 182 models | same, plus its own domain name tripped the EXCLUDE filter |
+| Basketball Emotion | ✅ 53 models | same; also needed the article-code base match |
+| Décimas | ✅ 20 models | CDATA wrapper broke `json.loads` on a payload full of EANs |
+| Viladomat | ✅ 14 models | `--limit` sampled the head of a brand-grouped sitemap |
+| The North Face | ✅ 3 models | global sitemap never reached `/es-es/`; 403s the honest UA |
+| Under Armour | ⚠️ key, no overlap | publishes gtin13; we stock only 7 UA models |
+| Wala | ❌ discovery | 51.246 sitemap URLs, all categories, zero products |
+| RunningXpert | ❌ discovery | 11.902 URLs, only 32 products |
+| Running Warehouse | ❌ discovery | 466-URL sitemap, 2 shoe entries |
+| Foot Locker | ❌ no key | 2.200 product pages, no GTIN and no article code |
+| Nencini Sport | ❌ blocked | 403 on every product page |
+| 11teamsports | ❌ blocked | declares a sitemap that 403s |
+| Alltricks | ❌ blocked | 403 on `robots.txt` itself |
+
+Six of the fourteen now feed the landing page. **Every one of those six failed
+for a reason inside this crawler, not inside the shop** — and none of them was
+the reason first recorded.
+
+---
+
 ## The procedure: five questions
 
 Every site is assessed with the same five questions, in this order. It is
@@ -112,6 +166,8 @@ site is configuration rather than code:
 | `crawl_delay_s` | minimum gap between requests; honours published `Crawl-delay` |
 | `strategy` | `sitemap_jsonld` (plain HTTP) or `headless` (patchright) |
 | `enabled` | opt-in; a site is never crawled until deliberately switched on |
+| `sitemap_max_children` | child-sitemap fan-out limit; NULL uses the default of 12 |
+| `user_agent` | `honest` (default) or `browser`, for shops that 403 every other client |
 
 URL shapes differ more than expected, which is why `product_url_re` exists:
 
@@ -122,7 +178,10 @@ URL shapes differ more than expected, which is why `product_url_re` exists:
 | Top4Running, 11teamsports | `/p/slug` | `/p/` |
 | Bergfreunde | `/slug/` | `^https://www\.bergfreunde\.es/[^/]+/$` |
 | i-Run | `/…/Trailtalon-Speed_fiche_143095.html` | `_fiche_\d+\.html$` |
-| Viladomat | `/es/product/slug` | `/product/` |
+| Viladomat | `/es/product/brand_slug_id` | `/es/product/` (Spanish store only) |
+| Running / Fútbol / Basketball Emotion | `/es/comprar/zapatilla/brand/slug` | `/comprar/zapatilla/` |
+| Décimas | `/es-es/slug-pum8240000.html` | `-[a-zA-Z]{3}\d{6,}\.html$` |
+| The North Face | `/es-es/p/calzado-747784/slug-NF0A8A96` | `/es-es/p/` |
 
 Without it the crawler either burns requests on category pages (Atmósfera) or
 rejects everything (`/p/`, trailing slash).
@@ -146,7 +205,14 @@ rejects everything (`/p/`, trailing slash).
 **A 5-page sample proves nothing.** I wrote off Bergfreunde and Top4Running on
 5 pages with 0 matches. At 300 pages they are the second and fifth largest
 sources (1.120 and 769 offers). **Use at least 100 pages before concluding
-anything.** Viladomat is genuinely dead — 0 from 300.
+anything.**
+
+**Where you sample matters as much as how much.** I then declared Viladomat
+"genuinely dead — 0 from 300". It was not. `--limit` takes the *head* of the
+candidate list, a sitemap is usually grouped by brand, and those first 300 URLs
+were brands we do not stock. Sampling the same site with a stride across the
+whole list returned 16 matches in 10 pages, and the full crawl returned 170
+offers. **Sample with a stride, never from the head.**
 
 **"No structured data" was my own bug.** `_ld_nodes` only flattened `@graph`, so
 a `Product` nested inside `WebPage.mainEntity` was invisible. That is exactly how
@@ -167,6 +233,40 @@ Sprinter 46.187, both with real prices.
 **A readable `robots.txt` does not mean an accessible site.** Decathlon
 publishes a permissive `robots.txt` with `Crawl-delay` and returns 403 on its
 homepage. Declared policy and what the WAF allows are different things.
+
+**A shoe-shaped URL is not a product page.** My re-probe of 14 sellers fetched
+the first six URLs matching `/zapatilla|shoe|calzado/` and reported "no
+structured data" for five of them. Every URL it tested was a *category listing*
+— `/mens-running-shoes.html`, `/es-es/zapatillas-running-hombre`,
+`/category/zapatillas/adidas/astir.html` — because sitemaps list categories
+before products. The sites were fine; the sample was not.
+
+**A hostname is not a path.** `is_candidate()` slugged the whole URL, so
+`futbolemotion.com` was rejected by its own domain for containing the EXCLUDE
+word "futbol", and every URL on `top4running.es` passed the shoe test because
+the *domain* contains "running" — 6.186 candidates of which 5.441 were jackets,
+joggers and neck gaiters. Judge the path, not the host.
+
+**A child sitemap is not always named `.xml`.** The Emotion shops paginate
+theirs as `/es/sitemap/productos/limit/1000/offset/0/idioma/es`. The walker
+recursed only into locs ending in `.xml`, so it returned those index pages as
+if they were products: a 2.754-URL catalogue looked like 75 junk entries. Their
+sitemap is also three levels deep — root → `/es/sitemap.xml` → paginated
+children — and the default fan-out cap of 12 silently truncated Fútbol Emotion
+to a third of its catalogue, which is why `sitemap_max_children` now exists.
+
+**`json.loads` is not a parser for the wild.** Décimas publishes every size's
+EAN in `<script id="zandman-data" type="application/json"><![CDATA[…]]>`. The
+CDATA wrapper made `json.loads` reject 1,3 MB of perfectly good state, and the
+page reported "no offers". `extract_state()` now strips the wrapper and uses
+`raw_decode`, which reads the leading value and ignores trailing junk.
+
+**Diagnose before concluding — and separate the causes.** The probe swallowed
+failed fetches with `if not html: continue`, so "blocked" and "publishes no
+data" produced the identical verdict. Nine of ten "dead" sites turned out to
+have failed at *discovery*; only Nencini was genuinely blocked. Every wrong
+verdict in this project has come from the same place: the crawler's own
+shortcomings, reported as facts about the seller.
 
 **Source-list volume predicts nothing.** Atmósfera has 10.461 records and yields
 26 models; Bergfreunde has 1.808 and yields 73.
@@ -335,32 +435,45 @@ reference anywhere on the page. Nothing to join on, and no parser fixes that.
 
 ### C · Client-rendered with nothing extractable
 
-**RunningXpert, Foot Locker, Décimas, Running Warehouse, Wala.**
+**RunningXpert, Foot Locker, Running Warehouse, Wala.**
 
-Re-tested with patchright against real product pages: the JavaScript runs, the
-page grows, and still no offers — except Wala, which renders 11 offers with no
-identifier and therefore belongs in group A or B.
+> **Correction (2026-09-23).** Décimas was in this group and does not belong
+> here. It publishes an EAN and a price for **every size** in a
+> `<script id="zandman-data" type="application/json">` block; the extractor was
+> rejecting the payload because `json.loads` cannot cope with the CDATA wrapper.
+> It is now crawled and contributes 20 models. "Client-rendered with nothing
+> extractable" was a statement about my parser, not about the shop.
 
-> **Fix:** per-site CSS parsers reading price and identifier from specific
-> elements. Works anywhere; breaks on every redesign, which is exactly why
-> structured data is preferred.
->
-> **Effort:** 2–4 h per site, plus ongoing maintenance. **Low priority** — these
-> are small sellers.
+What the remaining four actually are, after re-testing product pages rather
+than the category pages the first probe sampled:
+
+| Shop | Real obstacle |
+|---|---|
+| **Foot Locker** | 2.200 product URLs, offers render — but **no `gtin13` and no manufacturer code anywhere**. Nothing to join on. Genuinely group B. |
+| **Wala** | Its 51.246-URL sitemap is **categories only**; not one product URL. Needs category-page discovery. |
+| **RunningXpert** | Same: 11.902 URLs, of which only 32 are products. Category-page discovery. |
+| **Running Warehouse** | 466-URL sitemap with 2 shoe entries. Effectively no product sitemap. |
 
 ### D · No sitemap declared
 
-**SportsShoes, Running Emotion, Fútbol Emotion, Salomon, Basketball Emotion.**
+**SportsShoes and Salomon** — `robots.txt` is served and permissive but
+advertises no sitemap, so there is nothing to enumerate. Salomon was solved by
+probing the conventional locations anyway.
 
-`robots.txt` is served and permissive, but advertises no sitemap, so there is
-nothing to enumerate.
-
-> **Fix:** category-page discovery — walk the shop's own navigation, follow
-> pagination, collect product links. A second discovery strategy alongside
-> `sitemap_urls()`, reusable across all five.
+> **Correction (2026-09-23).** **Running Emotion, Fútbol Emotion and Basketball
+> Emotion were never in this group.** All three declare a sitemap. It is three
+> levels deep — root index → `/es/sitemap.xml` → paginated
+> `/sitemap/productos/limit/1000/offset/N/` children — and the walker recursed
+> only into locs ending in `.xml`, so it returned the *index pages themselves*
+> as though they were products. That is why they looked empty.
 >
-> **Effort:** roughly a day. **Note:** SportsShoes and Running Emotion are
-> running specialists, so their catalogue overlap should be high.
+> All three are now crawled, and **Running Emotion is the single largest source
+> in the project at 283 models**, with Fútbol Emotion second at 182. They
+> publish no GTIN, but their JSON-LD `sku` is the manufacturer article code and
+> matches our `ref_prov`.
+>
+> Category-page discovery is still the right fix for Wala and RunningXpert — it
+> was simply never what was wrong with the Emotion shops.
 
 ### E · Hard-blocked
 
@@ -377,16 +490,13 @@ declares a sitemap that never returns URLs.
 
 | # | Action | Effort | Unlocks |
 |---|---|---|---|
-| 1 | **Fix the 11teamsports sitemap** | ~1 h | 1 seller, already enabled, 87 GTIN offers seen |
-| 2 | **Category-page discovery** (group D) | ~1 day | 5 sellers, 2 of them running specialists |
-| 3 | **Embedded-state extractor** (group A) | ~1 day | JD Sports only — see the correction above |
-| 4 | Manufacturer code from image URLs | ~2 h | a second key where EANs are absent (JD Sports leaks `jd_IH7759`) |
-| 5 | Per-site CSS parsers (group C) | 2–4 h each | small sellers, ongoing maintenance |
-| 6 | Fuzzy name matching (group B) | 2–3 days | last resort, needs human review |
+| 1 | **Category-page discovery** | ~1 day | Wala, RunningXpert, Running Warehouse |
+| 2 | **Browser fetch for sitemaps behind a WAF** | ~2 h | 11teamsports, Alltricks — both 403 on the sitemap itself |
+| 3 | Manufacturer code from image URLs | ~2 h | a second key where EANs are absent (JD Sports leaks `jd_IH7759`) |
+| 4 | Fuzzy name matching (group B) | 2–3 days | Foot Locker, Barrabés — last resort, needs human review |
 
-Steps 1–3 are about two days and add **three** sellers, not five. Sprinter,
-Decathlon and Deporvillage are not reachable by any of them: the first two
-publish no usable identifier, and the third refuses product pages.
+Sprinter, Decathlon and Deporvillage remain unreachable by any of them: the
+first two publish no usable identifier and the third refuses product pages.
 
 > **The precondition for all of it:** none of this is worth doing while the
 > crawls are not scheduled. A wider stale dataset is worth less than a narrower

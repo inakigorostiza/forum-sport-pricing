@@ -488,6 +488,22 @@ async function page(offset){
   return r.json();
 }
 
+// PostgREST caps every response at 1.000 rows. Any table that can outgrow that
+// must be read in pages or it is silently truncated — which is exactly what
+// happened to the comparison once it passed 1.000 rows.
+async function pagedFetch(url){
+  const out=[]; let off=0;
+  for(;;){
+    const r = await fetch(`${url}&limit=1000&offset=${off}`,
+                          {headers:{apikey:ANON, Authorization:`Bearer ${ANON}`}});
+    if(!r.ok) return off ? out : null;
+    const p = await r.json();
+    out.push(...p);
+    if(p.length < 1000) return out;
+    off += 1000;
+  }
+}
+
 async function loadComparison(){
   // comparativa_publica is a narrow, public table refreshed by the scraper:
   // prices and the difference between them. Margin and cost stay private.
@@ -495,11 +511,13 @@ async function loadComparison(){
     + `?select=modelo,marca,nombre_modelo,img_thumb,url_fs,precio_fs,pvp,`
     + `competidor,precio_comp,url_comp,delta_eur,delta_pct,somos_mas_baratos,`
     + `nivel_stock,skus_vistos,skus_disponibles,promo,observed_at`
-    + `&order=delta_pct.desc`;
+    // A non-unique sort key is not a stable paging order: rows tied on
+    // delta_pct could repeat or vanish between pages, so break the tie.
+    + `&order=delta_pct.desc,modelo.asc,competidor.asc`;
   try{
-    const r = await fetch(u,{headers:{apikey:ANON, Authorization:`Bearer ${ANON}`}});
-    if(!r.ok) return [];                       // no comparison yet is not an error
-    return (await r.json()).map(d=>({...d,
+    const rows = await pagedFetch(u);
+    if(!rows) return [];                       // no comparison yet is not an error
+    return rows.map(d=>({...d,
       precio_fs:N(d.precio_fs), pvp:N(d.pvp), precio_comp:N(d.precio_comp),
       delta_eur:N(d.delta_eur), delta_pct:N(d.delta_pct)}));
   }catch{ return []; }

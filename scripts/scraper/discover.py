@@ -47,17 +47,25 @@ def _read(fetcher, url: str) -> str | None:
     return fetcher.get(url, timeout=60)
 
 
+# A child sitemap is not always named "*.xml". The Emotion shops paginate theirs
+# as /es/sitemap/productos/limit/1000/offset/0/idioma/es, and treating those as
+# leaf product URLs silently reduced a 2.700-URL catalogue to 75 junk entries.
+def _is_sitemap(url: str) -> bool:
+    return url.endswith((".xml", ".xml.gz")) or "/sitemap/" in url
+
+
 def sitemap_urls(fetcher, sitemap_url: str, *, max_children: int = 12) -> list[str]:
     """Walk a sitemap (or sitemap index) and return every <loc> found."""
     xml = _read(fetcher, sitemap_url)
     if not xml:
         return []
     locs = [m.group(1).strip() for m in LOC_RE.finditer(xml)]
-    if not any(u.endswith((".xml", ".xml.gz")) for u in locs):
+    children = [u for u in locs if _is_sitemap(u)]
+    if not children:
         return locs                      # a leaf sitemap
 
     out: list[str] = []
-    for child in [u for u in locs if u.endswith((".xml", ".xml.gz"))][:max_children]:
+    for child in children[:max_children]:
         child_xml = _read(fetcher, child)
         if child_xml:
             out.extend(m.group(1).strip() for m in LOC_RE.finditer(child_xml))
@@ -79,7 +87,9 @@ def is_candidate(url: str, brands: set[str],
     match later is the real arbiter."""
     if product_re is not None and not product_re.search(url):
         return False
-    s = _slug(url)
+    # Slug the PATH, not the whole URL: futbolemotion.com would otherwise be
+    # rejected by its own hostname for containing an EXCLUDE word.
+    s = _slug(re.sub(r"^https?://[^/]+", "", url))
     if not any(w in s for w in SHOE_WORDS):
         return False
     if any(w in s for w in EXCLUDE):
