@@ -118,7 +118,9 @@ def main(limit: int | None, dry_run: bool) -> int:
         "offers_matched": len(payload), "errors": st.errors, "min_gap_s": st.min_gap,
         "notes": "reference scraped from page body; model-level match"}])
     n = sb.rpc("refresh_comparativa_publica")
-    print(f"   wrote {len(saved)} products · {len(payload)} offers · comparison now {n} rows")
+    h = sb.rpc("refresh_posicionamiento_historico")   # accumulates; see run.py
+    print(f"   wrote {len(saved)} products · {len(payload)} offers · "
+          f"comparison now {n} rows · history +{h} rows")
     return 0
 
 

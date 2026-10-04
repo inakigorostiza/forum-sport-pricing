@@ -9,25 +9,30 @@ build narrative is in [activities.md](activities.md).
 
 ---
 
-## Where the data stands (2026-09-23)
+## Where the data stands (2026-10-04)
 
 **16 competitors live · 571 of 1.483 models covered (38,5 %) · 1.054
-model-competitor pairs.** On average we are **+7,4 %** above the competition and
-cheaper on **34,6 %** of comparisons.
+model-competitor pairs.** On average we are **+10,3 %** above the competition and
+cheaper on **30,7 %** of comparisons.
+
+> Those two figures read +7,4 % and 34,6 % until migration 020. They moved
+> because the comparison had been picking an arbitrary price whenever several
+> offers from one seller matched the same model — see "a tie in the dedupe key"
+> under *Lessons that cost time*. The new numbers are worse, and correct.
 
 | Competitor | Models | Avg. Δ vs us | Matching key |
 |---|--:|--:|---|
-| Running Emotion | 283 | +10,2 % | ref_prov |
-| Fútbol Emotion | 182 | +6,5 % | ref_prov |
-| Nike | 93 | +4,2 % | ref_prov |
+| Running Emotion | 283 | +14,3 % | ref_prov |
+| Fútbol Emotion | 182 | +10,2 % | ref_prov |
+| Nike | 93 | +16,0 % | ref_prov |
 | Bergfreunde | 73 | +10,8 % | gtin13 |
 | adidas | 66 | −5,9 % | ref_prov |
 | i-Run | 63 | +10,2 % | gtin13 |
-| Basketball Emotion | 53 | +8,1 % | ref_prov |
+| Basketball Emotion | 53 | +11,2 % | ref_prov |
 | Tradeinn | 52 | +21,2 % | gtin13 |
 | El Corte Inglés | 47 | +1,0 % | gtin13 |
 | Top4Running | 42 | +12,6 % | gtin13 |
-| Salomon | 27 | −1,4 % | ref_prov |
+| Salomon | 27 | −0,8 % | ref_prov |
 | Atmósfera Sport | 26 | +7,2 % | gtin13 |
 | Décimas | 20 | −7,1 % | gtin13 |
 | Viladomat | 14 | +15,3 % | gtin13 |
@@ -267,6 +272,19 @@ data" produced the identical verdict. Nine of ten "dead" sites turned out to
 have failed at *discovery*; only Nencini was genuinely blocked. Every wrong
 verdict in this project has come from the same place: the crawler's own
 shortcomings, reported as facts about the seller.
+
+**A tie in the dedupe key is a decision made by coin flip.** The comparison
+collapsed offers with `distinct on (modelo, competidor, coalesce(gtin13,
+size_raw, ''))`. Offers matched by article code carry no `gtin13` and usually no
+`size_raw`, so for every one of them that key was the same empty string:
+`DISTINCT ON` kept one arbitrary row and threw the rest away *before* `min()`
+could see them. 290 of 1.054 pairs — 27,5 % — were showing a competitor price
+picked at random from candidates differing by 24,49 € on average. `DISTINCT ON`
+always returns a row; whether it is the right one depends on the `ORDER BY`
+breaking the tie. When it does not, there is no error and no warning, just a
+plausible number. Fixed in migration 020 by making keyless offers
+un-collapsible, which also makes the view obey the rule the project already
+documented: the reference price is the cheapest found.
 
 **Source-list volume predicts nothing.** Atmósfera has 10.461 records and yields
 26 models; Bergfreunde has 1.808 and yields 73.

@@ -1,9 +1,13 @@
 name: Competitor price monitoring
 
-# Two phases, because a daily full crawl does not fit the Actions allowance
-# (a full Atmósfera sitemap pass is ~1.000 minutes; the budget is 2.000/month):
-#   discover — weekly, walks the sitemap and finds which pages match our catalogue
-#   refresh  — daily, re-fetches only those known-relevant pages (~1 minute each)
+# Why this shape: the positioning chart on the landing page is a time series,
+# and a time series needs a point every day. Nothing else in the project
+# produces one — competitor prices for a past day cannot be reconstructed, so a
+# day missed here is a hole in the data forever.
+#
+#   refresh   daily — re-fetch the URLs already known to match our catalogue,
+#                     and append one day to posicionamiento_historico
+#   discover  weekly — walk the sitemaps again to pick up new products
 on:
   schedule:
     - cron: "0 4 * * 1"     # Mondays 04:00 UTC — discover
@@ -11,13 +15,13 @@ on:
   workflow_dispatch:
     inputs:
       competitor:
-        description: Competitor slug
-        default: atmosfera-sport
+        description: One slug, or blank for all
+        default: ""
       phase:
         description: discover | refresh
         default: refresh
       limit:
-        description: Max pages (blank = no limit)
+        description: Max pages per competitor (blank = no limit)
         default: ""
 
 concurrency:
@@ -25,17 +29,16 @@ concurrency:
   cancel-in-progress: false      # never run two crawls at the same host at once
 
 jobs:
-  crawl:
+  # Plain HTTP sites, crawled one after another inside a SINGLE job.
+  #
+  # Counter-intuitively this is the cheap option. Actions bills per job-minute,
+  # so fifteen parallel jobs pay fifteen runner start-ups (~1.590 min/month)
+  # while one sequential job pays one (~900 min/month) — comfortably inside the
+  # 2.000 of the free plan on a private repo. The crawl itself is only ~29 min
+  # of wall clock for every competitor we have.
+  http:
     runs-on: ubuntu-latest
     timeout-minutes: 180
-    # One job per competitor, running concurrently. Different hosts share no
-    # rate limit, so total wall-clock becomes the slowest site rather than the
-    # sum of all of them — and Actions bills wall-clock per job either way.
-    # Never parallelise WITHIN a host: there the crawl delay is the contract.
-    strategy:
-      fail-fast: false
-      matrix:
-        competitor: [atmosfera-sport]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -43,30 +46,63 @@ jobs:
           python-version: "3.12"
       - run: pip install --quiet certifi openpyxl
 
-      - name: Decide phase
-        id: cfg
+      - name: Crawl
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PHASE: ${{ github.event_name == 'workflow_dispatch' && inputs.phase || (github.event.schedule == '0 4 * * 1' && 'discover' || 'refresh') }}
+          ONLY: ${{ inputs.competitor }}
+          LIMIT: ${{ inputs.limit }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "phase=${{ inputs.phase }}"            >> "$GITHUB_OUTPUT"
-            echo "competitor=${{ inputs.competitor }}"  >> "$GITHUB_OUTPUT"
-            echo "limit=${{ inputs.limit }}"            >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "0 4 * * 1" ]; then
-            echo "phase=discover"       >> "$GITHUB_OUTPUT"
-            echo "competitor=atmosfera-sport" >> "$GITHUB_OUTPUT"
-            echo "limit=1200"           >> "$GITHUB_OUTPUT"
-          else
-            echo "phase=refresh"        >> "$GITHUB_OUTPUT"
-            echo "competitor=atmosfera-sport" >> "$GITHUB_OUTPUT"
-            echo "limit="               >> "$GITHUB_OUTPUT"
-          fi
+          set -u
+          ALL="11teamsports atmosfera-sport basketball-emotion bergfreunde decimas
+               futbol-emotion i-run jd-sports nencini-sport running-emotion salomon
+               the-north-face top4running tradeinn viladomat"
+          [ -n "$ONLY" ] && ALL="$ONLY"
+          FAIL=0
+          for c in $ALL; do
+            echo "::group::$c ($PHASE)"
+            # One competitor failing must not cost us the other fourteen days of
+            # data, so the loop records the failure and carries on.
+            python3 scripts/scraper/run.py --competitor "$c" --phase "$PHASE" --no-cache \
+              ${LIMIT:+--limit "$LIMIT"} || { echo "FAILED: $c"; FAIL=1; }
+            echo "::endgroup::"
+          done
+          exit $FAIL
+
+  # Sites that only answer a real browser. Separate job because installing
+  # Chromium costs ~1 min and the fifteen above do not need it — today the
+  # workflow installed neither, so these three would have failed on import.
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          pip install --quiet certifi openpyxl patchright
+          patchright install --with-deps chromium
 
       - name: Crawl
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PHASE: ${{ github.event_name == 'workflow_dispatch' && inputs.phase || (github.event.schedule == '0 4 * * 1' && 'discover' || 'refresh') }}
+          ONLY: ${{ inputs.competitor }}
+          LIMIT: ${{ inputs.limit }}
         run: |
-          python3 scripts/scraper/run.py \
-            --competitor "${{ steps.cfg.outputs.competitor }}" \
-            --phase "${{ steps.cfg.outputs.phase }}" \
-            --no-cache \
-            ${{ steps.cfg.outputs.limit && format('--limit {0}', steps.cfg.outputs.limit) || '' }}
+          set -u
+          ALL="adidas el-corte-ingles nike"
+          if [ -n "$ONLY" ]; then
+            case " $ALL " in *" $ONLY "*) ALL="$ONLY" ;; *) echo "not a browser site"; exit 0 ;; esac
+          fi
+          FAIL=0
+          for c in $ALL; do
+            echo "::group::$c ($PHASE)"
+            python3 scripts/scraper/run.py --competitor "$c" --phase "$PHASE" --no-cache \
+              ${LIMIT:+--limit "$LIMIT"} || { echo "FAILED: $c"; FAIL=1; }
+            echo "::endgroup::"
+          done
+          exit $FAIL

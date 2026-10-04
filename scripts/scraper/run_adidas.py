@@ -105,8 +105,9 @@ def main(limit: int | None, dry_run: bool) -> int:
         "notes": f"article-code match; {len(products)} products",
     }])
     n = sb.rpc("refresh_comparativa_publica")
+    h = sb.rpc("refresh_posicionamiento_historico")   # accumulates; see run.py
     print(f"   wrote {len(saved)} products · {len(payload)} offers · "
-          f"public comparison now {n} models")
+          f"public comparison now {n} models · history +{h} rows")
     return 0
 
 

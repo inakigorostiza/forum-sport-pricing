@@ -197,6 +197,11 @@ def run(competitor: str, phase: str, limit: int | None, dry_run: bool,
         except Exception: pass
     n = sb.rpc("refresh_comparativa_publica")
     print(f"   public comparison refreshed: {n} models")
+    # Append today to the positioning history. Separate from the snapshot above
+    # because that one is rebuilt destructively every run, while this one has to
+    # accumulate: nobody can reconstruct a competitor's price for a past day.
+    h = sb.rpc("refresh_posicionamiento_historico")
+    print(f"   positioning history: {h} rows for today")
     return 0
 
 

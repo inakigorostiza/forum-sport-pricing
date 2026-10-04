@@ -30,7 +30,8 @@ on top of it, a Dynamic Pricing Calculator with a landing page.
 | 8 | GitHub and Vercel deployment | Done |
 | 9 | Competitor price scraping | Done — 10 competitors live |
 | 10 | Re-examining the "unscrapable" sellers | Done — 16 live, 38,5 % of catalogue |
-| 11 | Dynamic Pricing Calculator | Not started |
+| 11 | Dimension filters + positioning time series | Done |
+| 12 | Dynamic Pricing Calculator | Not started |
 
 ---
 
@@ -935,7 +936,120 @@ variants (`Novedades Nike` vs `NIKE`) with model names in exact agreement.
 > The crawler and the view had each been reviewed and each was defensible. The
 > bug lived in the gap between them, and it cost 40 % of the matches.
 
-## Phase 11 — Dynamic Pricing Calculator (not started)
+## Phase 11 — Las ocho dimensiones y la serie de posicionamiento
+
+Lo que pidió Forum Sport para el MVP: las ocho dimensiones del dataset como
+filtros, y el **POSICIONAMIENTO ONLINE %** (nuestro precio / el del competidor
+de referencia) como serie temporal que responda a todos los filtros.
+
+### Los filtros
+
+Siete de las ocho ya estaban en `v_modelos_detalle`; faltaba `custom_label`
+(migración 017). Tres más (`cat_extendido`, `abcd_tienda`, `abcd_digital`)
+estaban en la vista pero el frontend nunca las pedía.
+
+Están declaradas como **datos, no como ocho bloques repetidos**: cada una es
+«elige 1..n valores de una columna», así que la fila de filtros, el predicado y
+el botón de limpiar se escriben una vez y recorren `DIMS`. Dos normalizaciones
+hacen que los `Set` sean homogéneos: los booleanos pasan a `"true"`/`"false"`, y
+`NULL` pasa a un centinela, de modo que «sin clasificación» (294 modelos) es un
+valor elegible y no 294 modelos inalcanzables.
+
+Los ocho van detrás de un desplegable «Más filtros»: la barra es `sticky`, y
+once desplegables en una fila la convertían en un muro de tres líneas.
+
+### La serie
+
+Objetos nuevos: `precios_fs_diario` (privada, 018) y
+`posicionamiento_historico` (pública, 019), más `v_ofertas_emparejadas_diarias`.
+
+> **Lección — un ratio necesita histórico en el numerador, no solo en el
+> denominador.** `models.precio_rebaja` es una columna instantánea sin historia.
+> Dibujarla contra un denominador que sí se mueve habría recalculado cada punto
+> pasado con el precio de *hoy*: cambiar hoy la tarifa de un modelo habría
+> reescrito lo que el gráfico dice de marzo. Por eso el crawler fotografía
+> nuestro precio cada día, con `on conflict do nothing`: la primera escritura
+> del día gana y queda inmutable.
+
+> **Lección — una función de refresco acumulativa no se parece a una
+> instantánea.** `refresh_comparativa_publica()` hace `delete ... where true` y
+> reconstruye entera: correcto para una foto, catastrófico para un histórico.
+> `refresh_posicionamiento_historico()` acota el `delete` a un solo día, porque
+> el precio que un competidor tenía un día pasado no se puede reconstruir desde
+> ningún sitio.
+
+La agregación diaria se hace **en el navegador**, sobre los mismos objetos que
+devuelve `filtered()`. Un RPC habría obligado a escribir el predicado de los
+ocho filtros dos veces, en dos lenguajes y sin un test compartido — que es
+exactamente la forma de las migraciones 012 y 016. Una coincidencia perdida se
+ve; un filtro que discrepa un 3 % es un gráfico verosímil y silenciosamente
+falso.
+
+> **Lección — el *carry-forward* va por rival, no por modelo.** La primera
+> versión arrastraba «el precio más barato del modelo ese día». Como el crawler
+> visita un competidor cada vez, cualquier día en que solo se rastreara un rival
+> caro tiraba a la basura otro más barato todavía vigente: el gráfico decía
+> 110,8 % donde el KPI decía 112,3 %. Arrastrando cada rival por separado y
+> tomando el mínimo después, los dos coinciden al decimal.
+
+**Sesgo de composición.** La cesta cambia de un día a otro (312 modelos el 22 de
+septiembre, 571 el 23), así que una media diaria se mueve por cobertura además
+de por precio. Se trata con cesta fija sobre la vista, *carry-forward* de 7 días
+y el nº de modelos en el tooltip; los días cuya cesta baja del 30 % del máximo
+se dibujan **huecos** y no se usan como «último dato». El arreglo correcto a
+largo plazo —un índice encadenado de pares emparejados— queda documentado y sin
+construir.
+
+**Techo conocido:** por encima de ~40.000 filas en la ventana, la página deja de
+pedir el grano completo y baja solo el rival más barato de cada día (lo dice en
+la tarjeta). Pasado eso, tocaría mover la serie a un RPC — y entonces sí, con un
+test de conformidad que compare los dos caminos.
+
+### El fallo que apareció de paso
+
+Construyendo el histórico salió que **290 de 1.054 parejas (27,5 %) mostraban un
+precio de competidor elegido casi al azar**. La clave de colapso era
+`coalesce(gtin13, size_raw, '')`, y las ofertas emparejadas por código de
+artículo no traen `gtin13` ni casi nunca `size_raw`: para todas ellas la clave
+valía la misma cadena vacía, así que `DISTINCT ON` se quedaba con una fila
+arbitraria y descartaba el resto **antes** de que `min()` las viera.
+
+Nike publica 125,99 € y 179,99 € en la misma ficha; tres modelos nuestros
+comparten `ref_prov HQ3048`, y cuál de los dos precios salía en la página era
+una moneda al aire. Entre candidatos la diferencia media era de 24,49 € y la
+máxima de 93 €.
+
+La migración 020 hace incolapsables las ofertas sin clave natural (se deduplican
+por `id`), de modo que todas llegan al agregado y decide `min()` — que es además
+la regla que el proyecto ya tenía escrita: *el precio de referencia es el más
+barato encontrado*.
+
+**Efecto en las cifras, dicho claramente:** el posicionamiento medio pasa de
+**+7,4 % a +10,3 %** y los modelos en los que ganamos de 34,6 % a 30,7 %.
+Estamos peor de lo que la página decía, porque antes nos comparábamos contra un
+precio rival a veces más caro de lo real.
+
+> **Lección — un empate en la clave de deduplicación es una decisión tomada a
+> cara o cruz.** `DISTINCT ON` siempre devuelve una fila; que sea *la correcta*
+> depende de que el `ORDER BY` desempate. Cuando no desempata, no hay error, no
+> hay aviso y el número es plausible durante semanas.
+
+### Rastreo diario
+
+`.github/workflows/scrape.yml` tenía la matriz fijada a un competidor de 16 y
+no instalaba navegador, así que los tres sitios `headless` habrían fallado.
+Ahora son dos jobs —uno HTTP con los quince sitios en serie, otro con navegador
+para adidas, Nike y El Corte Inglés— y un fallo individual no tumba el resto.
+
+Un único job secuencial cuesta ~900 min/mes frente a ~1.590 si cada competidor
+fuera un job en paralelo, porque Actions factura el arranque de cada runner. El
+rastreo en sí son ~29 min/día para todos.
+
+**Sigue pendiente y es el cuello de botella:** los secretos `SUPABASE_URL` y
+`SUPABASE_SERVICE_ROLE_KEY` del repositorio. Sin ellos no se ejecuta nada y la
+serie se queda donde está.
+
+## Phase 12 — Dynamic Pricing Calculator (not started)
 
 Everything is in place: `margen`, `neto`, `descuento_pct`, `nivel_stock` and
 `cobertura_stock` are the levers, and the landing page already frames the

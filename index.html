@@ -152,6 +152,20 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 }
 .filters .f-lab{font-size:11px; letter-spacing:.09em; text-transform:uppercase;
   color:var(--muted); font-weight:650; margin-right:2px}
+/* The eight catalogue dimensions, folded away. flex-basis:100% puts the
+   disclosure on its own line inside the wrapping filter bar. */
+.dims{flex-basis:100%; margin:0}
+.dims>summary{display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+  font-size:12px; font-weight:600; color:var(--ink-2); padding:4px 0; width:max-content}
+.dims>summary::marker{color:var(--muted)}
+.dims>summary .n{background:var(--accent); color:#fff; border-radius:999px;
+  padding:1px 7px; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums}
+.dim-row{display:flex; flex-wrap:wrap; gap:8px; padding:9px 0 2px}
+.card .sub .warn{color:var(--s2); font-weight:600}
+.card .note{font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.5}
+.chip[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent)}
+.periodo{display:inline-flex; gap:4px; align-items:center}
+.periodo .chip{padding:7px 9px}
 select, .chip{
   font-family:var(--sans); font-size:13px; font-weight:500; color:var(--ink);
   background:var(--plane); border:1px solid var(--rule); border-radius:8px;
@@ -259,6 +273,8 @@ text.val.on-dark{fill:#fff}       /* on blue:   4.2:1 */
 .gridline{stroke:var(--grid); stroke-width:1}
 .axis{stroke:var(--axis); stroke-width:1}
 .mark{transition:opacity .13s}
+.parity{stroke:var(--dv-mid); stroke-width:1.5; stroke-dasharray:4 4}
+.hair{stroke:var(--axis); stroke-width:1; pointer-events:none}
 .hit{fill:transparent; cursor:pointer}
 g.row:hover .mark{opacity:.72}
 
@@ -466,13 +482,55 @@ document.getElementById("theme").onclick = () => {
 const FIELDS = ["modelo","brand_code","marca","nombre_modelo","tipo_producto","temporada",
   "ano_temporada","precio","precio_rebaja","descuento_pct","en_rebaja","margen","nivel_margen",
   "nivel_margen_orden","nivel_stock","nivel_stock_orden","cobertura_stock","outlet",
-  "exclusivo_online","num_skus","url","img_thumb"].join(",");
+  "exclusivo_online","cat_extendido","abcd_tienda","abcd_digital","custom_label",
+  "num_skus","url","img_thumb"].join(",");
 
 let ROWS = [];
 let COMP = [];                     // competitor comparison (public view only)
+let HIST = [];                     // daily positioning history
+let HIST_COMPLETO = true;          // false when only the cheapest rival per day was fetched
+let HIST_RANGO = null;             // the window currently in HIST, or null for "everything"
 // Sets, so each filter takes 1..n values. An empty set means "no restriction",
 // which keeps the default cheap: no membership test runs until something is picked.
-const F = { q:"", marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false };
+const F = { q:"", marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false,
+            desde:null, hasta:null };
+
+/* ── the eight catalogue dimensions Forum Sport asked to filter by ──────
+   Declared as data, not as eight near-identical blocks: every one of them is
+   "pick 1..n values of one column", so the filter row, the predicate and the
+   reset button are each written once and loop.
+
+   Two normalisations make the Sets homogeneous:
+   · booleans become "true"/"false", because a checkbox value is a string;
+   · NULL becomes SIN, so "no classification" is a value the user can pick
+     rather than a silently unreachable 294 models. */
+const SIN = "__sin__";
+const dimVal = (d, campo) => {
+  const v = d[campo];
+  return (v === null || v === undefined || v === "") ? SIN : String(v);
+};
+const siNo    = v => v === "true" ? "Sí" : "No";
+const ABCD    = ["AA","A","B","C","D",SIN];
+const abcdLab = v => v === SIN ? "Sin clasificación"
+               : v === "AA" ? "AA · los más vendidos"
+               : v === "D"  ? "D · los menos vendidos" : v;
+const DIMS = [
+  {k:"temporadas",  campo:"temporada",        label:"Temporada",
+   fmt:v=>({AN:"AN · anual", OI:"OI · otoño-invierno", PV:"PV · primavera-verano"}[v]||v)},
+  {k:"anos",        campo:"ano_temporada",    label:"Año temporada",
+   // 9998 is the dataset's "no year" sentinel, not a year.
+   fmt:v=>v==="9998"?"Sin año":v, sort:(a,b)=>b.value.localeCompare(a.value)},
+  {k:"exclusivo",   campo:"exclusivo_online", label:"Exclusivo online", fmt:siNo},
+  {k:"outlet",      campo:"outlet",           label:"Outlet",           fmt:siNo},
+  {k:"catExt",      campo:"cat_extendido",    label:"Cat. extendido",   fmt:siNo},
+  {k:"customLabel", campo:"custom_label",     label:"Custom label",
+   fmt:v=>v===SIN?"Sin etiqueta":v},
+  {k:"abcdTienda",  campo:"abcd_tienda",      label:"ABCD tienda",   fmt:abcdLab,
+   sort:(a,b)=>ABCD.indexOf(a.value)-ABCD.indexOf(b.value)},
+  {k:"abcdDigital", campo:"abcd_digital",     label:"ABCD digital",  fmt:abcdLab,
+   sort:(a,b)=>ABCD.indexOf(a.value)-ABCD.indexOf(b.value)},
+];
+for(const d of DIMS) F[d.k] = new Set();
 
 // Accent- and case-insensitive: "galaxy" must find "GALAXY", "peregrine" must
 // find "PEREGRINE GORE-TEX", and an accented query must not miss its own match.
@@ -523,6 +581,138 @@ async function loadComparison(){
   }catch{ return []; }
 }
 
+/* How many rows the browser will aggregate before we stop asking for the full
+   grain. Past this the page fetches only each day's cheapest rival, which keeps
+   the headline series exact and makes the competitor filter stop narrowing the
+   reference price — stated in the card rather than silently degraded. */
+const LIMITE_FILAS = 40000;
+const RANGO_STALE  = 7;            // days an observation may be carried forward
+
+async function loadHistoria(desde, hasta){
+  const rango = desde ? `&fecha=gte.${desde}` + (hasta?`&fecha=lte.${hasta}`:"") : "";
+  const base = `${URL_}/rest/v1/posicionamiento_historico`;
+  let soloBarato = false;
+  try{
+    // Ask how big the window is before committing to downloading it.
+    const head = await fetch(`${base}?select=fecha${rango}&limit=1`,
+      {headers:{apikey:ANON, Authorization:`Bearer ${ANON}`,
+                Prefer:"count=exact", Range:"0-0"}});
+    const total = Number((head.headers.get("content-range")||"").split("/")[1]) || 0;
+    soloBarato = total > LIMITE_FILAS;
+  }catch{ /* fall through: the fetch below will report the real failure */ }
+
+  const u = base
+    + `?select=fecha,modelo,competidor,precio_fs,precio_comp,posicionamiento,es_mas_barato`
+    + rango
+    + (soloBarato ? "&es_mas_barato=is.true" : "")
+    + `&order=fecha.asc,modelo.asc,competidor_slug.asc`;
+  try{
+    const rows = await pagedFetch(u);
+    HIST_COMPLETO = !soloBarato;
+    HIST_RANGO = desde ? {desde, hasta} : null;
+    if(!rows) return [];
+    return rows.map(d=>({...d,
+      precio_fs:N(d.precio_fs), precio_comp:N(d.precio_comp),
+      posicionamiento:N(d.posicionamiento)}));
+  }catch{ return []; }
+}
+
+/* The daily POSICIONAMIENTO ONLINE %.
+
+   Deliberately computed here, over the same model objects filtered() just
+   returned, rather than in SQL. An RPC would mean the filter predicate existed
+   twice in two languages with no shared test, and this project has already paid
+   for that twice (migrations 012 and 016). A dropped match is visible; a filter
+   that disagrees by 3 % is a plausible-looking chart that is quietly wrong.
+
+   Two corrections the raw average needs:
+   · a FIXED BASKET — the models in view, not "whatever was crawled that day",
+     so the line moves when prices move and not when coverage does;
+   · CARRY-FORWARD, capped at 7 days — a rival's price is still what we last saw
+     until we see otherwise. Without it a catalogue crawled competitor-by-
+     competitor renders as a sawtooth. */
+function serieDiaria(modelos){
+  if(!HIST.length) return [];
+  const enVista = new Set(modelos.map(m=>m.modelo));
+  const comps   = F.competidores;
+  const DIA = 86400000;
+
+  // Observations indexed per (modelo, competidor): carry-forward has to run per
+  // RIVAL, not per model. Collapsing to "the model's cheapest price that day"
+  // first would throw away a still-valid cheaper rival on any day when only a
+  // dearer one happened to be crawled — and the crawler does visit one
+  // competitor at a time.
+  const obs = new Map();            // "modelo|competidor" -> Map(fecha -> precio)
+  const nuestro = new Map();        // "modelo|fecha" -> our price that day
+  const dias = new Set(), compsDia = new Map();
+
+  for(const h of HIST){
+    if(!enVista.has(h.modelo)) continue;
+    if(comps.size && !comps.has(h.competidor)) continue;
+    if(h.precio_fs == null || !(h.precio_comp > 0)) continue;
+    dias.add(h.fecha);
+    if(!compsDia.has(h.fecha)) compsDia.set(h.fecha, new Set());
+    compsDia.get(h.fecha).add(h.competidor);
+    nuestro.set(h.modelo+"|"+h.fecha, h.precio_fs);
+    const k = h.modelo+"|"+h.competidor;
+    let m = obs.get(k); if(!m){ m = new Map(); obs.set(k, m); }
+    const prev = m.get(h.fecha);
+    if(prev == null || h.precio_comp < prev) m.set(h.fecha, h.precio_comp);
+  }
+
+  const fechas = [...dias].sort();
+  if(!fechas.length) return [];
+  const tiempos = fechas.map(f=>Date.parse(f));
+
+  // For each rival timeline, carry its last price forward (max 7 days), then
+  // keep the cheapest live rival per (día, modelo).
+  const refs = fechas.map(()=>new Map());   // índice de día -> Map(modelo -> precio)
+  for(const [k, porFecha] of obs){
+    const modelo = Number(k.slice(0, k.indexOf("|")));
+    let ultimo = null, ultimoT = 0;
+    for(let i=0;i<fechas.length;i++){
+      const hoy = porFecha.get(fechas[i]);
+      if(hoy != null){ ultimo = hoy; ultimoT = tiempos[i]; }
+      else if(ultimo == null || (tiempos[i]-ultimoT) > RANGO_STALE*DIA) continue;
+      const precio = hoy != null ? hoy : ultimo;
+      const prev = refs[i].get(modelo);
+      if(prev == null || precio < prev) refs[i].set(modelo, precio);
+    }
+  }
+
+  // Our own price: that day's if we have it, otherwise the most recent we saw.
+  const fsCarry = new Map();
+  const mediana = a => { const b=[...a].sort((x,y)=>x-y), i=b.length>>1;
+    return b.length%2 ? b[i] : (b[i-1]+b[i])/2; };
+
+  const puntos = fechas.map((f,i)=>{
+    const a=[];
+    for(const [modelo, precio] of refs[i]){
+      const hoy = nuestro.get(modelo+"|"+f);
+      if(hoy != null) fsCarry.set(modelo, hoy);
+      const fs = hoy != null ? hoy : fsCarry.get(modelo);
+      if(fs == null) continue;
+      a.push(fs / precio * 100);
+    }
+    return {
+      k: new Date(f+"T00:00:00").toLocaleDateString("es-ES",{day:"2-digit",month:"short"}),
+      t: tiempos[i], fecha: f,
+      // Mean, so the chart and the "diferencia media" KPI are the same statistic.
+      // The median rides along in the tooltip so skew stays visible.
+      v: a.length ? a.reduce((x,y)=>x+y,0)/a.length : null,
+      mediana: a.length ? mediana(a) : null,
+      n: a.length, comps: (compsDia.get(f)||new Set()).size,
+    };
+  });
+  // A day where we happened to crawl one small competitor is not comparable
+  // with a day covering the whole catalogue: its average says more about who we
+  // looked at than about our prices. Those days stay on the chart — hiding them
+  // would be worse — but they are drawn and read as low-confidence.
+  const nMax = Math.max(0, ...puntos.map(p=>p.n));
+  for(const pt of puntos) pt.flojo = pt.n > 0 && nMax > 0 && pt.n < 0.3*nMax;
+  return puntos;
+}
+
 async function load(){
   // PostgREST caps a response at 1.000 rows, so the 1.483 models come in two pages.
   const out=[]; let off=0;
@@ -552,7 +742,8 @@ const filtered = () => {
     (!F.marcas.size || F.marcas.has(d.brand_code)) &&
     (!F.tipos.size  || F.tipos.has(d.tipo_producto)) &&
     (!F.rebaja      || d.en_rebaja) &&
-    (!conComp       || conComp.has(d.modelo)));
+    (!conComp       || conComp.has(d.modelo)) &&
+    DIMS.every(dm => !F[dm.k].size || F[dm.k].has(dimVal(d, dm.campo))));
 };
 
 /* ── tooltip ──────────────────────────────────────────────────────────── */
@@ -597,6 +788,157 @@ function niceScale(maxVal, target=5){
   const step=(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p;
   const count=Math.max(1,Math.ceil(maxVal/step - 1e-9));
   return {max:step*count, ticks:Array.from({length:count+1},(_,i)=>step*i)};
+}
+
+/* Ticks over an arbitrary interval, for a metric that does not start at zero.
+   niceScale() is hard-wired to a zero baseline, which is right for counts and
+   wrong here: POSICIONAMIENTO ONLINE % lives around 100, so a 0-based axis
+   would squeeze the whole signal into a few pixels of wiggle. */
+function niceBand(min, max, target=5){
+  if(!(max>min)){ min=min-1; max=max+1; }
+  const raw=(max-min)/target, p=Math.pow(10,Math.floor(Math.log10(raw))), n=raw/p;
+  const step=(n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p;
+  const lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step;
+  const ticks=[]; for(let v=lo; v<=hi+1e-9; v+=step) ticks.push(Math.round(v*1e6)/1e6);
+  return {min:lo, max:hi, ticks};
+}
+
+/* Time series, one series. The x axis is a real time scale (date → position),
+   not an index scale: gaps where we did not crawl stay visible as gaps, and a
+   coarser grain can be mixed in later without rewriting this. */
+function line(points,{fmt=v=>nf1.format(v)+" %", baseline=null, unit=""}={}){
+  const W=640,H=272, PADL=48,PADR=14,PADT=16,PADB=38;
+  const pw=W-PADL-PADR, ph=H-PADT-PADB;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  const vals=points.filter(d=>d.v!=null).map(d=>d.v);
+  if(!vals.length) return svg;
+
+  // Honour the client's 95–115 % frame as a floor, not a clamp: an outlier day
+  // must not render off-canvas.
+  const lo=Math.min(95,...vals), hi=Math.max(115,...vals);
+  const sc=niceBand(lo,hi);
+  const t0=points[0].t, t1=points[points.length-1].t, span=Math.max(1,t1-t0);
+  const X=t=>PADL+(points.length===1?pw/2:pw*(t-t0)/span);
+  const Y=v=>PADT+ph-ph*(v-sc.min)/(sc.max-sc.min);
+
+  sc.ticks.forEach((tv,i)=>{
+    const y=Y(tv);
+    svg.append(el("line",{x1:PADL,x2:W-PADR,y1:y,y2:y,class:i?"gridline":"gridline"}));
+    const t=el("text",{x:PADL-8,y:y+4,class:"tick","text-anchor":"end"});
+    t.textContent=fmt(tv); svg.append(t);
+  });
+
+  // Parity. This is the semantic zero of the metric: above it we are dearer.
+  if(baseline!=null && baseline>=sc.min && baseline<=sc.max){
+    svg.append(el("line",{x1:PADL,x2:W-PADR,y1:Y(baseline),y2:Y(baseline),class:"parity"}));
+    const pl=el("text",{x:W-PADR,y:Y(baseline)-6,class:"tick","text-anchor":"end"});
+    pl.textContent="paridad"; pl.setAttribute("fill","var(--muted)"); svg.append(pl);
+  }
+
+  // Date labels: first, last and a few evenly spaced between.
+  const want=Math.min(points.length,6);
+  const cand = points.length<=1 ? [0]
+    : Array.from({length:want},(_,i)=>{
+        const t=t0+span*i/(want-1);
+        return points.reduce((bi,p,j)=>Math.abs(p.t-t)<Math.abs(points[bi].t-t)?j:bi,0);
+      });
+  let lastX=-1e9;
+  [...new Set(cand)].sort((a,b)=>a-b).forEach(i=>{
+    const x=X(points[i].t);
+    if(x-lastX < 58) return;            // would collide with the previous label
+    lastX=x;
+    const anchor = x > W-PADR-26 ? "end" : x < PADL+26 ? "start" : "middle";
+    const t=el("text",{x,y:PADT+ph+18,class:"tick","text-anchor":anchor});
+    t.textContent=points[i].k; svg.append(t);
+  });
+
+  // The line, broken wherever a day has no value rather than bridged across it.
+  let d="", open=false;
+  for(const pt of points){
+    if(pt.v==null || pt.flojo){ open=false; continue; }
+    d += (open?"L":"M")+X(pt.t)+","+Y(pt.v); open=true;
+  }
+  svg.append(el("path",{d,fill:"none",stroke:"var(--s1)","stroke-width":2,
+                        "stroke-linejoin":"round","stroke-linecap":"round",class:"mark"}));
+
+  // A two-point "trend line" is a lie about trend; while the series is short,
+  // show the observations as points instead of implying a slope between them.
+  const sparse=vals.filter((_,i)=>true).length<=14;
+  for(const pt of points){
+    if(pt.v==null) continue;
+    if(pt.flojo)
+      // Hollow: an observation we have, on a basket too small to trust.
+      svg.append(el("circle",{cx:X(pt.t),cy:Y(pt.v),r:4,fill:"var(--surface)",
+                              stroke:"var(--muted)","stroke-width":2}));
+    else if(sparse)
+      svg.append(el("circle",{cx:X(pt.t),cy:Y(pt.v),r:4.5,fill:"var(--s1)",
+                              stroke:"var(--surface)","stroke-width":2}));
+  }
+
+  // Selective direct labels — never a number on every point.
+  const real=points.filter(p=>p.v!=null);
+  const solid=real.filter(p=>!p.flojo);
+  const base=solid.length?solid:real;
+  const mx=base.reduce((a,b)=>b.v>a.v?b:a), mn=base.reduce((a,b)=>b.v<a.v?b:a);
+  const marked=new Set([base[0],base[base.length-1],mx,mn]);
+  for(const pt of marked){
+    // Anchor away from the edges: a centred label on the last point overflows
+    // the viewBox and gets clipped.
+    const x=X(pt.t);
+    const anchor = x > W-PADR-44 ? "end" : x < PADL+44 ? "start" : "middle";
+    const t=el("text",{x,y:Y(pt.v)-11,class:"val","text-anchor":anchor});
+    t.textContent=fmt(pt.v); svg.append(t);
+  }
+
+  // One crosshair over the whole plot, not one hit target per point: at 300
+  // points that would be 300 focusable elements.
+  const hair=el("line",{x1:0,x2:0,y1:PADT,y2:PADT+ph,class:"hair"});
+  hair.style.opacity="0"; svg.append(hair);
+  const dot=el("circle",{r:5,fill:"var(--s1)",stroke:"var(--surface)","stroke-width":2});
+  dot.style.opacity="0"; svg.append(dot);
+  const over=el("rect",{x:PADL,y:PADT,width:pw,height:ph,class:"hit",tabindex:"0",
+    role:"img","aria-label":`${points.length} días. Primero ${base[0].k}: ${fmt(base[0].v)}. `
+      +`Último ${base[base.length-1].k}: ${fmt(base[base.length-1].v)}. `
+      +`Mínimo ${fmt(mn.v)}, máximo ${fmt(mx.v)}.`});
+  let cur=real.length-1;
+  const paint=(e)=>{
+    if(e){ const b=over.getBoundingClientRect();
+      const frac=(e.clientX-b.left)/Math.max(1,b.width);
+      const t=t0+frac*span;
+      cur=real.reduce((bi,p,i)=>Math.abs(p.t-t)<Math.abs(real[bi].t-t)?i:bi,0); }
+    const pt=real[cur];
+    hair.setAttribute("x1",X(pt.t)); hair.setAttribute("x2",X(pt.t));
+    hair.style.opacity="1";
+    dot.setAttribute("cx",X(pt.t)); dot.setAttribute("cy",Y(pt.v)); dot.style.opacity="1";
+    // Labels come from the database, so they are written as text, never as HTML.
+    tip.textContent="";
+    const b=document.createElement("b"); b.textContent=pt.k; tip.append(b);
+    const add=(k,v)=>{ tip.append(document.createElement("br"));
+      const sp=document.createElement("span"); sp.className="t-k"; sp.textContent=k+": ";
+      tip.append(sp, document.createTextNode(v)); };
+    add("Posicionamiento", fmt(pt.v));
+    if(pt.mediana!=null) add("Mediana", fmt(pt.mediana));
+    if(pt.n!=null)       add("Modelos", nf.format(pt.n)+(pt.flojo?" · cobertura baja":""));
+    if(pt.comps!=null)   add("Competidores", nf.format(pt.comps));
+    tip.classList.add("on");
+    const r=tip.getBoundingClientRect(), bb=over.getBoundingClientRect();
+    const cx=(e?e.clientX:bb.left+bb.width*(pt.t-t0)/span);
+    tip.style.left=Math.min(Math.max(8,cx+14), innerWidth-r.width-8)+"px";
+    tip.style.top =Math.max(8,(e?e.clientY:bb.top)-r.height-12)+"px";
+  };
+  const hide=()=>{ tip.classList.remove("on"); hair.style.opacity="0"; dot.style.opacity="0"; };
+  over.addEventListener("mousemove",paint);
+  over.addEventListener("mouseleave",hide);
+  over.addEventListener("focus",()=>paint(null));
+  over.addEventListener("blur",hide);
+  over.addEventListener("keydown",ev=>{
+    if(ev.key!=="ArrowLeft"&&ev.key!=="ArrowRight") return;
+    ev.preventDefault();
+    cur=Math.max(0,Math.min(real.length-1,cur+(ev.key==="ArrowRight"?1:-1)));
+    paint(null);
+  });
+  svg.append(over);
+  return svg;
 }
 
 /* Horizontal bar chart. One series → one colour, no legend box (the title names it). */
@@ -883,21 +1225,70 @@ function render(){
     f.append(multiSelect({label:"Competidor", options:competidores,
                           selected:F.competidores, onChange:render}));
 
+  /* Period presets. Date range first — it is the control a reader reaches for
+     before any dimension. It is also the only filter that refetches, because
+     every other one is a pure function of data already in the browser. */
+  const per=document.createElement("span"); per.className="periodo";
+  const pl=document.createElement("span"); pl.className="f-lab"; pl.textContent="Periodo";
+  per.append(pl);
+  const hoy=new Date();
+  const iso=d=>d.toISOString().slice(0,10);
+  const presets=[["7 d",7],["30 d",30],["90 d",90],["Todo",null]];
+  for(const [etq,dd] of presets){
+    const b=document.createElement("button");
+    b.className="chip"; b.type="button"; b.textContent=etq;
+    const desde = dd===null ? null : iso(new Date(hoy.getTime()-dd*86400000));
+    b.setAttribute("aria-pressed", String(F.desde===desde));
+    b.onclick=async()=>{
+      F.desde=desde; F.hasta=null;
+      b.disabled=true; app.style.opacity=".55";
+      HIST = await loadHistoria(F.desde, F.hasta);
+      app.style.opacity=""; render();
+    };
+    per.append(b);
+  }
+  f.append(per);
+
   const btnRebaja=document.createElement("button");
   btnRebaja.className="chip"; btnRebaja.type="button"; btnRebaja.textContent="Solo en rebaja";
   btnRebaja.setAttribute("aria-pressed", String(F.rebaja));
   btnRebaja.onclick=()=>{F.rebaja=!F.rebaja; render();};
   f.append(btnRebaja);
 
+  /* The eight catalogue dimensions. They live behind a disclosure because the
+     filter bar is sticky: eleven dropdowns in one row would wrap to three lines
+     and park a wall across the top of the page. Collapsed, the summary carries
+     the number of active ones so nothing is hidden silently. */
+  const dimBox = document.createElement("details"); dimBox.className="dims";
+  const activos = DIMS.reduce((n,dm)=>n+(F[dm.k].size?1:0),0);
+  if(activos) dimBox.open = true;
+  const sum = document.createElement("summary");
+  sum.textContent = "Más filtros";
+  if(activos){ const b=document.createElement("span"); b.className="n";
+               b.textContent=String(activos); sum.append(b); }
+  dimBox.append(sum);
+  const dimRow = document.createElement("div"); dimRow.className="dim-row";
+  for(const dm of DIMS){
+    const counts = new Map();
+    for(const r of ROWS){ const v=dimVal(r,dm.campo); counts.set(v,(counts.get(v)||0)+1); }
+    const options = [...counts.entries()]
+      .map(([value,count])=>({value, label:dm.fmt(value), count}))
+      .sort(dm.sort || ((a,b)=>a.label.localeCompare(b.label,"es")));
+    dimRow.append(multiSelect({label:dm.label, options,
+                               selected:F[dm.k], onChange:render}));
+  }
+  dimBox.append(dimRow);
+
   const btnClear=document.createElement("button");
   btnClear.className="ghost"; btnClear.type="button"; btnClear.textContent="Limpiar";
   btnClear.onclick=()=>{F.q=""; F.marcas.clear(); F.tipos.clear(); F.competidores.clear();
-                        F.rebaja=false; render();};
+                        F.rebaja=false; DIMS.forEach(dm=>F[dm.k].clear()); render();};
   f.append(btnClear);
 
   const cnt=document.createElement("span"); cnt.className="f-count";
   cnt.innerHTML=`<b>${nf.format(rows.length)}</b> de ${nf.format(ROWS.length)} modelos`;
   f.append(cnt);
+  f.append(dimBox);
   app.append(f);
 
   // Park the sticky table headers directly under the filter bar. Measured
@@ -1009,6 +1400,59 @@ function render(){
   if(vs.length) app.append(cat);
 
   const grid=document.createElement("div"); grid.className="grid"; app.append(grid);
+
+  /* 0 · POSICIONAMIENTO ONLINE % en el tiempo --------------------------
+     La métrica que pide Forum Sport: nuestro precio dividido por el del
+     competidor de referencia (para el MVP, el más barato encontrado). */
+  {
+    const pts = serieDiaria(rows);
+    const sec = document.createElement("section"); sec.className="card wide";
+    const dias = pts.length;
+    const conDato = pts.filter(p=>p.v!=null);
+    // The headline quotes the last day with a basket worth quoting.
+    const solidos = conDato.filter(p=>!p.flojo);
+    const ultimo  = (solidos.length?solidos:conDato).slice(-1)[0];
+    const colaFloja = conDato.length && conDato[conDato.length-1].flojo
+                    ? conDato[conDato.length-1] : null;
+    let sub = dias
+      ? `Nuestro precio frente al del competidor más barato, <b>un modelo = un dato</b> — `
+        + `la misma base que la «diferencia media» de arriba, que es este mismo número `
+        + `menos 100. 100 % es paridad; por encima somos más caros. `
+        + `Último dato ${ultimo?ultimo.k:"—"}: <b>${nf1.format(ultimo?ultimo.v:0)} %</b>.`
+      : `Todavía no hay histórico para los filtros seleccionados.`;
+    if(dias && dias < 14)
+      sub += ` <span class="warn">Solo ${dias} ${dias===1?"día":"días"} de histórico: `
+           + `todavía no hay tendencia que leer.</span>`;
+    if(colaFloja)
+      sub += ` <span class="warn">El ${colaFloja.k} solo se rastrearon `
+           + `${nf.format(colaFloja.n)} modelos, muy por debajo del resto: ese punto `
+           + `aparece hueco y no se usa como último dato.</span>`;
+    if(!HIST_COMPLETO)
+      sub += ` <span class="warn">Rango amplio: se ha descargado solo el rival más `
+           + `barato de cada día, así que el filtro de competidor no cambia la referencia.</span>`;
+    sec.innerHTML = `<h2>Posicionamiento online %</h2><p class="sub">${sub}</p>`;
+
+    if(dias){
+      sec.append(line(pts,{baseline:100}));
+      // The basket changes from day to day, so say so where it is measurable
+      // rather than letting the line imply a stability it does not have.
+      const nMin=Math.min(...pts.map(p=>p.n)), nMax=Math.max(...pts.map(p=>p.n));
+      if(nMax && nMin !== nMax){
+        const nota=document.createElement("p"); nota.className="note";
+        nota.textContent=`La cesta comparada varía entre ${nf.format(nMin)} y `
+          +`${nf.format(nMax)} modelos según el día; parte del movimiento es cobertura, `
+          +`no precio. El tooltip lleva el número de modelos de cada fecha.`;
+        sec.append(nota);
+      }
+      const tbl=tableFor(["Fecha","Posicionamiento","Mediana","Modelos","Competidores"],
+        pts.filter(p=>p.v!=null).map(p=>[p.fecha, nf1.format(p.v)+" %",
+          nf1.format(p.mediana)+" %", nf.format(p.n), nf.format(p.comps)]));
+      const det=document.createElement("details");
+      det.innerHTML="<summary>Ver los datos como tabla</summary>"; det.append(tbl);
+      sec.append(det);
+    }
+    grid.append(sec);
+  }
 
   /* 1 · Posición de precio frente a la competencia ----------------------
      Distribución de los modelos comparados según cuánto nos separamos del
@@ -1317,8 +1761,9 @@ function render(){
 /* ── boot ─────────────────────────────────────────────────────────────── */
 (async () => {
   try{
-    const [rows_, comp_] = await Promise.all([load(), loadComparison()]);
-    ROWS = rows_; COMP = comp_;
+    const [rows_, comp_, hist_] =
+      await Promise.all([load(), loadComparison(), loadHistoria(null, null)]);
+    ROWS = rows_; COMP = comp_; HIST = hist_;
     const skus = ROWS.reduce((s,r)=>s+r.num_skus,0);
     document.getElementById("meta").innerHTML =
       `<b>${nf.format(ROWS.length)}</b> modelos <span class="dot"></span>`+

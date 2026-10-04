@@ -99,7 +99,9 @@ def main(limit: int | None, dry_run: bool) -> int:
         "notes": "style-code (mpn base) match",
     }])
     n = sb.rpc("refresh_comparativa_publica")
-    print(f"   wrote {len(saved)} products · {len(payload)} offers · comparison now {n} models")
+    h = sb.rpc("refresh_posicionamiento_historico")   # accumulates; see run.py
+    print(f"   wrote {len(saved)} products · {len(payload)} offers · "
+          f"comparison now {n} models · history +{h} rows")
     return 0
 
 
