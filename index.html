@@ -145,6 +145,19 @@ h1 em{font-style:normal; color:var(--fs-red)}
   box-shadow:0 0 0 0 color-mix(in srgb, var(--good) 60%, transparent); animation:pulse 2.6s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .mast-actions{display:flex; gap:8px; align-items:center}
+/* Language switch. A segmented pair rather than a dropdown: with exactly two
+   options a <select> hides the alternative behind a click, and the point of
+   the control is that the other language is visibly available. */
+.lang{display:inline-flex; border:1px solid var(--rule); background:var(--surface)}
+.lang button{
+  font-family:var(--display); font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:var(--tracking-nav);
+  color:var(--muted); background:none; border:0; border-radius:0;
+  padding:7px 10px; cursor:pointer; transition:.16s;
+}
+.lang button + button{border-left:1px solid var(--rule)}
+.lang button:hover{color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--ink); color:var(--plane)}
 button.ghost{
   font-family:var(--display); font-size:12px; font-weight:700; color:var(--ink);
   text-transform:uppercase; letter-spacing:var(--tracking-nav);
@@ -366,13 +379,16 @@ summary::-webkit-details-marker{display:none}
 summary::before{content:"▸ "; color:var(--axis)}
 details[open] summary::before{content:"▾ "}
 summary:hover{color:var(--ink-2)}
-.t-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%}
-/* position:sticky resolves against the nearest SCROLL CONTAINER, and the
-   horizontal wrapper is one — so a sticky <th> inside it would never stick to
-   the viewport. Above the width where the table fits, drop the wrapper's
-   scrolling so the header can stick to the page instead. Narrow screens keep
-   horizontal scrolling, where it matters more than a pinned header. */
-@media (min-width:1000px){ .t-wrap{overflow:visible} }
+/* No horizontal scrolling, at any width — not in the wrapper and not in the
+   page. Every table below is table-layout:fixed at width:100%, so a table can
+   never be wider than this box; what does not fit is dropped by a media query
+   or ellipsed, never pushed off-screen. Before this, the eight-column
+   recommendation table measured 1.479px inside a 1.440px window and dragged
+   the whole document sideways.
+   It also means the wrapper is no longer a scroll container, which is what
+   position:sticky resolves against — so the headers now stick at every width
+   instead of only above 1.000px. */
+.t-wrap{overflow:visible; max-width:100%}
 thead th{
   position:sticky;
   /* sits directly under the filter bar, whose height JS measures at runtime */
@@ -385,14 +401,33 @@ thead th::after{
   content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px;
   background:var(--axis);
 }
-table{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; min-width:420px}
+table{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;
+  table-layout:fixed}
 th,td{text-align:right; padding:7px 8px; border-bottom:1px solid var(--rule);
-  font-variant-numeric:tabular-nums}
+  font-variant-numeric:tabular-nums; overflow:hidden; text-overflow:ellipsis}
 th:first-child,td:first-child{text-align:left; font-variant-numeric:normal}
 th{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
   font-weight:650; border-bottom:1px solid var(--axis);
-  /* "Dif. %" and the currency cells were breaking across two lines. */
-  white-space:nowrap}
+  /* Headers wrap; they do not get cut. With table-layout:fixed a header that
+     does not fit is silently truncated, and "RECOMENDA…" is not a word. Some
+     of these are a single long word that normal wrapping cannot break, hence
+     overflow-wrap — two lines beats a lie. */
+  white-space:normal; overflow-wrap:anywhere}
+
+/* ── Sortable headers ─────────────────────────────────────────────────
+   Every table on the page sorts by any of its columns. The arrow is always
+   present, faint until the column is the active one: a control that only
+   appears on hover is a control nobody finds on a touch screen. */
+th.sortable{cursor:pointer; user-select:none}
+th.sortable:hover{color:var(--ink)}
+th.sortable::before{
+  content:"↕"; font-size:9px; opacity:.35; margin-right:5px;
+  display:inline-block; vertical-align:1px;
+}
+th.sortable:hover::before{opacity:.7}
+th[aria-sort="ascending"], th[aria-sort="descending"]{color:var(--ink)}
+th[aria-sort="ascending"]::before {content:"↑"; opacity:1; color:var(--accent)}
+th[aria-sort="descending"]::before{content:"↓"; opacity:1; color:var(--accent)}
 td{white-space:nowrap}
 td.prod-cell{white-space:normal}
 tbody tr:hover{background:color-mix(in srgb, var(--accent) 6%, transparent)}
@@ -413,7 +448,8 @@ td a:hover{color:var(--accent); border-color:var(--accent)}
 .prod-name{display:flex; flex-direction:column; gap:1px; min-width:0}
 .prod-name small{color:var(--muted); font-size:11.5px; letter-spacing:.03em;
   display:flex; align-items:center; gap:0}
-.prod-name a{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:34ch}
+.prod-name a{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+.prod-name small{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 td.prod-cell{padding:8px}
 .badge{
   display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em;
@@ -437,6 +473,45 @@ td.cont-mark{color:var(--muted); font-size:12px}
 td.best{font-weight:700}
 .edad{color:var(--muted); font-size:12px; white-space:nowrap}
 .edad.stale{color:var(--s2)}
+/* ── Column widths ────────────────────────────────────────────────────
+   With table-layout:fixed the widths are a decision, not an outcome, so they
+   are stated once per table. Below each breakpoint the least load-bearing
+   columns are dropped rather than squeezed: eight columns on a phone is eight
+   illegible columns. The data is still in the table view and in the tooltip. */
+.t-rec  th:nth-child(1){width:23%} .t-rec th:nth-child(8){width:19%}
+.t-comp th:nth-child(1){width:25%} .t-comp th:nth-child(7){width:14%}
+.t-cat  th:nth-child(1){width:34%}
+/* The "why" column is prose, so it wraps instead of ellipsing. */
+.t-rec td:nth-child(8){white-space:normal}
+
+
+@media (max-width:1000px){
+  /* recommended: drop recommended position and recommended margin */
+  .t-rec th:nth-child(5), .t-rec td:nth-child(5),
+  .t-rec th:nth-child(6), .t-rec td:nth-child(6),
+  /* competition: drop the euro gap (the % stays) and the reading age */
+  .t-comp th:nth-child(4), .t-comp td:nth-child(4),
+  .t-comp th:nth-child(8), .t-comp td:nth-child(8){display:none}
+}
+@media (max-width:720px){
+  .t-rec th:nth-child(4), .t-rec td:nth-child(4),
+  .t-rec th:nth-child(8), .t-rec td:nth-child(8),
+  .t-comp th:nth-child(6), .t-comp td:nth-child(6),
+  .t-cat  th:nth-child(2), .t-cat  td:nth-child(2),
+  .t-cat  th:nth-child(5), .t-cat  td:nth-child(5){display:none}
+  .thumb{width:34px; height:34px}
+  tr.grp-cont td.prod-cell{padding-left:28px}
+  th,td{padding:7px 5px}
+  /* Quedan cuatro columnas: el nombre del producto puede quedarse con la
+     mitad, que es lo que hace falta para leerlo. */
+  .t-rec th:nth-child(1), .t-comp th:nth-child(1), .t-cat th:nth-child(1){width:42%}
+  /* La barra de confianza es redundante cuando el número está al lado y, a
+     este ancho, le roba al número los píxeles del símbolo de porcentaje. */
+  .conf-bar{display:none}
+  .f-count{margin-left:0}
+  th{letter-spacing:.02em}
+}
+
 .comp-note{
   font-size:12px; color:var(--muted); margin:12px 0 0; padding-top:10px;
   border-top:1px solid var(--rule);
@@ -501,6 +576,10 @@ footer a{color:var(--ink-2)}
       </div>
       <div class="mast-actions">
         <span class="live"><span class="pulse"></span> Datos en vivo</span>
+        <div class="lang" id="lang" role="group" aria-label="Idioma">
+          <button type="button" data-lang="es" aria-pressed="true">ES</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
         <button class="ghost" id="theme" type="button" aria-label="Cambiar tema">Tema</button>
       </div>
     </div>
@@ -514,7 +593,7 @@ footer a{color:var(--ink-2)}
   </div>
 
   <footer>
-    <span>
+    <span id="pie">
       Catálogo de running y trail · origen <code>Dataset_FS_pricing_dinámico.xlsx</code> ·
       1.483 modelos verificados con 43/43 comprobaciones
     </span>
@@ -526,24 +605,388 @@ footer a{color:var(--ink-2)}
 const URL_  = "https://hhehxwdpvoojgjbogton.supabase.co";
 const ANON  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoZWh4d2Rwdm9vamdqYm9ndG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNzI0MTgsImV4cCI6MjEwNTY0ODQxOH0.JzAvwowqBm6hFM9Ct19Tqq-MyxROK-JAiYjg7LWaROY";
 
-/* ── formatting (es-ES) ───────────────────────────────────────────────── */
-const nf  = new Intl.NumberFormat("es-ES");
-const nf1 = new Intl.NumberFormat("es-ES",{minimumFractionDigits:1,maximumFractionDigits:1});
-const eur = new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0});
-const eur2= new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",minimumFractionDigits:2});
+/* ── idioma · language ────────────────────────────────────────────────
+   Castellano e inglés. Toda cadena visible vive en T con sus dos versiones y
+   se lee con t(); ninguna se escribe suelta en el punto de uso, porque una
+   cadena suelta es una cadena que se queda sin traducir en cuanto alguien la
+   toca. Las que llevan {hueco} reciben valores ya formateados.
+
+   Cambiar de idioma reconstruye los formateadores de Intl: el separador de
+   miles, la posición del símbolo de moneda y «hace 3 días» son parte de la
+   traducción, no decoración alrededor de ella. */
+const IDIOMAS = ["es","en"];
+let LANG = "es";
+try{ const g = localStorage.getItem("fs-lang"); if(IDIOMAS.includes(g)) LANG = g; }catch{}
+const LOC = () => LANG === "es" ? "es-ES" : "en-GB";
+
+const T = {
+/* cabecera, pie, estados ---------------------------------------------- */
+"app.titulo":    {es:"Laboratorio de pricing", en:"Pricing lab"},
+"app.eyebrow":   {es:"Running y trail hombre · Temporada en curso",
+                  en:"Men’s running and trail · Current season"},
+"app.vivo":      {es:"Datos en vivo",        en:"Live data"},
+"app.tema":      {es:"Tema",                 en:"Theme"},
+"app.temaAria":  {es:"Cambiar tema",         en:"Change theme"},
+"app.idioma":    {es:"Idioma",               en:"Language"},
+"app.cargando":  {es:"Cargando catálogo…",   en:"Loading catalogue…"},
+"app.conectando":{es:"Conectando con Supabase…", en:"Connecting to Supabase…"},
+"app.error":     {es:"No se pudo cargar el catálogo: ", en:"Could not load the catalogue: "},
+"app.meta":      {es:"<b>{modelos}</b> modelos <span class=\"dot\"></span><b>{skus}</b> SKU "
+                    +"<span class=\"dot\"></span><b>{marcas}</b> marcas "
+                    +"<span class=\"dot\"></span> running y trail hombre",
+                  en:"<b>{modelos}</b> models <span class=\"dot\"></span><b>{skus}</b> SKUs "
+                    +"<span class=\"dot\"></span><b>{marcas}</b> brands "
+                    +"<span class=\"dot\"></span> men’s running and trail"},
+"app.pie":       {es:"Catálogo de running y trail · origen <code>Dataset_FS_pricing_dinámico.xlsx</code> · "
+                    +"1483 modelos verificados con 43/43 comprobaciones",
+                  en:"Running and trail catalogue · source <code>Dataset_FS_pricing_dinámico.xlsx</code> · "
+                    +"1,483 models verified against 43/43 checks"},
+
+/* valores del catálogo ------------------------------------------------ */
+"si":  {es:"Sí", en:"Yes"},
+"no":  {es:"No", en:"No"},
+"abcd.sin":  {es:"Sin clasificación",      en:"Unclassified"},
+"abcd.AA":   {es:"AA · los más vendidos",  en:"AA · best sellers"},
+"abcd.D":    {es:"D · los menos vendidos", en:"D · slowest sellers"},
+"temp.AN":   {es:"AN · anual",             en:"AN · all year"},
+"temp.OI":   {es:"OI · otoño-invierno",    en:"OI · autumn-winter"},
+"temp.PV":   {es:"PV · primavera-verano",  en:"PV · spring-summer"},
+"sinAno":    {es:"Sin año",                en:"No year"},
+"sinEtiqueta":{es:"Sin etiqueta",          en:"No label"},
+// nivel_stock y nivel_margen llegan en castellano desde la base; aquí solo se
+// traduce su presentación, nunca el valor con el que se filtra.
+"niv.muy bajo":{es:"muy bajo", en:"very low"},
+"niv.bajo":    {es:"bajo",     en:"low"},
+"niv.medio":   {es:"medio",    en:"medium"},
+"niv.alto":    {es:"alto",     en:"high"},
+"niv.muy alto":{es:"muy alto", en:"very high"},
+"tipo.running":{es:"Running",  en:"Running"},
+"tipo.trail":  {es:"Trail",    en:"Trail"},
+
+/* dimensiones (filtros) ----------------------------------------------- */
+"dim.temporada":  {es:"Temporada",       en:"Season"},
+"dim.ano":        {es:"Año temporada",   en:"Season year"},
+"dim.exclusivo":  {es:"Exclusivo online",en:"Online exclusive"},
+"dim.outlet":     {es:"Outlet",          en:"Outlet"},
+"dim.catExt":     {es:"Cat. extendido",  en:"Extended cat."},
+"dim.customLabel":{es:"Custom label",    en:"Custom label"},
+"dim.abcdTienda": {es:"ABCD tienda",     en:"ABCD store"},
+"dim.abcdDigital":{es:"ABCD digital",    en:"ABCD digital"},
+
+/* controles ------------------------------------------------------------ */
+"f.filtrar":   {es:"Filtrar",      en:"Filter"},
+"f.marca":     {es:"Marca",        en:"Brand"},
+"f.tipo":      {es:"Tipo",         en:"Type"},
+"f.competidor":{es:"Competidor",   en:"Competitor"},
+"f.periodo":   {es:"Periodo",      en:"Period"},
+"f.todo":      {es:"Todo",         en:"All"},
+"f.dias":      {es:"{n} d",        en:"{n} d"},
+"f.rebaja":    {es:"Solo en rebaja", en:"On sale only"},
+"f.mas":       {es:"Más filtros",  en:"More filters"},
+"f.limpiar":   {es:"Limpiar",      en:"Clear"},
+"f.cuenta":    {es:"<b>{n}</b> de {total} modelos", en:"<b>{n}</b> of {total} models"},
+"f.todos":     {es:"Todos",        en:"All"},
+"f.ninguno":   {es:"Ninguno",      en:"None"},
+"f.buscar":    {es:"Buscar modelo…", en:"Search model…"},
+"f.buscarAria":{es:"Buscar modelo o marca", en:"Search model or brand"},
+"f.limpiarAria":{es:"Limpiar búsqueda", en:"Clear search"},
+"f.sinCoincidencia":{es:"Ningún modelo coincide con «{q}»",
+                     en:"No model matches “{q}”"},
+"f.vacio":     {es:"Ningún modelo cumple estos filtros", en:"No model matches these filters"},
+"f.vacioQ":    {es:" · búsqueda «{q}»", en:" · search “{q}”"},
+
+/* genéricos ------------------------------------------------------------ */
+"g.tabla":     {es:"Ver los datos como tabla", en:"View the data as a table"},
+"g.modelos":   {es:"modelos",   en:"models"},
+"g.modelo":    {es:"modelo",    en:"model"},
+"g.ahora":     {es:"ahora",     en:"now"},
+"g.paridad":   {es:"paridad",   en:"parity"},
+"g.pctTotal":  {es:"% del total", en:"% of total"},
+"g.nivel":     {es:"Nivel",     en:"Level"},
+"g.thModelo":  {es:"Modelo",    en:"Model"},
+"g.ejemplo":   {es:"ejemplo",   en:"example"},
+
+/* serie temporal ------------------------------------------------------- */
+"ts.titulo":   {es:"Posicionamiento online %", en:"Online price positioning %"},
+"ts.aria":     {es:"{n} días. Primero {p}: {pv}. Último {u}: {uv}. Mínimo {min}, máximo {max}.",
+                en:"{n} days. First {p}: {pv}. Last {u}: {uv}. Minimum {min}, maximum {max}."},
+"ts.tipPos":   {es:"Posicionamiento", en:"Positioning"},
+"ts.tipMed":   {es:"Mediana",         en:"Median"},
+"ts.tipMod":   {es:"Modelos",         en:"Models"},
+"ts.tipComp":  {es:"Competidores",    en:"Competitors"},
+"ts.cobBaja":  {es:" · cobertura baja", en:" · low coverage"},
+"ts.sub":      {es:"Nuestro precio frente al del competidor más barato, <b>un modelo = un dato</b> — "
+                  +"la misma base que la «diferencia media» de arriba, que es este mismo número "
+                  +"menos 100. 100 % es paridad; por encima somos más caros. Último dato {dia}: <b>{v}</b>.",
+                en:"Our price against the cheapest rival’s, <b>one model = one data point</b> — "
+                  +"the same basis as the “average gap” above, which is this number minus 100. "
+                  +"100 % is parity; above it we are dearer. Latest reading {dia}: <b>{v}</b>."},
+"ts.sinHist":  {es:"Todavía no hay histórico para los filtros seleccionados.",
+                en:"There is no history yet for the selected filters."},
+"ts.corto":    {es:" <span class=\"warn\">Solo {n} {d} de histórico: todavía no hay tendencia que leer.</span>",
+                en:" <span class=\"warn\">Only {n} {d} of history: there is no trend to read yet.</span>"},
+"ts.dia":      {es:"día",  en:"day"},
+"ts.diasPl":   {es:"días", en:"days"},
+"ts.cola":     {es:" <span class=\"warn\">El {dia} solo se rastrearon {n} modelos, muy por debajo "
+                  +"del resto: ese punto aparece hueco y no se usa como último dato.</span>",
+                en:" <span class=\"warn\">On {dia} only {n} models were crawled, far below the rest: "
+                  +"that point is drawn hollow and is not used as the latest reading.</span>"},
+"ts.parcial":  {es:" <span class=\"warn\">Rango amplio: se ha descargado solo el rival más barato de "
+                  +"cada día, así que el filtro de competidor no cambia la referencia.</span>",
+                en:" <span class=\"warn\">Wide range: only each day’s cheapest rival was downloaded, "
+                  +"so the competitor filter does not change the reference price.</span>"},
+"ts.cesta":    {es:"La cesta comparada varía entre {min} y {max} modelos según el día; parte del "
+                  +"movimiento es cobertura, no precio. El tooltip lleva el número de modelos de cada fecha.",
+                en:"The compared basket varies between {min} and {max} models depending on the day; part "
+                  +"of the movement is coverage, not price. The tooltip carries each date’s model count."},
+"ts.thFecha":  {es:"Fecha", en:"Date"},
+
+/* titular -------------------------------------------------------------- */
+"h.lede":      {es:"de los modelos comparados son más caros en Forum Sport que en el competidor más barato.",
+                en:"of the compared models are dearer at Forum Sport than at the cheapest competitor."},
+"h.nota":      {es:"<strong>{n}</strong> modelos · <strong>{r}</strong> {rl} · diferencia media <strong>{gap}</strong>",
+                en:"<strong>{n}</strong> models · <strong>{r}</strong> {rl} · average gap <strong>{gap}</strong>"},
+"h.peor":      {es:" · mayor brecha <strong>{m}</strong> ({p} sobre {c})",
+                en:" · widest gap <strong>{m}</strong> ({p} over {c})"},
+"h.competidor":{es:"competidor",  en:"competitor"},
+"h.competidores":{es:"competidores", en:"competitors"},
+"h.ledePvp":   {es:"de los modelos se venden por debajo de su PVP.",
+                en:"of the models sell below their list price."},
+"h.notaPvp":   {es:"Sin precios de competencia para este filtro: la comparativa no puede calcularse sobre esta selección.",
+                en:"No competitor prices for this filter: the comparison cannot be computed on this selection."},
+
+/* KPIs ----------------------------------------------------------------- */
+"k.comparados":{es:"Modelos comparados", en:"Models compared"},
+"k.delCat":    {es:"{p} del catálogo filtrado", en:"{p} of the filtered catalogue"},
+"k.competidores":{es:"Competidores", en:"Competitors"},
+"k.conPrecio": {es:"con precio observado", en:"with an observed price"},
+"k.masCaros":  {es:"Más caros",   en:"Dearer"},
+"k.masBaratos":{es:"Más baratos", en:"Cheaper"},
+"k.mismoPrecio":{es:"Mismo precio", en:"Same price"},
+"k.difMedia":  {es:"Diferencia media", en:"Average gap"},
+"k.frenteBarato":{es:"frente al más barato", en:"against the cheapest"},
+"k.modelos":   {es:"Modelos", en:"Models"},
+"k.sku":       {es:"{n} SKU",  en:"{n} SKUs"},
+"k.marcas":    {es:"Marcas",   en:"Brands"},
+"k.enCatalogo":{es:"en el catálogo", en:"in the catalogue"},
+"k.pvpMedio":  {es:"PVP medio", en:"Average list price"},
+"k.tarifa":    {es:"precio de tarifa", en:"list price"},
+"k.precioReal":{es:"Precio medio real", en:"Average actual price"},
+"k.trasRebaja":{es:"tras rebaja", en:"after markdown"},
+"k.dtoMedio":  {es:"Descuento medio", en:"Average discount"},
+"k.deRebajados":{es:"de los rebajados", en:"of marked-down models"},
+"k.margenMedio":{es:"Margen medio", en:"Average margin"},
+"k.sintetico": {es:"sintético", en:"synthetic"},
+"k.enRebaja":  {es:"En rebaja", en:"On sale"},
+"k.nModelos":  {es:"{n} modelos", en:"{n} models"},
+"k.stockBajo": {es:"Stock bajo o muy bajo", en:"Low or very low stock"},
+"k.delCatalogo":{es:"del catálogo", en:"of the catalogue"},
+
+/* motor de precio ------------------------------------------------------ */
+"m.titulo":    {es:"Precio recomendado", en:"Recommended price"},
+"m.sub":       {es:"<b>Esto no es un precio óptimo.</b> Un óptimo exige saber cuánto se vende a cada "
+                  +"precio, y en este dataset no hay ni una sola unidad vendida: sin demanda no hay "
+                  +"elasticidad. Lo que hay es un recomendador por reglas — posición objetivo frente al "
+                  +"rival más barato según rotación y stock, recortada por barreras que no se negocian. "
+                  +"El coste con el que se calcula el margen es <b>sintético</b> "
+                  +"(<code>precio × (1 − margen)</code>, y el margen solo toma cuatro valores), así que "
+                  +"el suelo de margen es aproximado.",
+                en:"<b>This is not an optimal price.</b> An optimum requires knowing how much sells at "
+                  +"each price, and this dataset contains not a single unit sold: no demand means no "
+                  +"elasticity. What it does support is a rule-based recommender — a target position "
+                  +"against the cheapest rival, set by rotation and stock, then cut back by guardrails "
+                  +"that are not negotiable. The cost the margin is computed from is <b>synthetic</b> "
+                  +"(<code>price × (1 − margin)</code>, and the margin only takes four values), so the "
+                  +"margin floor is approximate."},
+"m.conConf":   {es:"{n} con confianza ≥ 50 %", en:"{n} with confidence ≥ 50 %"},
+"m.baja":      {es:"A la baja", en:"Down"},
+"m.alza":      {es:"Al alza",   en:"Up"},
+"m.media":     {es:"{v} de media", en:"{v} on average"},
+"m.sinCambio": {es:"Sin cambio", en:"Unchanged"},
+"m.enObjetivo":{es:"ya en su objetivo", en:"already on target"},
+"m.posActual": {es:"Posición actual", en:"Current position"},
+"m.sobreRival":{es:"sobre el rival más barato", en:"against the cheapest rival"},
+"m.posRec":    {es:"Posición recomendada", en:"Recommended position"},
+"m.params":    {es:"Parámetros del motor", en:"Engine parameters"},
+"m.reset":     {es:"Restablecer", en:"Reset"},
+"m.pObjAA":    {es:"Objetivo AA (% del rival)", en:"Target AA (% of rival)"},
+"m.pObjA":     {es:"Objetivo A", en:"Target A"},
+"m.pObjB":     {es:"Objetivo B", en:"Target B"},
+"m.pObjC":     {es:"Objetivo C", en:"Target C"},
+"m.pObjD":     {es:"Objetivo D", en:"Target D"},
+"m.pObjSin":   {es:"Objetivo sin clasificar", en:"Target, unclassified"},
+"m.pStkMA":    {es:"Stock muy alto (pp)",  en:"Very high stock (pp)"},
+"m.pStkA":     {es:"Stock alto (pp)",      en:"High stock (pp)"},
+"m.pStkM":     {es:"Stock medio (pp)",     en:"Medium stock (pp)"},
+"m.pStkB":     {es:"Stock bajo (pp)",      en:"Low stock (pp)"},
+"m.pStkMB":    {es:"Stock muy bajo (pp)",  en:"Very low stock (pp)"},
+"m.pOutlet":   {es:"Outlet (pp)",          en:"Outlet (pp)"},
+"m.pVieja":    {es:"Temporada anterior (pp)", en:"Previous season (pp)"},
+"m.pMargen":   {es:"Margen mínimo (%)",    en:"Minimum margin (%)"},
+"m.pRedondeo": {es:"Redondeo (€)",         en:"Rounding (€)"},
+"m.thActual":  {es:"Actual",       en:"Current"},
+"m.thRec":     {es:"Recomendado",  en:"Recommended"},
+"m.thDif":     {es:"Dif.",         en:"Diff."},
+"m.thPosRec":  {es:"Posición rec.", en:"Rec. position"},
+"m.thMargen":  {es:"Margen rec.",  en:"Rec. margin"},
+"m.thConf":    {es:"Confianza",    en:"Confidence"},
+"m.thPorQue":  {es:"Por qué",      en:"Why"},
+"m.inviable":  {es:"Inviable: el margen mínimo supera el PVP",
+                en:"Infeasible: the minimum margin exceeds the list price"},
+"m.barrMargen":{es:"Limitado por el suelo de margen (coste sintético)",
+                en:"Capped by the margin floor (synthetic cost)"},
+"m.barrPvp":   {es:"Limitado por el PVP", en:"Capped by the list price"},
+"m.barrOutlet":{es:"Outlet: solo puede bajar", en:"Outlet: can only go down"},
+"m.objetivo":  {es:"Objetivo {p} del rival más barato", en:"Target {p} of the cheapest rival"},
+"m.sinComp":   {es:"Sin competencia: solo señales internas",
+                en:"No competitor data: internal signals only"},
+"m.sinRotacion":{es:"sin rotación", en:"no rotation class"},
+"m.stock":     {es:"stock {v}", en:"{v} stock"},
+"m.nota":      {es:"Mostrando los {n} mayores ajustes de {total} modelos. La confianza mide la calidad "
+                  +"del dato de mercado — número de rivales, si el emparejado es por EAN o por código, "
+                  +"antigüedad y cuánto se parecen entre sí — no el acierto del precio.",
+                en:"Showing the {n} largest adjustments out of {total} models. Confidence measures the "
+                  +"quality of the market data — how many rivals, whether the match is by EAN or by "
+                  +"article code, how old it is and how closely the rivals agree — not whether the price "
+                  +"is right."},
+/* notas de confianza */
+"c.sinPrecios":{es:"sin precios de competencia", en:"no competitor prices"},
+"c.unSolo":    {es:"un solo competidor", en:"a single competitor"},
+"c.porCodigo": {es:"emparejado por código de artículo, no por EAN",
+                en:"matched by article code, not by EAN"},
+"c.antiguo":   {es:"dato de hace {n} días", en:"reading is {n} days old"},
+"c.discrepan": {es:"los rivales discrepan un {p}", en:"rivals disagree by {p}"},
+"c.sinRot":    {es:"sin clasificación de rotación", en:"no rotation classification"},
+
+/* posición de precio --------------------------------------------------- */
+"pp.titulo":   {es:"Posición de precio", en:"Price position"},
+"pp.tituloLargo":{es:"Posición de precio frente a la competencia",
+                  en:"Price position against the competition"},
+"pp.vacio":    {es:"Ningún modelo del filtro actual tiene precio de competencia.",
+                en:"No model in the current filter has a competitor price."},
+"pp.sub":      {es:"Cada modelo comparado con el competidor más barato que lo vende. A la izquierda "
+                  +"ganamos, a la derecha perdemos. <strong>{b}</strong> más baratos · "
+                  +"<strong>{i}</strong> al mismo precio · <strong>{c}</strong> más caros de {t}.",
+                en:"Each model against the cheapest competitor that sells it. On the left we win, on the "
+                  +"right we lose. <strong>{b}</strong> cheaper · <strong>{i}</strong> at the same price "
+                  +"· <strong>{c}</strong> dearer out of {t}."},
+"pp.legBarato":{es:"Somos más baratos", en:"We are cheaper"},
+"pp.legIgual": {es:"Mismo precio (±2 %)", en:"Same price (±2 %)"},
+"pp.legCaro":  {es:"Somos más caros", en:"We are dearer"},
+"pp.b1":       {es:"−20 % o más", en:"−20 % or more"},
+"pp.b2":       {es:"−20 a −10 %", en:"−20 to −10 %"},
+"pp.b3":       {es:"−10 a −2 %",  en:"−10 to −2 %"},
+"pp.b4":       {es:"±2 % igual",  en:"±2 % level"},
+"pp.b5":       {es:"+2 a +10 %",  en:"+2 to +10 %"},
+"pp.b6":       {es:"+10 a +20 %", en:"+10 to +20 %"},
+"pp.b7":       {es:"+20 % o más", en:"+20 % or more"},
+"pp.thDif":    {es:"Diferencia frente al más barato", en:"Gap against the cheapest"},
+"pp.thPct":    {es:"% del comparado", en:"% of compared"},
+
+/* frente a la competencia ---------------------------------------------- */
+"fc.titulo":   {es:"Frente a la competencia", en:"Against the competition"},
+"fc.vacio":    {es:"Ningún modelo del filtro actual tiene todavía datos de competencia.",
+                en:"No model in the current filter has competitor data yet."},
+"fc.sub":      {es:"{m} modelos · {p} precios observados en {f}. Somos más caros en <strong>{c}</strong> "
+                  +"de {p}{ig}{mu}. Ordenado por mayor diferencia en contra.",
+                en:"{m} models · {p} prices observed at {f}. We are dearer on <strong>{c}</strong> of "
+                  +"{p}{ig}{mu}. Sorted by the largest gap against us."},
+"fc.iguales":  {es:", igualamos el precio en <strong>{n}</strong>",
+                en:", we match the price on <strong>{n}</strong>"},
+"fc.multi":    {es:" · {n} modelos tienen más de un competidor",
+                en:" · {n} models have more than one competitor"},
+"fc.thFs":     {es:"Forum Sport", en:"Forum Sport"},
+"fc.thComp":   {es:"Competencia", en:"Competitor"},
+"fc.thDifPct": {es:"Dif. %",      en:"Diff. %"},
+"fc.thPos":    {es:"Posición",    en:"Position"},
+"fc.thAct":    {es:"Actualizado", en:"Updated"},
+"fc.igual":    {es:"igual",       en:"level"},
+"fc.barato":   {es:"más barato",  en:"cheaper"},
+"fc.caro":     {es:"más caro",    en:"dearer"},
+"fc.rivales":  {es:" · {n} competidores", en:" · {n} competitors"},
+"fc.precioBajo":{es:"Precio más bajo", en:"Lowest price"},
+"fc.verEn":    {es:"Ver {m} en {c}", en:"View {m} at {c}"},
+"fc.nota":     {es:"★ marca el precio más bajo de cada producto, contando el nuestro. Precio más bajo "
+                  +"observado por competidor. Última lectura: {f}. El precio de la competencia enlaza a su ficha.",
+                en:"★ marks the lowest price for each product, ours included. Lowest price observed per "
+                  +"competitor. Last reading: {f}. The competitor price links to their product page."},
+
+/* resto de tarjetas ---------------------------------------------------- */
+"mb.titulo":   {es:"Modelos por marca", en:"Models by brand"},
+"mb.sub12":    {es:"Las 12 marcas con más modelos; el resto se agrupa en «Otras».",
+                en:"The 12 brands with the most models; the rest are grouped under “Other”."},
+"mb.sub":      {es:"Marcas del catálogo.", en:"Brands in the catalogue."},
+"mb.otras":    {es:"Otras marcas", en:"Other brands"},
+"mb.agrupadas":{es:"{n} marcas agrupadas", en:"{n} brands grouped"},
+"mb.thMarca":  {es:"Marca", en:"Brand"},
+"bp.titulo":   {es:"Distribución por banda de precio", en:"Distribution by price band"},
+"bp.sub":      {es:"Modelos según su PVP de tarifa, en euros.",
+                en:"Models by list price, in euros."},
+"bp.thBanda":  {es:"Banda (€)", en:"Band (€)"},
+"nm.titulo":   {es:"Nivel de margen", en:"Margin level"},
+"nm.sub":      {es:"Escala ordenada de menor a mayor margen sintético.",
+                en:"Ordered scale, from lowest to highest synthetic margin."},
+"ns.titulo":   {es:"Nivel de stock", en:"Stock level"},
+"ns.sub":      {es:"Escala ordenada de menor a mayor cobertura de almacén.",
+                en:"Ordered scale, from lowest to highest warehouse coverage."},
+"rt.titulo":   {es:"Running y trail", en:"Running and trail"},
+"rt.sub":      {es:"Reparto del catálogo por tipo de producto.",
+                en:"Split of the catalogue by product type."},
+"rt.thTipo":   {es:"Tipo", en:"Type"},
+"cat.titulo":  {es:"Catálogo", en:"Catalogue"},
+"cat.sub":     {es:"Todos los modelos del filtro, ordenados por descuento sobre PVP. «Neto» es el "
+                  +"ingreso tras margen, calculado en la base de datos. El nombre enlaza a la ficha pública.",
+                en:"Every model in the filter, ordered by discount off the list price. “Net” is the "
+                  +"revenue after margin, computed in the database. The name links to the public page."},
+"cat.thPvp":   {es:"PVP",    en:"List"},
+"cat.thPrecio":{es:"Precio", en:"Price"},
+"cat.thDto":   {es:"Dto.",   en:"Disc."},
+"cat.thNeto":  {es:"Neto",   en:"Net"},
+"cat.thStock": {es:"Stock",  en:"Stock"},
+"pg.primera":  {es:"Primera página", en:"First page"},
+"pg.anterior": {es:"Página anterior", en:"Previous page"},
+"pg.siguiente":{es:"Página siguiente", en:"Next page"},
+"pg.ultima":   {es:"Última página", en:"Last page"},
+"pg.porPagina":{es:"Por página", en:"Per page"},
+"pg.filasAria":{es:"Filas por página", en:"Rows per page"},
+"pg.rango":    {es:"{a}–{b} de {t} modelos", en:"{a}–{b} of {t} models"},
+"pg.sinRes":   {es:"Sin resultados", en:"No results"},
+};
+
+/* Sustituye {hueco} por valores ya formateados. Una clave que falte se
+   devuelve tal cual, visible en la página: un hueco en blanco se cuela en
+   producción, una clave cruda no. */
+function t(k, vals){
+  const e = T[k];
+  let s = e ? (e[LANG] ?? e.es) : k;
+  if(vals) for(const n in vals) s = s.split("{"+n+"}").join(vals[n]);
+  return s;
+}
+// Valores del catálogo que se muestran traducidos pero se filtran en crudo.
+const nivelLab = v => t("niv."+v) === "niv."+v ? v : t("niv."+v);
+
+/* ── formatting ───────────────────────────────────────────────────────── */
+let nf, nf1, eur, eur2, rtf, fechaCorta, fechaLarga;
+function formatos(){
+  const l = LOC();
+  nf  = new Intl.NumberFormat(l);
+  nf1 = new Intl.NumberFormat(l,{minimumFractionDigits:1,maximumFractionDigits:1});
+  eur = new Intl.NumberFormat(l,{style:"currency",currency:"EUR",maximumFractionDigits:0});
+  eur2= new Intl.NumberFormat(l,{style:"currency",currency:"EUR",minimumFractionDigits:2});
+  rtf = new Intl.RelativeTimeFormat(l, {numeric:"auto"});
+  fechaCorta = new Intl.DateTimeFormat(l,{day:"numeric",month:"short"});
+  fechaLarga = new Intl.DateTimeFormat(l,{dateStyle:"long", timeStyle:"short"});
+}
+formatos();
 const pct = v => nf1.format(v)+" %";
 const N   = v => v===null||v===undefined ? null : Number(v);   // PostgREST sends numeric as string
 
 /* How old a price is matters more than when it was taken, so recent readings
    are relative and older ones fall back to a date. */
-const rtf = new Intl.RelativeTimeFormat("es-ES", {numeric:"auto"});
-const fechaCorta = new Intl.DateTimeFormat("es-ES",{day:"numeric",month:"short"});
-const fechaLarga = new Intl.DateTimeFormat("es-ES",
-  {dateStyle:"long", timeStyle:"short"});
 function antiguedad(iso){
   if(!iso) return {txt:"—", full:"", stale:false};
   const d = new Date(iso), mins = Math.round((Date.now() - d) / 60000);
-  const txt = mins < 1      ? "ahora"
+  const txt = mins < 1      ? t("g.ahora")
             : mins < 60     ? rtf.format(-mins, "minute")
             : mins < 1440   ? rtf.format(-Math.round(mins/60), "hour")
             : mins < 10080  ? rtf.format(-Math.round(mins/1440), "day")
@@ -595,25 +1038,27 @@ const dimVal = (d, campo) => {
   const v = d[campo];
   return (v === null || v === undefined || v === "") ? SIN : String(v);
 };
-const siNo    = v => v === "true" ? "Sí" : "No";
+const siNo    = v => v === "true" ? t("si") : t("no");
 const ABCD    = ["AA","A","B","C","D",SIN];
-const abcdLab = v => v === SIN ? "Sin clasificación"
-               : v === "AA" ? "AA · los más vendidos"
-               : v === "D"  ? "D · los menos vendidos" : v;
+const abcdLab = v => v === SIN ? t("abcd.sin")
+               : v === "AA" ? t("abcd.AA")
+               : v === "D"  ? t("abcd.D") : v;
+// Las etiquetas son funciones, no cadenas: DIMS se construye una vez al cargar
+// y tiene que seguir siendo correcto después de cambiar de idioma.
 const DIMS = [
-  {k:"temporadas",  campo:"temporada",        label:"Temporada",
-   fmt:v=>({AN:"AN · anual", OI:"OI · otoño-invierno", PV:"PV · primavera-verano"}[v]||v)},
-  {k:"anos",        campo:"ano_temporada",    label:"Año temporada",
+  {k:"temporadas",  campo:"temporada",        label:()=>t("dim.temporada"),
+   fmt:v=>["AN","OI","PV"].includes(v)?t("temp."+v):v},
+  {k:"anos",        campo:"ano_temporada",    label:()=>t("dim.ano"),
    // 9998 is the dataset's "no year" sentinel, not a year.
-   fmt:v=>v==="9998"?"Sin año":v, sort:(a,b)=>b.value.localeCompare(a.value)},
-  {k:"exclusivo",   campo:"exclusivo_online", label:"Exclusivo online", fmt:siNo},
-  {k:"outlet",      campo:"outlet",           label:"Outlet",           fmt:siNo},
-  {k:"catExt",      campo:"cat_extendido",    label:"Cat. extendido",   fmt:siNo},
-  {k:"customLabel", campo:"custom_label",     label:"Custom label",
-   fmt:v=>v===SIN?"Sin etiqueta":v},
-  {k:"abcdTienda",  campo:"abcd_tienda",      label:"ABCD tienda",   fmt:abcdLab,
+   fmt:v=>v==="9998"?t("sinAno"):v, sort:(a,b)=>b.value.localeCompare(a.value)},
+  {k:"exclusivo",   campo:"exclusivo_online", label:()=>t("dim.exclusivo"), fmt:siNo},
+  {k:"outlet",      campo:"outlet",           label:()=>t("dim.outlet"),    fmt:siNo},
+  {k:"catExt",      campo:"cat_extendido",    label:()=>t("dim.catExt"),    fmt:siNo},
+  {k:"customLabel", campo:"custom_label",     label:()=>t("dim.customLabel"),
+   fmt:v=>v===SIN?t("sinEtiqueta"):v},
+  {k:"abcdTienda",  campo:"abcd_tienda",      label:()=>t("dim.abcdTienda"), fmt:abcdLab,
    sort:(a,b)=>ABCD.indexOf(a.value)-ABCD.indexOf(b.value)},
-  {k:"abcdDigital", campo:"abcd_digital",     label:"ABCD digital",  fmt:abcdLab,
+  {k:"abcdDigital", campo:"abcd_digital",     label:()=>t("dim.abcdDigital"), fmt:abcdLab,
    sort:(a,b)=>ABCD.indexOf(a.value)-ABCD.indexOf(b.value)},
 ];
 for(const d of DIMS) F[d.k] = new Set();
@@ -781,7 +1226,7 @@ function serieDiaria(modelos){
       a.push(fs / precio * 100);
     }
     return {
-      k: new Date(f+"T00:00:00").toLocaleDateString("es-ES",{day:"2-digit",month:"short"}),
+      k: new Date(f+"T00:00:00").toLocaleDateString(LOC(),{day:"2-digit",month:"short"}),
       t: tiempos[i], fecha: f,
       // Mean, so the chart and the "diferencia media" KPI are the same statistic.
       // The median rides along in the tooltip so skew stays visible.
@@ -905,29 +1350,29 @@ function confianza(r, comps){
   const n = comps.length;
   let c = 0, notas = [];
   c += n===0 ? 0 : n===1 ? 15 : n===2 ? 26 : n<=4 ? 34 : 40;
-  if(n===0) notas.push("sin precios de competencia");
-  if(n===1) notas.push("un solo competidor");
+  if(n===0) notas.push(t("c.sinPrecios"));
+  if(n===1) notas.push(t("c.unSolo"));
 
   if(n){
     // gtin13 es talla exacta; ref_prov empareja a nivel de modelo y puede
     // cruzar nuestro color con otro suyo.
     const exacto = comps.some(x=>x.match_method==="gtin13");
     c += exacto ? 15 : 8;
-    if(!exacto) notas.push("emparejado por código de artículo, no por EAN");
+    if(!exacto) notas.push(t("c.porCodigo"));
 
     const dias = Math.max(0, Math.round(
       (Date.now() - Math.max(...comps.map(x=>Date.parse(x.observed_at)||0))) / 86400000));
     c += dias<=1 ? 20 : dias<=7 ? 14 : dias<=14 ? 8 : dias<=30 ? 3 : 0;
-    if(dias>7) notas.push(`dato de hace ${dias} días`);
+    if(dias>7) notas.push(t("c.antiguo",{n:dias}));
   }
   if(n>=2){
     const ps = comps.map(x=>x.precio_comp).filter(v=>v>0);
     const disp = (Math.max(...ps)-Math.min(...ps))/Math.min(...ps)*100;
     c += disp<5 ? 15 : disp<15 ? 10 : disp<30 ? 5 : 0;
-    if(disp>=15) notas.push(`los rivales discrepan un ${nf1.format(disp)} %`);
+    if(disp>=15) notas.push(t("c.discrepan",{p:pct(disp)}));
   }
   c += r.abcd_digital ? 10 : r.abcd_tienda ? 5 : 0;
-  if(!r.abcd_digital && !r.abcd_tienda) notas.push("sin clasificación de rotación");
+  if(!r.abcd_digital && !r.abcd_tienda) notas.push(t("c.sinRot"));
 
   // Un único punto de mercado no puede corroborarse por mucho que sea fresco y
   // exacto: por encima de 45 estaríamos fingiendo certeza.
@@ -1076,7 +1521,7 @@ function line(points,{fmt=v=>nf1.format(v)+" %", baseline=null, unit=""}={}){
   if(baseline!=null && baseline>=sc.min && baseline<=sc.max){
     svg.append(el("line",{x1:PADL,x2:W-PADR,y1:Y(baseline),y2:Y(baseline),class:"parity"}));
     const pl=el("text",{x:W-PADR,y:Y(baseline)-6,class:"tick","text-anchor":"end"});
-    pl.textContent="paridad"; pl.setAttribute("fill","var(--muted)"); svg.append(pl);
+    pl.textContent=t("g.paridad"); pl.setAttribute("fill","var(--muted)"); svg.append(pl);
   }
 
   // Date labels: first, last and a few evenly spaced between.
@@ -1141,9 +1586,8 @@ function line(points,{fmt=v=>nf1.format(v)+" %", baseline=null, unit=""}={}){
   const dot=el("circle",{r:5,fill:"var(--s1)",stroke:"var(--surface)","stroke-width":2});
   dot.style.opacity="0"; svg.append(dot);
   const over=el("rect",{x:PADL,y:PADT,width:pw,height:ph,class:"hit",tabindex:"0",
-    role:"img","aria-label":`${points.length} días. Primero ${base[0].k}: ${fmt(base[0].v)}. `
-      +`Último ${base[base.length-1].k}: ${fmt(base[base.length-1].v)}. `
-      +`Mínimo ${fmt(mn.v)}, máximo ${fmt(mx.v)}.`});
+    role:"img","aria-label":t("ts.aria",{n:points.length, p:base[0].k, pv:fmt(base[0].v),
+      u:base[base.length-1].k, uv:fmt(base[base.length-1].v), min:fmt(mn.v), max:fmt(mx.v)})});
   let cur=real.length-1;
   const paint=(e)=>{
     if(e){ const b=over.getBoundingClientRect();
@@ -1160,10 +1604,10 @@ function line(points,{fmt=v=>nf1.format(v)+" %", baseline=null, unit=""}={}){
     const add=(k,v)=>{ tip.append(document.createElement("br"));
       const sp=document.createElement("span"); sp.className="t-k"; sp.textContent=k+": ";
       tip.append(sp, document.createTextNode(v)); };
-    add("Posicionamiento", fmt(pt.v));
-    if(pt.mediana!=null) add("Mediana", fmt(pt.mediana));
-    if(pt.n!=null)       add("Modelos", nf.format(pt.n)+(pt.flojo?" · cobertura baja":""));
-    if(pt.comps!=null)   add("Competidores", nf.format(pt.comps));
+    add(t("ts.tipPos"), fmt(pt.v));
+    if(pt.mediana!=null) add(t("ts.tipMed"), fmt(pt.mediana));
+    if(pt.n!=null)       add(t("ts.tipMod"), nf.format(pt.n)+(pt.flojo?t("ts.cobBaja"):""));
+    if(pt.comps!=null)   add(t("ts.tipComp"), nf.format(pt.comps));
     tip.classList.add("on");
     const r=tip.getBoundingClientRect(), bb=over.getBoundingClientRect();
     const cx=(e?e.clientX:bb.left+bb.width*(pt.t-t0)/span);
@@ -1186,7 +1630,7 @@ function line(points,{fmt=v=>nf1.format(v)+" %", baseline=null, unit=""}={}){
 }
 
 /* Horizontal bar chart. One series → one colour, no legend box (the title names it). */
-function hbar(items,{fill="var(--s1)", fmt=nf.format, unit="modelos", colorOf=null}={}){
+function hbar(items,{fill="var(--s1)", fmt=v=>nf.format(v), unit=t("g.modelos"), colorOf=null}={}){
   const BAR=Math.min(24,Math.max(12,Math.round(210/items.length)));
   const GAP=Math.max(8,Math.round(BAR*.55)), LAB=132, PADR=64, W=640;
   const H=items.length*(BAR+GAP)+16;
@@ -1212,7 +1656,7 @@ function hbar(items,{fill="var(--s1)", fmt=nf.format, unit="modelos", colorOf=nu
 }
 
 /* Column chart. */
-function columns(items,{fill="var(--s1)", fmt=nf.format, unit="modelos", colorOf=null, rotate=false}={}){
+function columns(items,{fill="var(--s1)", fmt=v=>nf.format(v), unit=t("g.modelos"), colorOf=null, rotate=false}={}){
   const W=640,H=rotate?250:224, PADB=rotate?52:32, PADT=18, PADL=44, PADR=8;
   const pw=W-PADL-PADR, ph=H-PADB-PADT;
   const band=pw/items.length, BAR=Math.min(24,Math.max(6,band-Math.max(2,band*.28)));
@@ -1240,7 +1684,7 @@ function columns(items,{fill="var(--s1)", fmt=nf.format, unit="modelos", colorOf
 }
 
 /* Part-to-whole: a single stacked bar, 2px surface gap between segments. */
-function stacked(items,{fmt=nf.format}={}){
+function stacked(items,{fmt=v=>nf.format(v)}={}){
   const W=640,H=46,BAR=30,GAP=2, total=items.reduce((s,d)=>s+d.v,0)||1;
   const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
   let x=0;
@@ -1254,7 +1698,7 @@ function stacked(items,{fmt=nf.format}={}){
     }
     const hit=el("rect",{x,y:0,width:w,height:BAR+12,class:"hit",tabindex:"0",
       role:"img","aria-label":`${d.k}: ${fmt(d.v)}`});
-    bindTip(hit,`<b>${d.k}</b><br><span class="t-k">modelos:</span> ${fmt(d.v)} (${nf1.format(d.v/total*100)} %)`);
+    bindTip(hit,`<b>${d.k}</b><br><span class="t-k">${t("g.modelos")}:</span> ${fmt(d.v)} (${nf1.format(d.v/total*100)} %)`);
     g.append(hit); svg.append(g); x+=w+GAP;
   });
   return svg;
@@ -1281,10 +1725,10 @@ function close_(){
 function searchBox(rows, onChange){
   const root = document.createElement("div"); root.className = "search";
   root.innerHTML = `<span class="ico">⌕</span>
-    <input class="search-in" type="search" placeholder="Buscar modelo…"
+    <input class="search-in" type="search" placeholder="${t("f.buscar")}"
            autocomplete="off" role="combobox" aria-expanded="false"
-           aria-autocomplete="list" aria-label="Buscar modelo o marca">
-    <button class="clr" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+           aria-autocomplete="list" aria-label="${t("f.buscarAria")}">
+    <button class="clr" type="button" aria-label="${t("f.limpiarAria")}" hidden>×</button>
     <div class="ac" role="listbox" hidden></div>`;
   const input = root.querySelector("input");
   const ac    = root.querySelector(".ac");
@@ -1316,14 +1760,14 @@ function searchBox(rows, onChange){
     // Names that start with the query rank above names that merely contain it.
     items = index.filter(e => norm(e.name).includes(q) || norm(e.marca).includes(q))
       .sort((a,b) => (norm(b.name).startsWith(q) - norm(a.name).startsWith(q))
-                  || a.name.localeCompare(b.name,"es"))
+                  || a.name.localeCompare(b.name,LANG))
       .slice(0, 8);
     ac.innerHTML = items.length
       ? items.map((e,i) => `<div class="ac-opt" role="option" data-i="${i}"
            aria-selected="${i===cursor}"><span>${mark(e.name,q)}</span>
            <span class="br">${e.marca}</span>
            <span class="cnt">${e.n}</span></div>`).join("")
-      : `<div class="ac-none">Ningún modelo coincide con «${input.value}»</div>`;
+      : `<div class="ac-none">${t("f.sinCoincidencia",{q:input.value})}</div>`;
     ac.hidden = false; input.setAttribute("aria-expanded","true");
     ac.querySelectorAll(".ac-opt").forEach(el =>
       el.onmousedown = ev => { ev.preventDefault(); choose(items[+el.dataset.i]); });
@@ -1368,8 +1812,8 @@ function multiSelect({label, options, selected, onChange}){
   paint();
 
   const head = document.createElement("div"); head.className = "ms-head";
-  head.innerHTML = `<button type="button" data-all>Todos</button>
-                    <button type="button" data-none>Ninguno</button>`;
+  head.innerHTML = `<button type="button" data-all>${t("f.todos")}</button>
+                    <button type="button" data-none>${t("f.ninguno")}</button>`;
   pop.append(head);
   head.querySelector("[data-all]").onclick = () => {
     options.forEach(o => selected.add(o.value));
@@ -1417,11 +1861,66 @@ const ORD_STOCK =["muy bajo","bajo","medio","alto","muy alto"];
 const RAMP4=["var(--o1)","var(--o2)","var(--o4)","var(--o5)"];
 const RAMP5=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)"];
 
+/* ── ordenación por columna ────────────────────────────────────────────
+   Se ordena por el valor, no por lo que se ve. «1.234,50 €» y «hace 3 días»
+   no se ordenan alfabéticamente, y en inglés el mismo número se escribe
+   «1,234.50»: ordenar el texto daría un orden distinto en cada idioma. Por
+   eso cada celda formateada lleva data-sort con su valor crudo.
+
+   onSort existe para las tablas que no tienen todas sus filas en el DOM: la
+   del catálogo está paginada, así que reordenar los <tr> visibles ordenaría
+   una página en lugar de la tabla. */
+function ordenable(tabla, {onSort=null, inicial=null}={}){
+  const ths = [...tabla.tHead.rows[0].cells];
+  let col = inicial ? inicial.col : -1;
+  let dir = inicial ? inicial.dir : -1;
+
+  const valor = (tr,i) => {
+    const td = tr.cells[i];
+    if(!td) return "";
+    return td.dataset.sort !== undefined ? td.dataset.sort : td.textContent.trim();
+  };
+  const aplicar = () => {
+    ths.forEach((th,i)=>th.setAttribute("aria-sort",
+      i!==col ? "none" : dir>0 ? "ascending" : "descending"));
+    if(onSort){ onSort(col, dir); return; }
+    const tb = tabla.tBodies[0], filas = [...tb.rows];
+    const crudos = filas.map(tr=>valor(tr,col));
+    const numerica = crudos.every(v => v==="" || v==="—" || !isNaN(parseFloat(v)));
+    const vacio = v => v==="" || v==="—";
+    filas.sort((a,b)=>{
+      const x=valor(a,col), y=valor(b,col);
+      // Un hueco no es un cero: siempre al final, se ordene como se ordene.
+      if(vacio(x)||vacio(y)) return vacio(x)&&vacio(y) ? 0 : vacio(x) ? 1 : -1;
+      return numerica ? dir*(parseFloat(x)-parseFloat(y))
+                      : dir*String(x).localeCompare(String(y), LANG, {numeric:true});
+    });
+    for(const tr of filas) tb.append(tr);
+  };
+  ths.forEach((th,i)=>{
+    th.classList.add("sortable");
+    th.tabIndex = 0;
+    th.setAttribute("aria-sort","none");
+    // Primer clic: texto ascendente, número descendente. Lo que se busca en
+    // una columna de cifras es casi siempre la más grande.
+    const ir = () => { dir = (col===i) ? -dir : (i===0 ? 1 : -1); col = i; aplicar(); };
+    th.onclick = ir;
+    th.onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); ir(); } };
+  });
+  if(inicial) aplicar();
+  return aplicar;
+}
+
+/* Una celda es el texto a mostrar, o [texto, valor por el que ordenar]. */
 function tableFor(cols,rows){
-  const t=document.createElement("table");
-  t.innerHTML=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead>`
-    +`<tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
-  const w=document.createElement("div"); w.className="t-wrap"; w.append(t); return w;
+  const celda = c => Array.isArray(c)
+    ? `<td data-sort="${String(c[1]).replace(/"/g,"&quot;")}">${c[0]}</td>`
+    : `<td>${c}</td>`;
+  const tb=document.createElement("table"); tb.className="t-simple";
+  tb.innerHTML=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead>`
+    +`<tbody>${rows.map(r=>`<tr>${r.map(celda).join("")}</tr>`).join("")}</tbody>`;
+  ordenable(tb);
+  const w=document.createElement("div"); w.className="t-wrap"; w.append(tb); return w;
 }
 function card(title,sub,node,tbl,wide=false){
   const c=document.createElement("section");
@@ -1429,7 +1928,7 @@ function card(title,sub,node,tbl,wide=false){
   c.innerHTML=`<h2>${title}</h2><p class="sub">${sub}</p>`;
   if(node) c.append(node);
   if(tbl){ const d=document.createElement("details");
-    d.innerHTML="<summary>Ver los datos como tabla</summary>"; d.append(tbl); c.append(d); }
+    d.innerHTML=`<summary>${t("g.tabla")}</summary>`; d.append(tbl); c.append(d); }
   return c;
 }
 
@@ -1448,39 +1947,40 @@ function render(){
   const marcas = [...new Map(ROWS.map(r=>[r.brand_code, r.marca])).entries()]
     .map(([code,name])=>({value:code, label:name,
                           count:ROWS.filter(r=>r.brand_code===code).length}))
-    .sort((a,b)=>a.label.localeCompare(b.label,"es"));
+    .sort((a,b)=>a.label.localeCompare(b.label,LANG));
   const tipos = [...new Set(ROWS.map(r=>r.tipo_producto))].sort()
-    .map(t=>({value:t, label:t[0].toUpperCase()+t.slice(1),
-              count:ROWS.filter(r=>r.tipo_producto===t).length}));
+    .map(v=>({value:v, label:t("tipo."+v)==="tipo."+v ? v[0].toUpperCase()+v.slice(1) : t("tipo."+v),
+              count:ROWS.filter(r=>r.tipo_producto===v).length}));
   const competidores = [...new Set(COMP.map(c=>c.competidor))].sort()
     .map(n=>({value:n, label:n,
               count:new Set(COMP.filter(c=>c.competidor===n).map(c=>c.modelo)).size}));
 
   const f = document.createElement("div"); f.className="filters";
-  const lab = document.createElement("span"); lab.className="f-lab"; lab.textContent="Filtrar";
+  const lab = document.createElement("span"); lab.className="f-lab"; lab.textContent=t("f.filtrar");
   f.append(lab);
   const sb = searchBox(ROWS, render);
   f.append(sb.root);
-  f.append(multiSelect({label:"Marca", options:marcas,
+  f.append(multiSelect({label:t("f.marca"), options:marcas,
                         selected:F.marcas, onChange:render}));
-  f.append(multiSelect({label:"Tipo", options:tipos,
+  f.append(multiSelect({label:t("f.tipo"), options:tipos,
                         selected:F.tipos, onChange:render}));
   if(competidores.length)
-    f.append(multiSelect({label:"Competidor", options:competidores,
+    f.append(multiSelect({label:t("f.competidor"), options:competidores,
                           selected:F.competidores, onChange:render}));
 
   /* Period presets. Date range first — it is the control a reader reaches for
      before any dimension. It is also the only filter that refetches, because
      every other one is a pure function of data already in the browser. */
   const per=document.createElement("span"); per.className="periodo";
-  const pl=document.createElement("span"); pl.className="f-lab"; pl.textContent="Periodo";
+  const pl=document.createElement("span"); pl.className="f-lab"; pl.textContent=t("f.periodo");
   per.append(pl);
   const hoy=new Date();
   const iso=d=>d.toISOString().slice(0,10);
-  const presets=[["7 d",7],["30 d",30],["90 d",90],["Todo",null]];
-  for(const [etq,dd] of presets){
+  const presets=[7,30,90,null];
+  for(const dd of presets){
     const b=document.createElement("button");
-    b.className="chip"; b.type="button"; b.textContent=etq;
+    b.className="chip"; b.type="button";
+    b.textContent = dd===null ? t("f.todo") : t("f.dias",{n:dd});
     const desde = dd===null ? null : iso(new Date(hoy.getTime()-dd*86400000));
     b.setAttribute("aria-pressed", String(F.desde===desde));
     b.onclick=async()=>{
@@ -1494,7 +1994,7 @@ function render(){
   f.append(per);
 
   const btnRebaja=document.createElement("button");
-  btnRebaja.className="chip"; btnRebaja.type="button"; btnRebaja.textContent="Solo en rebaja";
+  btnRebaja.className="chip"; btnRebaja.type="button"; btnRebaja.textContent=t("f.rebaja");
   btnRebaja.setAttribute("aria-pressed", String(F.rebaja));
   btnRebaja.onclick=()=>{F.rebaja=!F.rebaja; render();};
   f.append(btnRebaja);
@@ -1507,7 +2007,7 @@ function render(){
   const activos = DIMS.reduce((n,dm)=>n+(F[dm.k].size?1:0),0);
   if(activos) dimBox.open = true;
   const sum = document.createElement("summary");
-  sum.textContent = "Más filtros";
+  sum.textContent = t("f.mas");
   if(activos){ const b=document.createElement("span"); b.className="n";
                b.textContent=String(activos); sum.append(b); }
   dimBox.append(sum);
@@ -1517,20 +2017,20 @@ function render(){
     for(const r of ROWS){ const v=dimVal(r,dm.campo); counts.set(v,(counts.get(v)||0)+1); }
     const options = [...counts.entries()]
       .map(([value,count])=>({value, label:dm.fmt(value), count}))
-      .sort(dm.sort || ((a,b)=>a.label.localeCompare(b.label,"es")));
-    dimRow.append(multiSelect({label:dm.label, options,
+      .sort(dm.sort || ((a,b)=>a.label.localeCompare(b.label,LANG)));
+    dimRow.append(multiSelect({label:dm.label(), options,
                                selected:F[dm.k], onChange:render}));
   }
   dimBox.append(dimRow);
 
   const btnClear=document.createElement("button");
-  btnClear.className="ghost"; btnClear.type="button"; btnClear.textContent="Limpiar";
+  btnClear.className="ghost"; btnClear.type="button"; btnClear.textContent=t("f.limpiar");
   btnClear.onclick=()=>{F.q=""; F.marcas.clear(); F.tipos.clear(); F.competidores.clear();
                         F.rebaja=false; DIMS.forEach(dm=>F[dm.k].clear()); render();};
   f.append(btnClear);
 
   const cnt=document.createElement("span"); cnt.className="f-count";
-  cnt.innerHTML=`<b>${nf.format(rows.length)}</b> de ${nf.format(ROWS.length)} modelos`;
+  cnt.innerHTML=t("f.cuenta",{n:nf.format(rows.length), total:nf.format(ROWS.length)});
   f.append(cnt);
   f.append(dimBox);
   app.append(f);
@@ -1552,8 +2052,7 @@ function render(){
 
   if(!rows.length){
     app.insertAdjacentHTML("beforeend",
-      `<div class="state">Ningún modelo cumple estos filtros${
-        F.q?` · búsqueda «${F.q}»`:""}.</div>`); return;
+      `<div class="state">${t("f.vacio")}${F.q?t("f.vacioQ",{q:F.q}):""}.</div>`); return;
   }
 
   /* hero + kpis · Forum Sport frente a la competencia ------------------ */
@@ -1580,42 +2079,41 @@ function render(){
   const hero=document.createElement("div"); hero.className="hero";
   if(vs.length){
     const pctCaros = caros.length/vs.length*100;
-    hero.innerHTML=`<p class="hero-fig">${nf1.format(pctCaros)} %</p>
-      <p class="lede">de los modelos comparados son más caros en Forum Sport
-      que en el competidor más barato.</p>
-      <p class="hero-note"><strong>${nf.format(vs.length)}</strong> modelos ·
-      <strong>${nf.format(rivales)}</strong> competidor${rivales===1?"":"es"} ·
-      diferencia media <strong>${gapMedio>0?"+":""}${nf1.format(gapMedio)} %</strong>${
-      peor&&peor.delta_pct>0?` · mayor brecha <strong>${peor.nombre_modelo}</strong>
-      (${nf1.format(peor.delta_pct)} % sobre ${peor.competidor})`:""}</p>`;
+    hero.innerHTML=`<p class="hero-fig">${pct(pctCaros)}</p>
+      <p class="lede">${t("h.lede")}</p>
+      <p class="hero-note">${t("h.nota",{
+        n:nf.format(vs.length), r:nf.format(rivales),
+        rl:rivales===1?t("h.competidor"):t("h.competidores"),
+        gap:(gapMedio>0?"+":"")+pct(gapMedio)})}${
+      peor&&peor.delta_pct>0
+        ? t("h.peor",{m:peor.nombre_modelo, p:pct(peor.delta_pct), c:peor.competidor})
+        : ""}</p>`;
   } else {
     // Nothing crawled for this slice: fall back to the catalogue story.
     const pctReb0 = rows.filter(r=>r.en_rebaja).length/rows.length*100;
-    hero.innerHTML=`<p class="hero-fig">${nf1.format(pctReb0)} %</p>
-      <p class="lede">de los modelos se venden por debajo de su PVP.</p>
-      <p class="hero-note">Sin precios de competencia para este filtro: la
-      comparativa no puede calcularse sobre esta selección.</p>`;
+    hero.innerHTML=`<p class="hero-fig">${pct(pctReb0)}</p>
+      <p class="lede">${t("h.ledePvp")}</p>
+      <p class="hero-note">${t("h.notaPvp")}</p>`;
   }
   app.append(hero);
 
   const reb=rows.filter(r=>r.en_rebaja);
   const share = n => vs.length ? pct(n/vs.length*100) : "—";
   const kpis = vs.length ? [
-    ["Modelos comparados", nf.format(vs.length),
-     `${pct(vs.length/rows.length*100)} del catálogo filtrado`],
-    ["Competidores", nf.format(rivales), "con precio observado"],
-    ["Más caros", nf.format(caros.length), share(caros.length)],
-    ["Más baratos", nf.format(baratos.length), share(baratos.length)],
-    ["Mismo precio", nf.format(iguales0.length), share(iguales0.length)],
-    ["Diferencia media", `${gapMedio>0?"+":""}${nf1.format(gapMedio)} %`,
-     "frente al más barato"],
+    [t("k.comparados"), nf.format(vs.length),
+     t("k.delCat",{p:pct(vs.length/rows.length*100)})],
+    [t("k.competidores"), nf.format(rivales), t("k.conPrecio")],
+    [t("k.masCaros"), nf.format(caros.length), share(caros.length)],
+    [t("k.masBaratos"), nf.format(baratos.length), share(baratos.length)],
+    [t("k.mismoPrecio"), nf.format(iguales0.length), share(iguales0.length)],
+    [t("k.difMedia"), `${gapMedio>0?"+":""}${pct(gapMedio)}`, t("k.frenteBarato")],
   ] : [
-    ["Modelos", nf.format(rows.length), `${nf.format(rows.reduce((s,r)=>s+r.num_skus,0))} SKU`],
-    ["Marcas", nf.format(new Set(rows.map(r=>r.brand_code)).size), "en el catálogo"],
-    ["PVP medio", eur.format(avg(rows,r=>r.precio)), "precio de tarifa"],
-    ["Precio medio real", eur.format(avg(rows,r=>r.precio_rebaja)), "tras rebaja"],
-    ["Descuento medio", reb.length?pct(avg(reb,r=>r.descuento_pct)):"—", "de los rebajados"],
-    ["Margen medio", pct(avg(rows,r=>r.margen)*100), "sintético"],
+    [t("k.modelos"), nf.format(rows.length), t("k.sku",{n:nf.format(rows.reduce((s,r)=>s+r.num_skus,0))})],
+    [t("k.marcas"), nf.format(new Set(rows.map(r=>r.brand_code)).size), t("k.enCatalogo")],
+    [t("k.pvpMedio"), eur.format(avg(rows,r=>r.precio)), t("k.tarifa")],
+    [t("k.precioReal"), eur.format(avg(rows,r=>r.precio_rebaja)), t("k.trasRebaja")],
+    [t("k.dtoMedio"), reb.length?pct(avg(reb,r=>r.descuento_pct)):"—", t("k.deRebajados")],
+    [t("k.margenMedio"), pct(avg(rows,r=>r.margen)*100), t("k.sintetico")],
   ];
   const k=document.createElement("div"); k.className="kpis";
   // Money, and only money, wears the brand's price face.
@@ -1628,14 +2126,14 @@ function render(){
   // they are the context for every chart below.
   const cat=document.createElement("div"); cat.className="kpis kpis-sec";
   cat.innerHTML=[
-    ["Modelos", nf.format(rows.length), `${nf.format(rows.reduce((s,r)=>s+r.num_skus,0))} SKU`],
-    ["PVP medio", eur.format(avg(rows,r=>r.precio)), "precio de tarifa"],
-    ["Precio medio real", eur.format(avg(rows,r=>r.precio_rebaja)), "tras rebaja"],
-    ["En rebaja", pct(reb.length/rows.length*100), `${nf.format(reb.length)} modelos`],
-    ["Margen medio", pct(avg(rows,r=>r.margen)*100), "sintético"],
-    ["Stock bajo o muy bajo",
+    [t("k.modelos"), nf.format(rows.length), t("k.sku",{n:nf.format(rows.reduce((s,r)=>s+r.num_skus,0))})],
+    [t("k.pvpMedio"), eur.format(avg(rows,r=>r.precio)), t("k.tarifa")],
+    [t("k.precioReal"), eur.format(avg(rows,r=>r.precio_rebaja)), t("k.trasRebaja")],
+    [t("k.enRebaja"), pct(reb.length/rows.length*100), t("k.nModelos",{n:nf.format(reb.length)})],
+    [t("k.margenMedio"), pct(avg(rows,r=>r.margen)*100), t("k.sintetico")],
+    [t("k.stockBajo"),
      pct(rows.filter(r=>r.nivel_stock==="muy bajo"||r.nivel_stock==="bajo").length/rows.length*100),
-     "del catálogo"],
+     t("k.delCatalogo")],
   ].map(([l,v,sub])=>
     `<div class="kpi"><p class="k-label">${l}</p><p class="k-val${money(v)}">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
   if(vs.length) app.append(cat);
@@ -1656,22 +2154,15 @@ function render(){
     const colaFloja = conDato.length && conDato[conDato.length-1].flojo
                     ? conDato[conDato.length-1] : null;
     let sub = dias
-      ? `Nuestro precio frente al del competidor más barato, <b>un modelo = un dato</b> — `
-        + `la misma base que la «diferencia media» de arriba, que es este mismo número `
-        + `menos 100. 100 % es paridad; por encima somos más caros. `
-        + `Último dato ${ultimo?ultimo.k:"—"}: <b>${nf1.format(ultimo?ultimo.v:0)} %</b>.`
-      : `Todavía no hay histórico para los filtros seleccionados.`;
+      ? t("ts.sub",{dia:ultimo?ultimo.k:"—", v:pct(ultimo?ultimo.v:0)})
+      : t("ts.sinHist");
     if(dias && dias < 14)
-      sub += ` <span class="warn">Solo ${dias} ${dias===1?"día":"días"} de histórico: `
-           + `todavía no hay tendencia que leer.</span>`;
+      sub += t("ts.corto",{n:dias, d:dias===1?t("ts.dia"):t("ts.diasPl")});
     if(colaFloja)
-      sub += ` <span class="warn">El ${colaFloja.k} solo se rastrearon `
-           + `${nf.format(colaFloja.n)} modelos, muy por debajo del resto: ese punto `
-           + `aparece hueco y no se usa como último dato.</span>`;
+      sub += t("ts.cola",{dia:colaFloja.k, n:nf.format(colaFloja.n)});
     if(!HIST_COMPLETO)
-      sub += ` <span class="warn">Rango amplio: se ha descargado solo el rival más `
-           + `barato de cada día, así que el filtro de competidor no cambia la referencia.</span>`;
-    sec.innerHTML = `<h2>Posicionamiento online %</h2><p class="sub">${sub}</p>`;
+      sub += t("ts.parcial");
+    sec.innerHTML = `<h2>${t("ts.titulo")}</h2><p class="sub">${sub}</p>`;
 
     if(dias){
       sec.append(line(pts,{baseline:100}));
@@ -1680,16 +2171,14 @@ function render(){
       const nMin=Math.min(...pts.map(p=>p.n)), nMax=Math.max(...pts.map(p=>p.n));
       if(nMax && nMin !== nMax){
         const nota=document.createElement("p"); nota.className="note";
-        nota.textContent=`La cesta comparada varía entre ${nf.format(nMin)} y `
-          +`${nf.format(nMax)} modelos según el día; parte del movimiento es cobertura, `
-          +`no precio. El tooltip lleva el número de modelos de cada fecha.`;
+        nota.textContent=t("ts.cesta",{min:nf.format(nMin), max:nf.format(nMax)});
         sec.append(nota);
       }
-      const tbl=tableFor(["Fecha","Posicionamiento","Mediana","Modelos","Competidores"],
-        pts.filter(p=>p.v!=null).map(p=>[p.fecha, nf1.format(p.v)+" %",
-          nf1.format(p.mediana)+" %", nf.format(p.n), nf.format(p.comps)]));
+      const tbl=tableFor([t("ts.thFecha"),t("ts.tipPos"),t("ts.tipMed"),t("ts.tipMod"),t("ts.tipComp")],
+        pts.filter(p=>p.v!=null).map(p=>[p.fecha, [pct(p.v),p.v],
+          [pct(p.mediana),p.mediana], [nf.format(p.n),p.n], [nf.format(p.comps),p.comps]]));
       const det=document.createElement("details");
-      det.innerHTML="<summary>Ver los datos como tabla</summary>"; det.append(tbl);
+      det.innerHTML=`<summary>${t("g.tabla")}</summary>`; det.append(tbl);
       sec.append(det);
     }
     grid.append(sec);
@@ -1709,23 +2198,16 @@ function render(){
       ? conRef.reduce((s,x)=>s+x.actual/x.ref*100,0)/conRef.length : null;
     const fiables = recs.filter(x=>x.confianza>=50).length;
 
-    sec.innerHTML = `<h2>Precio recomendado</h2>
-      <p class="sub"><b>Esto no es un precio óptimo.</b> Un óptimo exige saber cuánto
-      se vende a cada precio, y en este dataset no hay ni una sola unidad vendida:
-      sin demanda no hay elasticidad. Lo que hay es un recomendador por reglas —
-      posición objetivo frente al rival más barato según rotación y stock, recortada
-      por barreras que no se negocian. El coste con el que se calcula el margen es
-      <b>sintético</b> (<code>precio × (1 − margen)</code>, y el margen solo toma
-      cuatro valores), así que el suelo de margen es aproximado.</p>`;
+    sec.innerHTML = `<h2>${t("m.titulo")}</h2><p class="sub">${t("m.sub")}</p>`;
 
     const kpi = document.createElement("div"); kpi.className="kpis";
     kpi.innerHTML = [
-      ["Modelos", nf.format(recs.length), `${nf.format(fiables)} con confianza ≥ 50 %`],
-      ["A la baja", nf.format(bajan.length), bajan.length?`${eur2.format(bajan.reduce((s,x)=>s+x.delta_eur,0)/bajan.length)} de media`:"—"],
-      ["Al alza", nf.format(suben.length), suben.length?`${eur2.format(suben.reduce((s,x)=>s+x.delta_eur,0)/suben.length)} de media`:"—"],
-      ["Sin cambio", nf.format(igual), "ya en su objetivo"],
-      ["Posición actual", posAct?nf1.format(posAct)+" %":"—", "sobre el rival más barato"],
-      ["Posición recomendada", posRec?nf1.format(posRec)+" %":"—",
+      [t("k.modelos"), nf.format(recs.length), t("m.conConf",{n:nf.format(fiables)})],
+      [t("m.baja"), nf.format(bajan.length), bajan.length?t("m.media",{v:eur2.format(bajan.reduce((s,x)=>s+x.delta_eur,0)/bajan.length)}):"—"],
+      [t("m.alza"), nf.format(suben.length), suben.length?t("m.media",{v:eur2.format(suben.reduce((s,x)=>s+x.delta_eur,0)/suben.length)}):"—"],
+      [t("m.sinCambio"), nf.format(igual), t("m.enObjetivo")],
+      [t("m.posActual"), posAct?pct(posAct):"—", t("m.sobreRival")],
+      [t("m.posRec"), posRec?pct(posRec):"—",
         posRec&&posAct?`${posRec<posAct?"−":"+"}${nf1.format(Math.abs(posRec-posAct))} pp`:"—"],
     ].map(([l,v,sub])=>
       `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
@@ -1735,28 +2217,28 @@ function render(){
        vive aquí, no en el servidor. */
     const box = document.createElement("details"); box.className="dims params";
     if(paramsOpen) box.open = true;
-    box.innerHTML = `<summary>Parámetros del motor</summary>`;
+    box.innerHTML = `<summary>${t("m.params")}</summary>`;
     const grid2 = document.createElement("div"); grid2.className="param-grid";
     const campos = [
-      ["Objetivo AA (% del rival)","obj_AA",50,200,1],
-      ["Objetivo A","obj_A",50,200,1],
-      ["Objetivo B","obj_B",50,200,1],
-      ["Objetivo C","obj_C",50,200,1],
-      ["Objetivo D","obj_D",50,200,1],
-      ["Objetivo sin clasificar","obj_sin",50,200,1],
-      ["Stock muy alto (pp)","stk_muy_alto",-30,30,1],
-      ["Stock alto (pp)","stk_alto",-30,30,1],
-      ["Stock medio (pp)","stk_medio",-30,30,1],
-      ["Stock bajo (pp)","stk_bajo",-30,30,1],
-      ["Stock muy bajo (pp)","stk_muy_bajo",-30,30,1],
-      ["Outlet (pp)","aj_outlet",-30,30,1],
-      ["Temporada anterior (pp)","aj_temporada_vieja",-30,30,1],
-      ["Margen mínimo (%)","margen_min",0,80,1],
-      ["Redondeo (€)","redondeo",0.01,10,0.01],
+      ["m.pObjAA","obj_AA",50,200,1],
+      ["m.pObjA","obj_A",50,200,1],
+      ["m.pObjB","obj_B",50,200,1],
+      ["m.pObjC","obj_C",50,200,1],
+      ["m.pObjD","obj_D",50,200,1],
+      ["m.pObjSin","obj_sin",50,200,1],
+      ["m.pStkMA","stk_muy_alto",-30,30,1],
+      ["m.pStkA","stk_alto",-30,30,1],
+      ["m.pStkM","stk_medio",-30,30,1],
+      ["m.pStkB","stk_bajo",-30,30,1],
+      ["m.pStkMB","stk_muy_bajo",-30,30,1],
+      ["m.pOutlet","aj_outlet",-30,30,1],
+      ["m.pVieja","aj_temporada_vieja",-30,30,1],
+      ["m.pMargen","margen_min",0,80,1],
+      ["m.pRedondeo","redondeo",0.01,10,0.01],
     ];
     for(const [lab,k,min,max,step] of campos){
       const w=document.createElement("label"); w.className="param";
-      w.innerHTML=`<span>${lab}</span>`;
+      w.innerHTML=`<span>${t(lab)}</span>`;
       const i=document.createElement("input");
       i.type="number"; i.value=P[k]; i.min=min; i.max=max; i.step=step;
       i.onchange=()=>{ const v=parseFloat(i.value);
@@ -1766,7 +2248,7 @@ function render(){
     }
     box.append(grid2);
     const reset=document.createElement("button");
-    reset.className="ghost"; reset.type="button"; reset.textContent="Restablecer";
+    reset.className="ghost"; reset.type="button"; reset.textContent=t("m.reset");
     reset.onclick=()=>{ P={...PARAMS_DEF}; guardarParams(); paramsOpen=true; render(); };
     box.append(reset);
     sec.append(box);
@@ -1775,39 +2257,40 @@ function render(){
     const orden=[...recs].sort((a,b)=>Math.abs(b.delta_eur)-Math.abs(a.delta_eur));
     const top=orden.slice(0,40);
     const byId=new Map(rows.map(r=>[r.modelo,r]));
-    const t=document.createElement("table");
-    t.innerHTML=`<thead><tr><th>Modelo</th><th>Actual</th><th>Recomendado</th>
-      <th>Dif.</th><th>Posición rec.</th><th>Margen rec.</th><th>Confianza</th>
-      <th>Por qué</th></tr></thead><tbody>${top.map(x=>{
+    // `tb`, no `t`: en este fichero `t()` es la función de traducción, y una
+    // variable local llamada `t` la tapa dentro de la plantilla de abajo.
+    const tb=document.createElement("table"); tb.className="t-rec";
+    tb.innerHTML=`<thead><tr><th>${t("g.thModelo")}</th>
+      <th>${t("m.thActual")}</th><th>${t("m.thRec")}</th>
+      <th>${t("m.thDif")}</th><th>${t("m.thPosRec")}</th><th>${t("m.thMargen")}</th>
+      <th>${t("m.thConf")}</th><th>${t("m.thPorQue")}</th></tr></thead><tbody>${top.map(x=>{
       const r=byId.get(x.modelo);
       const cls=x.delta_eur<-0.004?"delta-dn":x.delta_eur>0.004?"delta-up":"";
-      const motivo = x.inviable ? "Inviable: el margen mínimo supera el PVP"
-        : x.barrera==="margen" ? "Limitado por el suelo de margen (coste sintético)"
-        : x.barrera==="PVP" ? "Limitado por el PVP"
-        : x.barrera==="outlet" ? "Outlet: solo puede bajar"
-        : x.ref ? `Objetivo ${nf1.format(x.objetivo)} % del rival más barato`
-        : "Sin competencia: solo señales internas";
+      const motivo = x.inviable ? t("m.inviable")
+        : x.barrera==="margen" ? t("m.barrMargen")
+        : x.barrera==="PVP" ? t("m.barrPvp")
+        : x.barrera==="outlet" ? t("m.barrOutlet")
+        : x.ref ? t("m.objetivo",{p:pct(x.objetivo)})
+        : t("m.sinComp");
       return `<tr>
-        <td class="prod-cell"><span class="prod-name">
+        <td class="prod-cell" data-sort="${r.nombre_modelo.replace(/"/g,"&quot;")}"><span class="prod-name">
           <a href="${r.url}" target="_blank" rel="noopener">${r.nombre_modelo}</a>
-          <small>${r.marca} · ${r.abcd_digital||"sin rotación"} · stock ${r.nivel_stock}</small>
+          <small>${r.marca} · ${r.abcd_digital||t("m.sinRotacion")} · ${t("m.stock",{v:nivelLab(r.nivel_stock)})}</small>
         </span></td>
-        <td>${eur2.format(x.actual)}</td>
-        <td><b>${eur2.format(x.precio_rec)}</b></td>
-        <td class="${cls}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
-        <td>${x.posicion_rec?nf1.format(x.posicion_rec)+" %":"—"}</td>
-        <td>${nf1.format(x.margen_rec)} %</td>
-        <td><span class="conf"><span class="conf-bar"><i style="width:${x.confianza}%"></i></span>
+        <td data-sort="${x.actual}">${eur2.format(x.actual)}</td>
+        <td data-sort="${x.precio_rec}"><b>${eur2.format(x.precio_rec)}</b></td>
+        <td class="${cls}" data-sort="${x.delta_eur}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
+        <td data-sort="${x.posicion_rec??""}">${x.posicion_rec?pct(x.posicion_rec):"—"}</td>
+        <td data-sort="${x.margen_rec}">${pct(x.margen_rec)}</td>
+        <td data-sort="${x.confianza}"><span class="conf"><span class="conf-bar"><i style="width:${x.confianza}%"></i></span>
             ${x.confianza} %</span></td>
-        <td class="t-k">${motivo}${x.notas.length?` · ${x.notas[0]}`:""}</td>
+        <td class="t-k" data-sort="${motivo.replace(/"/g,"&quot;")}">${motivo}${x.notas.length?` · ${x.notas[0]}`:""}</td>
       </tr>`;}).join("")}</tbody>`;
-    const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
+    ordenable(tb);
+    const w=document.createElement("div"); w.className="t-wrap"; w.append(tb);
     sec.append(w);
     const nota=document.createElement("p"); nota.className="note";
-    nota.textContent=`Mostrando los ${nf.format(top.length)} mayores ajustes de `
-      +`${nf.format(recs.length)} modelos. La confianza mide la calidad del dato de `
-      +`mercado — número de rivales, si el emparejado es por EAN o por código, `
-      +`antigüedad y cuánto se parecen entre sí — no el acierto del precio.`;
+    nota.textContent=t("m.nota",{n:nf.format(top.length), total:nf.format(recs.length)});
     sec.append(nota);
     grid.append(sec);
   }
@@ -1829,50 +2312,48 @@ function render(){
     const vs1 = [...mejor.values()];
 
     const BANDAS = [
-      {k:"−20 % o más", lo:-1e9, hi:-20,  c:"var(--dv-c3)"},
-      {k:"−20 a −10 %", lo:-20,  hi:-10,  c:"var(--dv-c2)"},
-      {k:"−10 a −2 %",  lo:-10,  hi:-2,   c:"var(--dv-c1)"},
-      {k:"±2 % igual",  lo:-2,   hi:2,    c:"var(--dv-mid)"},
-      {k:"+2 a +10 %",  lo:2,    hi:10,   c:"var(--dv-d1)"},
-      {k:"+10 a +20 %", lo:10,   hi:20,   c:"var(--dv-d2)"},
-      {k:"+20 % o más", lo:20,   hi:1e9,  c:"var(--dv-d3)"},
+      {k:t("pp.b1"), lo:-1e9, hi:-20,  c:"var(--dv-c3)"},
+      {k:t("pp.b2"), lo:-20,  hi:-10,  c:"var(--dv-c2)"},
+      {k:t("pp.b3"), lo:-10,  hi:-2,   c:"var(--dv-c1)"},
+      {k:t("pp.b4"), lo:-2,   hi:2,    c:"var(--dv-mid)"},
+      {k:t("pp.b5"), lo:2,    hi:10,   c:"var(--dv-d1)"},
+      {k:t("pp.b6"), lo:10,   hi:20,   c:"var(--dv-d2)"},
+      {k:t("pp.b7"), lo:20,   hi:1e9,  c:"var(--dv-d3)"},
     ];
     const items = BANDAS.map(b=>{
       const inB = vs1.filter(x=>x.delta_pct >= b.lo && x.delta_pct < b.hi);
       return {k:b.k, v:inB.length, c:b.c,
               note:inB.length
-                ? `<span class="t-k">${inB.length===1?"modelo":"modelos"}:</span> ${nf.format(inB.length)}`
-                  + `<br><span class="t-k">ejemplo:</span> ${inB[0].nombre_modelo}`
+                ? `<span class="t-k">${inB.length===1?t("g.modelo"):t("g.modelos")}:</span> ${nf.format(inB.length)}`
+                  + `<br><span class="t-k">${t("g.ejemplo")}:</span> ${inB[0].nombre_modelo}`
                 : ""};
     });
 
     const c = document.createElement("section"); c.className="card wide";
     if(!vs1.length){
-      c.innerHTML=`<h2>Posición de precio</h2>
-        <p class="sub">Ningún modelo del filtro actual tiene precio de competencia.</p>`;
+      c.innerHTML=`<h2>${t("pp.titulo")}</h2><p class="sub">${t("pp.vacio")}</p>`;
       grid.append(c);
     } else {
       const baratos = vs1.filter(x=>x.delta_pct < -2).length;
       const igual   = vs1.filter(x=>x.delta_pct >= -2 && x.delta_pct < 2).length;
       const caros   = vs1.filter(x=>x.delta_pct >= 2).length;
-      c.innerHTML=`<h2>Posición de precio frente a la competencia</h2>
-        <p class="sub">Cada modelo comparado con el competidor más barato que lo vende.
-        A la izquierda ganamos, a la derecha perdemos.
-        <strong>${nf.format(baratos)}</strong> más baratos ·
-        <strong>${nf.format(igual)}</strong> al mismo precio ·
-        <strong>${nf.format(caros)}</strong> más caros de ${nf.format(vs1.length)}.</p>`;
+      c.innerHTML=`<h2>${t("pp.tituloLargo")}</h2>
+        <p class="sub">${t("pp.sub",{b:nf.format(baratos), i:nf.format(igual),
+                                     c:nf.format(caros), t:nf.format(vs1.length)})}</p>`;
       const box=document.createElement("div");
       const leg=document.createElement("div"); leg.className="legend";
-      leg.innerHTML=`<span><i class="swatch" style="background:var(--dv-c2)"></i>Somos más baratos</span>
-        <span><i class="swatch" style="background:var(--dv-mid)"></i>Mismo precio (±2 %)</span>
-        <span><i class="swatch" style="background:var(--dv-d2)"></i>Somos más caros</span>`;
-      box.append(leg, columns(items, {colorOf:d=>d.c, unit:"modelos", rotate:true}));
+      leg.innerHTML=`<span><i class="swatch" style="background:var(--dv-c2)"></i>${t("pp.legBarato")}</span>
+        <span><i class="swatch" style="background:var(--dv-mid)"></i>${t("pp.legIgual")}</span>
+        <span><i class="swatch" style="background:var(--dv-d2)"></i>${t("pp.legCaro")}</span>`;
+      box.append(leg, columns(items, {colorOf:d=>d.c, rotate:true}));
       c.append(box);
-      c.append(...[tableFor(["Diferencia frente al más barato","Modelos","% del comparado"],
-        items.map(d=>[d.k, nf.format(d.v),
-                      nf1.format(vs1.length?d.v/vs1.length*100:0)+" %"]))].map(t=>{
+      c.append(...[tableFor([t("pp.thDif"),t("k.modelos"),t("pp.thPct")],
+        // La primera columna son bandas ordenadas de −20 % a +20 %: alfabéticamente
+        // quedarían al azar, así que ordenan por su posición en la escala.
+        items.map((d,i)=>[[d.k,i], [nf.format(d.v),d.v],
+                      [pct(vs1.length?d.v/vs1.length*100:0), vs1.length?d.v/vs1.length:0]]))].map(tb=>{
         const det=document.createElement("details");
-        det.innerHTML="<summary>Ver los datos como tabla</summary>"; det.append(t); return det;}));
+        det.innerHTML=`<summary>${t("g.tabla")}</summary>`; det.append(tb); return det;}));
       grid.append(c);
     }
   }
@@ -1892,7 +2373,7 @@ function render(){
         return {...c, eq, edad: antiguedad(c.observed_at),
           cls:   eq ? "delta-eq" : (c.delta_eur>0 ? "delta-up" : "delta-dn"),
           badge: eq ? "igual"    : (c.somos_mas_baratos ? "barato" : "caro"),
-          label: eq ? "igual"    : (c.somos_mas_baratos ? "más barato" : "más caro")};
+          label: eq ? t("fc.igual") : (c.somos_mas_baratos ? t("fc.barato") : t("fc.caro"))};
       })
       .sort((a,b)=>b.delta_pct-a.delta_pct);
     // Group by model, worst gap first, and within a model cheapest rival first.
@@ -1919,8 +2400,7 @@ function render(){
     });
     const c = document.createElement("section"); c.className="card wide";
     if(!comp.length){
-      c.innerHTML=`<h2>Frente a la competencia</h2>
-        <p class="sub">Ningún modelo del filtro actual tiene todavía datos de competencia.</p>`;
+      c.innerHTML=`<h2>${t("fc.titulo")}</h2><p class="sub">${t("fc.vacio")}</p>`;
       grid.append(c); 
     } else {
       const caros   = comp.filter(x=>!x.eq && !x.somos_mas_baratos).length;
@@ -1929,45 +2409,70 @@ function render(){
       const multi   = [...nComp.values()].filter(v=>v>1).length;
       const fuentes = [...new Set(comp.map(x=>x.competidor))];
       const fecha = new Date(Math.max(...comp.map(x=>+new Date(x.observed_at))));
-      c.innerHTML=`<h2>Frente a la competencia</h2>
-        <p class="sub">${nf.format(modelos)} modelos · ${nf.format(comp.length)} precios observados en
-        ${fuentes.join(", ")}. Somos más caros en <strong>${nf.format(caros)}</strong>
-        de ${nf.format(comp.length)}${iguales?`, igualamos el precio en <strong>${nf.format(iguales)}</strong>`:""}${
-        multi?` · ${nf.format(multi)} modelos tienen más de un competidor`:""}.
-        Ordenado por mayor diferencia en contra.</p>`;
-      const t=document.createElement("table");
-      t.innerHTML=`<thead><tr><th>Modelo</th><th>Forum Sport</th><th>Competencia</th>
-        <th>Dif.</th><th>Dif. %</th><th>Posición</th><th>Competidor</th>
-        <th>Actualizado</th></tr></thead>
-        <tbody>${comp.map(x=>`<tr class="${x.eq?"igual-row ":""}${x.first?"grp-start":"grp-cont"}">
-          ${x.first ? `<td class="prod-cell"><span class="prod">
+      c.innerHTML=`<h2>${t("fc.titulo")}</h2>
+        <p class="sub">${t("fc.sub",{
+          m:nf.format(modelos), p:nf.format(comp.length), f:fuentes.join(", "),
+          c:nf.format(caros),
+          ig:iguales?t("fc.iguales",{n:nf.format(iguales)}):"",
+          mu:multi?t("fc.multi",{n:nf.format(multi)}):""})}</p>`;
+      const tb=document.createElement("table"); tb.className="t-comp";
+      tb.innerHTML=`<thead><tr><th>${t("g.thModelo")}</th><th>${t("fc.thFs")}</th><th>${t("fc.thComp")}</th>
+        <th>${t("m.thDif")}</th><th>${t("fc.thDifPct")}</th><th>${t("fc.thPos")}</th>
+        <th>${t("f.competidor")}</th><th>${t("fc.thAct")}</th></tr></thead><tbody></tbody>`;
+
+      /* Esta tabla agrupa: el nombre se imprime una vez por modelo y los
+         rivales siguientes son «↳». Esa agrupación solo tiene sentido con las
+         filas de un modelo juntas, así que en cuanto se ordena por una columna
+         la tabla se aplana y cada fila recupera su nombre y su precio. Ordenar
+         con la agrupación puesta dejaría «↳» huérfanos bajo otro producto. */
+      const fila = (x, agrupado) => {
+        const cab = agrupado && !x.first;
+        return `<tr class="${x.eq?"igual-row ":""}${!agrupado?"":x.first?"grp-start":"grp-cont"}">
+          ${!cab ? `<td class="prod-cell" data-sort="${x.nombre_modelo.replace(/"/g,"&quot;")}"><span class="prod">
             <img class="thumb" src="${x.img_thumb}" alt="" loading="lazy" decoding="async"
                  width="46" height="46"
                  onerror="this.setAttribute('data-failed','');this.removeAttribute('src')">
             <span class="prod-name">
               <a href="${x.url_fs}" target="_blank" rel="noopener">${x.nombre_modelo}</a>
-              <small>${x.marca}${x.rivals>1?` · ${x.rivals} competidores`:""}</small>
+              <small>${x.marca}${x.rivals>1?t("fc.rivales",{n:x.rivals}):""}</small>
             </span></span></td>`
-          : `<td class="prod-cell cont-mark">↳</td>`}
-          <td class="${x.first&&x.fsGana?"best":""}">${x.first
-            ? `${x.fsGana?'<span class="star" title="Precio más bajo">★</span>':""}${eur2.format(x.precio_fs)}`
+          : `<td class="prod-cell cont-mark" data-sort="${x.nombre_modelo.replace(/"/g,"&quot;")}">↳</td>`}
+          <td class="${!cab&&x.fsGana?"best":""}" data-sort="${x.precio_fs}">${!cab
+            ? `${x.fsGana?`<span class="star" title="${t("fc.precioBajo")}">★</span>`:""}${eur2.format(x.precio_fs)}`
             : ""}</td>
-          <td class="${x.compGana?"best":""}">${x.compGana
-            ? '<span class="star" title="Precio más bajo">★</span>':""}<a href="${x.url_comp}"
+          <td class="${x.compGana?"best":""}" data-sort="${x.precio_comp}">${x.compGana
+            ? `<span class="star" title="${t("fc.precioBajo")}">★</span>`:""}<a href="${x.url_comp}"
             target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a></td>
-          <td class="${x.cls}">${x.eq?"":(x.delta_eur>0?"+":"")}${eur2.format(x.delta_eur)}</td>
-          <td class="${x.cls}">${x.eq?"":(x.delta_pct>0?"+":"")}${nf1.format(x.delta_pct)} %</td>
-          <td><span class="badge ${x.badge}">${x.label}</span></td>
-          <td><a href="${x.url_comp}" target="_blank" rel="noopener"
-                 title="Ver ${x.nombre_modelo} en ${x.competidor}">${x.competidor}</a></td>
-          <td class="edad${x.edad.stale?" stale":""}" title="${x.edad.full}">${x.edad.txt}</td></tr>`).join("")}</tbody>`;
-      const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
+          <td class="${x.cls}" data-sort="${x.delta_eur}">${x.eq?"":(x.delta_eur>0?"+":"")}${eur2.format(x.delta_eur)}</td>
+          <td class="${x.cls}" data-sort="${x.delta_pct}">${x.eq?"":(x.delta_pct>0?"+":"")}${pct(x.delta_pct)}</td>
+          <td data-sort="${x.delta_pct}"><span class="badge ${x.badge}">${x.label}</span></td>
+          <td data-sort="${x.competidor.replace(/"/g,"&quot;")}"><a href="${x.url_comp}" target="_blank" rel="noopener"
+                 title="${t("fc.verEn",{m:x.nombre_modelo, c:x.competidor})}">${x.competidor}</a></td>
+          <td class="edad${x.edad.stale?" stale":""}" title="${x.edad.full}"
+              data-sort="${Date.parse(x.observed_at)||0}">${x.edad.txt}</td></tr>`;
+      };
+      const CLAVES_C = [x=>x.nombre_modelo, x=>x.precio_fs, x=>x.precio_comp,
+                        x=>x.delta_eur, x=>x.delta_pct, x=>x.delta_pct,
+                        x=>x.competidor, x=>Date.parse(x.observed_at)||0];
+      const pintar = orden => {
+        tb.tBodies[0].innerHTML =
+          (orden ? [...comp].sort(orden) : comp).map(x=>fila(x, !orden)).join("");
+      };
+      pintar(null);
+      ordenable(tb,{onSort:(col,dir)=>{
+        const k=CLAVES_C[col];
+        pintar((a,b)=>{
+          const x=k(a), y=k(b);
+          const c = typeof x==="string" ? x.localeCompare(y,LANG,{numeric:true}) : x-y;
+          return dir*c || a.nombre_modelo.localeCompare(b.nombre_modelo,LANG)
+                       || a.precio_comp-b.precio_comp;
+        });
+      }});
+      const w=document.createElement("div"); w.className="t-wrap"; w.append(tb);
       c.append(w);
       const note=document.createElement("p"); note.className="comp-note";
-      note.textContent=`★ marca el precio más bajo de cada producto, contando el nuestro. `
-        + `Precio más bajo observado por competidor. Última lectura: `
-        + fecha.toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"})
-        + `. El precio de la competencia enlaza a su ficha.`;
+      note.textContent=t("fc.nota",{
+        f:fecha.toLocaleDateString(LOC(),{day:"numeric",month:"long",year:"numeric"})});
       c.append(note);
       grid.append(c);
     }
@@ -1978,59 +2483,60 @@ function render(){
     const m=[...by(rows,r=>r.marca).entries()].sort((a,b)=>b[1]-a[1]);
     const top=m.slice(0,12).map(([k,v])=>({k,v}));
     const rest=m.slice(12).reduce((s,[,v])=>s+v,0);
-    if(rest) top.push({k:"Otras marcas",v:rest,note:`<span class="t-k">${m.length-12} marcas agrupadas</span>`});
-    grid.append(card("Modelos por marca",
-      m.length>12?`Las 12 marcas con más modelos; el resto se agrupa en «Otras».`:"Marcas del catálogo.",
+    if(rest) top.push({k:t("mb.otras"),v:rest,
+      note:`<span class="t-k">${t("mb.agrupadas",{n:m.length-12})}</span>`});
+    grid.append(card(t("mb.titulo"), m.length>12?t("mb.sub12"):t("mb.sub"),
       hbar(top),
-      tableFor(["Marca","Modelos"], m.map(([k,v])=>[k,nf.format(v)]))));
+      tableFor([t("mb.thMarca"),t("k.modelos")], m.map(([k,v])=>[k,[nf.format(v),v]]))));
   }
 
   /* 4 · Bandas de precio ------------------------------------------------- */
   {
     const items=BANDS.map(([lo,hi,k])=>({k,v:rows.filter(r=>r.precio>=lo&&r.precio<hi).length}))
       .filter(d=>d.v);
-    grid.append(card("Distribución por banda de precio",
-      "Modelos según su PVP de tarifa, en euros.",
+    grid.append(card(t("bp.titulo"), t("bp.sub"),
       columns(items),
-      tableFor(["Banda (€)","Modelos"], items.map(d=>[d.k,nf.format(d.v)]))));
+      tableFor([t("bp.thBanda"),t("k.modelos")],
+        items.map((d,i)=>[[d.k,i],[nf.format(d.v),d.v]]))));
   }
 
   /* 5 · Nivel de margen (ordinal ramp) ----------------------------------- */
   {
-    const items=ORD_MARGEN.map(k=>({k,v:rows.filter(r=>r.nivel_margen===k).length}))
+    const items=ORD_MARGEN.map(k=>({k:nivelLab(k),raw:k,v:rows.filter(r=>r.nivel_margen===k).length}))
       .filter(d=>d.v);
-    const idx=k=>ORD_MARGEN.indexOf(k);
-    grid.append(card("Nivel de margen",
-      "Escala ordenada de menor a mayor margen sintético.",
-      hbar(items,{colorOf:d=>RAMP4[idx(d.k)]}),
-      tableFor(["Nivel","Modelos","% del total"],
-        items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"]))));
+    const idx=d=>ORD_MARGEN.indexOf(d.raw);
+    grid.append(card(t("nm.titulo"), t("nm.sub"),
+      hbar(items,{colorOf:d=>RAMP4[idx(d)]}),
+      tableFor([t("g.nivel"),t("k.modelos"),t("g.pctTotal")],
+        items.map(d=>[[d.k,idx(d)],[nf.format(d.v),d.v],
+                      [pct(d.v/rows.length*100),d.v]]))));
   }
 
   /* 6 · Nivel de stock (ordinal ramp) ------------------------------------ */
   {
-    const items=ORD_STOCK.map(k=>({k,v:rows.filter(r=>r.nivel_stock===k).length}))
+    const items=ORD_STOCK.map(k=>({k:nivelLab(k),raw:k,v:rows.filter(r=>r.nivel_stock===k).length}))
       .filter(d=>d.v);
-    const idx=k=>ORD_STOCK.indexOf(k);
-    grid.append(card("Nivel de stock",
-      "Escala ordenada de menor a mayor cobertura de almacén.",
-      hbar(items,{colorOf:d=>RAMP5[idx(d.k)]}),
-      tableFor(["Nivel","Modelos","% del total"],
-        items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"]))));
+    const idx=d=>ORD_STOCK.indexOf(d.raw);
+    grid.append(card(t("ns.titulo"), t("ns.sub"),
+      hbar(items,{colorOf:d=>RAMP5[idx(d)]}),
+      tableFor([t("g.nivel"),t("k.modelos"),t("g.pctTotal")],
+        items.map(d=>[[d.k,idx(d)],[nf.format(d.v),d.v],
+                      [pct(d.v/rows.length*100),d.v]]))));
   }
 
   /* 7 · Running vs trail ------------------------------------------------- */
   {
     const items=[...by(rows,r=>r.tipo_producto).entries()]
       .sort((a,b)=>b[1]-a[1])
-      .map(([k,v],i)=>({k:k[0].toUpperCase()+k.slice(1),v,
+      .map(([k,v],i)=>({k:t("tipo."+k)==="tipo."+k ? k[0].toUpperCase()+k.slice(1) : t("tipo."+k), v,
         c:i?"var(--s2)":"var(--s1)", ink:i?"on-light":"on-dark"}));
     const leg=document.createElement("div"); leg.className="legend";
     leg.innerHTML=items.map(d=>`<span><i class="swatch" style="background:${d.c}"></i>${d.k}</span>`).join("");
     const box=document.createElement("div"); box.append(leg,stacked(items));
-    grid.append(card("Running y trail","Reparto del catálogo por tipo de producto.", box,
-      tableFor(["Tipo","Modelos","% del total"],
-        items.map(d=>[d.k,nf.format(d.v),nf1.format(d.v/rows.length*100)+" %"])), true));
+    grid.append(card(t("rt.titulo"), t("rt.sub"), box,
+      tableFor([t("rt.thTipo"),t("k.modelos"),t("g.pctTotal")],
+        items.map(d=>[d.k,[nf.format(d.v),d.v],
+                      [pct(d.v/rows.length*100),d.v]])), true));
   }
 
   /* 8 · Catálogo paginado ------------------------------------------------ */
@@ -2038,8 +2544,7 @@ function render(){
     // The whole filtered slice, not a top-N: paging is what makes 1.483 rows
     // browsable. Still ordered by discount, so the head of the table is the
     // same "mayores descuentos" view it replaces.
-    const all=[...rows].sort((a,b)=>
-      b.descuento_pct-a.descuento_pct || a.nombre_modelo.localeCompare(b.nombre_modelo,"es"));
+    const all=[...rows];
     let per=12, page=0;
     const pages=()=>Math.max(1,Math.ceil(all.length/per));
 
@@ -2054,25 +2559,26 @@ function render(){
         </span></span></td>
       <td>${eur2.format(r.precio)}</td>
       <td>${r.en_rebaja?eur2.format(r.precio_rebaja):"—"}</td>
-      <td>${r.en_rebaja?`<b>${nf1.format(r.descuento_pct)} %</b>`:'<span class="t-k">—</span>'}</td>
+      <td>${r.en_rebaja?`<b>${pct(r.descuento_pct)}</b>`:'<span class="t-k">—</span>'}</td>
       <td>${eur2.format(r.precio_rebaja*(1-r.margen))}</td>
-      <td>${r.nivel_stock}</td></tr>`;
+      <td>${nivelLab(r.nivel_stock)}</td></tr>`;
 
-    const t=document.createElement("table");
-    t.innerHTML=`<thead><tr><th>Modelo</th><th>PVP</th><th>Precio</th>
-      <th>Dto.</th><th>Neto</th><th>Stock</th></tr></thead><tbody></tbody>`;
-    const tbody=t.querySelector("tbody");
+    const tb=document.createElement("table"); tb.className="t-cat";
+    tb.innerHTML=`<thead><tr><th>${t("g.thModelo")}</th><th>${t("cat.thPvp")}</th>
+      <th>${t("cat.thPrecio")}</th><th>${t("cat.thDto")}</th><th>${t("cat.thNeto")}</th>
+      <th>${t("cat.thStock")}</th></tr></thead><tbody></tbody>`;
+    const tbody=tb.querySelector("tbody");
 
     const pager=document.createElement("div"); pager.className="pager";
     pager.innerHTML=`
-      <button class="pg" data-go="first" type="button" aria-label="Primera página">«</button>
-      <button class="pg" data-go="prev"  type="button" aria-label="Página anterior">‹</button>
+      <button class="pg" data-go="first" type="button" aria-label="${t("pg.primera")}">«</button>
+      <button class="pg" data-go="prev"  type="button" aria-label="${t("pg.anterior")}">‹</button>
       <span class="of" aria-hidden="true"></span>
-      <button class="pg" data-go="next"  type="button" aria-label="Página siguiente">›</button>
-      <button class="pg" data-go="last"  type="button" aria-label="Última página">»</button>
+      <button class="pg" data-go="next"  type="button" aria-label="${t("pg.siguiente")}">›</button>
+      <button class="pg" data-go="last"  type="button" aria-label="${t("pg.ultima")}">»</button>
       <span class="range grow" role="status" aria-live="polite"></span>
-      <label class="range" for="per">Por página</label>
-      <select id="per" aria-label="Filas por página">
+      <label class="range" for="per">${t("pg.porPagina")}</label>
+      <select id="per" aria-label="${t("pg.filasAria")}">
         <option value="12">12</option><option value="25">25</option>
         <option value="50">50</option><option value="100">100</option>
       </select>`;
@@ -2085,8 +2591,8 @@ function render(){
       tbody.innerHTML=slice.map(row).join("");
       of.textContent=`${page+1} / ${nf.format(pages())}`;
       range.textContent=all.length
-        ? `${nf.format(start+1)}–${nf.format(start+slice.length)} de ${nf.format(all.length)} modelos`
-        : "Sin resultados";
+        ? t("pg.rango",{a:nf.format(start+1), b:nf.format(start+slice.length), t:nf.format(all.length)})
+        : t("pg.sinRes");
       btn("first").disabled=btn("prev").disabled = page===0;
       btn("last").disabled =btn("next").disabled = page>=pages()-1;
     }
@@ -2095,7 +2601,7 @@ function render(){
            : k==="next" ?Math.min(last,page+1) : last;
       draw();
       // Keep the table head in view when paging from further down the row list.
-      t.scrollIntoView({block:"nearest", behavior:"smooth"});
+      tb.scrollIntoView({block:"nearest", behavior:"smooth"});
     };
     pager.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
     pager.querySelector("#per").onchange=e=>{
@@ -2103,12 +2609,36 @@ function render(){
       per=Number(e.target.value); page=Math.floor(firstRow/per); draw();
     };
 
+    // Esta tabla no tiene sus filas en el DOM: solo las 12 de la página. Si se
+    // reordenaran los <tr> visibles se ordenaría una página, no la tabla, y la
+    // fila con el mayor descuento seguiría escondida en la página 7. Así que
+    // ordena el array completo y se vuelve a la primera página.
+    // Las claves son lo que la celda MUESTRA, no lo que la fila contiene: las
+    // columnas «Precio» y «Dto.» están vacías cuando el modelo no está
+    // rebajado, y ordenar por el precio de rebaja que no se ve llenaba la
+    // cabecera de guiones.
+    const CLAVES=[r=>r.nombre_modelo, r=>r.precio,
+                  r=>r.en_rebaja?r.precio_rebaja:null,
+                  r=>r.en_rebaja?r.descuento_pct:null,
+                  r=>r.precio_rebaja*(1-r.margen),
+                  r=>ORD_STOCK.indexOf(r.nivel_stock)];
+    ordenable(tb,{inicial:{col:3,dir:-1}, onSort:(col,dir)=>{
+      const k=CLAVES[col];
+      all.sort((a,b)=>{
+        const x=k(a), y=k(b);
+        // Un hueco no es un cero: las celdas vacías van al final en ambos sentidos.
+        if(x==null || y==null) return x==null&&y==null ? 0 : x==null ? 1 : -1;
+        const c = typeof x==="string" ? x.localeCompare(y,LANG,{numeric:true}) : x-y;
+        // Desempate estable por nombre: sin él, dos modelos con el mismo
+        // descuento cambian de sitio entre ordenaciones sin motivo visible.
+        return dir*c || a.nombre_modelo.localeCompare(b.nombre_modelo,LANG);
+      });
+      page=0; draw();
+    }});
+
     const c=document.createElement("section"); c.className="card wide";
-    c.innerHTML=`<h2>Catálogo</h2>
-      <p class="sub">Todos los modelos del filtro, ordenados por descuento sobre PVP.
-      «Neto» es el ingreso tras margen, calculado en la base de datos.
-      El nombre enlaza a la ficha pública.</p>`;
-    const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
+    c.innerHTML=`<h2>${t("cat.titulo")}</h2><p class="sub">${t("cat.sub")}</p>`;
+    const w=document.createElement("div"); w.className="t-wrap"; w.append(tb);
     c.append(w, pager); grid.append(c);
     draw();
   }
@@ -2116,22 +2646,60 @@ function render(){
   document.getElementById("state")?.remove();
 }
 
+/* ── cadenas fuera de #app ────────────────────────────────────────────
+   render() reconstruye #app entero, así que todo lo que vive dentro se
+   traduce solo. La cabecera y el pie no: se repintan aquí, desde la misma
+   tabla T, para que no queden dos fuentes de texto. */
+function pintarEstaticos(){
+  document.documentElement.lang = LANG;
+  document.querySelector("h1.tool").textContent = t("app.titulo");
+  document.querySelector(".eyebrow").textContent = t("app.eyebrow");
+  document.querySelector(".live").innerHTML = `<span class="pulse"></span> ${t("app.vivo")}`;
+  const th = document.getElementById("theme");
+  th.textContent = t("app.tema"); th.setAttribute("aria-label", t("app.temaAria"));
+  const lg = document.getElementById("lang");
+  lg.setAttribute("aria-label", t("app.idioma"));
+  lg.querySelectorAll("button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.lang === LANG)));
+  document.getElementById("pie").innerHTML = t("app.pie");
+
+  const meta = document.getElementById("meta");
+  if(ROWS.length){
+    meta.innerHTML = t("app.meta",{
+      modelos: nf.format(ROWS.length),
+      skus:    nf.format(ROWS.reduce((s,r)=>s+r.num_skus,0)),
+      marcas:  nf.format(new Set(ROWS.map(r=>r.brand_code)).size)});
+  } else {
+    meta.innerHTML = `<span>${t("app.cargando")}</span>`;
+  }
+  const st = document.getElementById("state");
+  if(st && !st.classList.contains("err")) st.textContent = t("app.conectando");
+}
+
+document.getElementById("lang").addEventListener("click", e => {
+  const b = e.target.closest("button[data-lang]");
+  if(!b || b.dataset.lang === LANG) return;
+  LANG = b.dataset.lang;
+  try{ localStorage.setItem("fs-lang", LANG); }catch{}
+  // Los formateadores PRIMERO: pintarEstaticos() ya los usa para el contador
+  // de modelos, y render() los usa en cada cifra de la página.
+  formatos();
+  pintarEstaticos();
+  if(ROWS.length) render();
+});
+
 /* ── boot ─────────────────────────────────────────────────────────────── */
+pintarEstaticos();
 (async () => {
   try{
     const [rows_, comp_, hist_] =
       await Promise.all([load(), loadComparison(), loadHistoria(null, null)]);
     ROWS = rows_; COMP = comp_; HIST = hist_;
-    const skus = ROWS.reduce((s,r)=>s+r.num_skus,0);
-    document.getElementById("meta").innerHTML =
-      `<b>${nf.format(ROWS.length)}</b> modelos <span class="dot"></span>`+
-      `<b>${nf.format(skus)}</b> SKU <span class="dot"></span>`+
-      `<b>${nf.format(new Set(ROWS.map(r=>r.brand_code)).size)}</b> marcas `+
-      `<span class="dot"></span> running y trail hombre`;
+    pintarEstaticos();
     render();
   }catch(e){
     document.getElementById("state").className="state err";
-    document.getElementById("state").textContent="No se pudo cargar el catálogo: "+e.message;
+    document.getElementById("state").textContent=t("app.error")+e.message;
     console.error(e);
   }
 })();
