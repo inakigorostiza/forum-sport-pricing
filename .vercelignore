@@ -19,3 +19,7 @@ supabase/
 .mcp.json
 .env*
 .github/
+
+# The design system kit: 17 MB of brand source, screenshots of the live site and
+# a React UI kit. Never part of the deployed page.
+Forum Sport Design System/

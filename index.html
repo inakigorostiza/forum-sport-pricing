@@ -5,64 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Forum Sport · Pricing dinámico</title>
 <meta name="description" content="Panel de precios, márgenes y stock del catálogo de running y trail de Forum Sport.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232a78d6'/%3E%3Cpath d='M9 22V10h9M9 16h7' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23E32219'/%3E%3Cpath d='M9 23V9h12M9 16h9' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Public+Sans:ital,wght@0,300..800;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700&family=Roboto:wght@300;400;500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Tokens ───────────────────────────────────────────────────────────── */
+/* ── Tokens · Forum Sport design system ───────────────────────────────
+   Values come from the kit's tokens/{colors,typography,spacing}.css. The
+   brand ships exactly two hues — red #E32219 and blue #0279FF — so every
+   chart ramp below is derived from those two in OKLCH and then VALIDATED
+   with the dataviz validator rather than eyeballed. Light ramps are checked
+   against #FFFFFF, dark ones against brand ink #222222: the dark mode is
+   stepped on purpose, never an automatic flip. */
 :root{
   color-scheme: light;
-  --plane:#f4f2ed;      /* page plane, warmed */
-  --surface:#fcfcfb;    /* chart surface (validator baseline) */
-  --ink:#0b0b0b;
-  --ink-2:#52514e;
-  --muted:#898781;
-  --grid:#e1e0d9;
-  --axis:#c3c2b7;
-  --rule:rgba(11,11,11,.10);
-  --accent:#2a78d6;
-  --s1:#2a78d6; --s2:#eb6834;              /* categorical slots 1,2 (validated) */
-  --o1:#86b6ef; --o2:#5598e7; --o3:#2a78d6; --o4:#1c5cab; --o5:#104281; /* ordinal */
-  /* Diverging, for price position: blue = cheaper, gray = level, orange = dearer.
-     Each arm validated as an ordinal ramp; the midpoint is neutral by design. */
-  --dv-c3:#1c5cab; --dv-c2:#2a78d6; --dv-c1:#86b6ef;
-  --dv-mid:#b9b7ae;
-  --dv-d1:#f09a72; --dv-d2:#eb6834; --dv-d3:#a83c15;
-  --good:#006300;
-  --shadow:0 1px 2px rgba(11,11,11,.04), 0 8px 24px -12px rgba(11,11,11,.10);
-  --serif:"Instrument Serif", Georgia, serif;
-  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Brand */
+  --fs-red:#E32219; --fs-blue:#0279FF; --fs-ink:#222222;
+  --plane:#FFFFFF;      /* the site is a white page */
+  --surface:#FFFFFF;    /* cards are white, separated by hairlines, not fills */
+  --stage:#F2F2F2;      /* image stages, table headers, inner blocks */
+  --ink:#222222;        /* headings, nav, primary button */
+  --ink-2:#333333;      /* body copy */
+  --muted:#787676;      /* inactive */
+  --grid:#E3E3E3;       /* hairlines, gridlines */
+  --axis:#BCBCBC;
+  --rule:#E3E3E3;
+  --accent:#0279FF;
+  --s1:#0279FF; --s2:#E32219;              /* categorical · validated on #fff */
+  /* Ordinal, single hue at the brand-blue angle, L evenly spaced */
+  --o1:#73ACFF; --o2:#3B8CFE; --o3:#036EE8; --o4:#0155B8; --o5:#003E8A;
+  /* Diverging: blue = we are cheaper, grey = level, red = we are dearer.
+     Brand-coherent, and red/blue is the safest diverging pair for CVD. */
+  /* "Cheaper" is green by request, overriding the brand's two-hue palette.
+     Green/red is the classic colour-blind failure pair, so the greens below
+     were picked for CVD separation, not for looks: #05893E holds dE 7.9 under
+     deuteranopia and 4.51:1 on white. That sits in the 6-8 band, which is only
+     legal because every instance is also labelled ("mas barato"/"mas caro")
+     and signed (-25,99 EUR), never colour alone. */
+  --dv-c3:#057836; --dv-c2:#2E9E52; --dv-c1:#53BE70;
+  --dv-mid:#BCBCBC;
+  --dv-d1:#FF7261; --dv-d2:#D90E0A; --dv-d3:#8B0202;
+  --good:#05893E;       /* cheaper / positive. 4.51:1 on white: legible as text. */
+  --bad:#D90E0A;
+  /* The brand is flat. Only chips and floating elements carry a shadow. */
+  --shadow:none;
+  --shadow-chip:0 1px 2px rgba(0,0,0,.18);
+  --display:'Roboto Condensed','Arial Narrow',sans-serif;
+  --sans:'Roboto',Helvetica,Arial,sans-serif;
+  --price:'Caveat','Comic Sans MS',cursive;   /* substitute for the brand's hand-lettered price face */
+  --tracking-nav:0.08em;
+  --filters-h:58px;
 }
+
 @media (prefers-color-scheme: dark){
   :root:where(:not([data-theme="light"])){
     color-scheme: dark;
-    --plane:#0d0d0d; --surface:#1a1a19;
-    --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
-    --grid:#2c2c2a; --axis:#383835; --rule:rgba(255,255,255,.12);
-    --accent:#3987e5;
-    --s1:#3987e5; --s2:#d95926;
-    --o1:#9ec5f4; --o2:#6da7ec; --o3:#3987e5; --o4:#256abf; --o5:#184f95;
-    --dv-c3:#1c5cab; --dv-c2:#3987e5; --dv-c1:#9ec5f4;
-    --dv-mid:#6f6d66;
-    --dv-d1:#f0a07c; --dv-d2:#d95926; --dv-d3:#9c3a14;
-    --good:#0ca30c;
-    --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.6);
+    --plane:#171717; --surface:#222222; --stage:#2B2B2B;
+    --ink:#FFFFFF; --ink-2:#E3E3E3; --muted:#BCBCBC;
+    --grid:#3A3A3A; --axis:#555555; --rule:#3A3A3A;
+    --accent:#2081FF;
+    --s1:#2081FF; --s2:#EF3327;
+    --o1:#B5D3FF; --o2:#87B8FF; --o3:#569BFE; --o4:#0E7BFE; --o5:#0263D2;
+    --dv-c3:#25984D; --dv-c2:#53BE70; --dv-c1:#7CE695;
+    --dv-mid:#787676;
+    --dv-d1:#FEB6AA; --dv-d2:#FF6150; --dv-d3:#D60203;
+    --good:#5AC576;
+    --bad:#FF6150;
+    --shadow:none;
+    --shadow-chip:0 1px 2px rgba(0,0,0,.5);
   }
 }
 :root[data-theme="dark"]{
   color-scheme: dark;
-  --plane:#0d0d0d; --surface:#1a1a19;
-  --ink:#fff; --ink-2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --rule:rgba(255,255,255,.12);
-  --accent:#3987e5;
-  --s1:#3987e5; --s2:#d95926;
-  --o1:#9ec5f4; --o2:#6da7ec; --o3:#3987e5; --o4:#256abf; --o5:#184f95;
-  --dv-c3:#1c5cab; --dv-c2:#3987e5; --dv-c1:#9ec5f4;
-  --dv-mid:#6f6d66;
-  --dv-d1:#f0a07c; --dv-d2:#d95926; --dv-d3:#9c3a14;
-  --good:#0ca30c;
-  --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 24px -12px rgba(0,0,0,.6);
+  --plane:#171717; --surface:#222222; --stage:#2B2B2B;
+  --ink:#FFFFFF; --ink-2:#E3E3E3; --muted:#BCBCBC;
+  --grid:#3A3A3A; --axis:#555555; --rule:#3A3A3A;
+  --accent:#2081FF;
+  --s1:#2081FF; --s2:#EF3327;
+  --o1:#B5D3FF; --o2:#87B8FF; --o3:#569BFE; --o4:#0E7BFE; --o5:#0263D2;
+  --dv-c3:#25984D; --dv-c2:#53BE70; --dv-c1:#7CE695;
+  --dv-mid:#787676;
+  --dv-d1:#FEB6AA; --dv-d2:#FF6150; --dv-d3:#D60203;
+  --good:#5AC576;
+  --bad:#FF6150;
+  --shadow:none;
+  --shadow-chip:0 1px 2px rgba(0,0,0,.5);
 }
 
 *{box-sizing:border-box}
@@ -77,18 +104,31 @@ body{
 @media(min-width:900px){ .wrap{padding:0 40px} }
 
 /* ── Masthead ─────────────────────────────────────────────────────────── */
-header.mast{border-bottom:1px solid var(--rule); padding:36px 0 22px; margin-bottom:30px}
+header.mast{border-bottom:1px solid var(--rule); padding:0 0 18px; margin-bottom:28px}
+.mast-brand{display:flex; align-items:center; gap:16px; height:66px;
+  border-bottom:1px solid var(--rule); margin-bottom:18px}
+.mast-brand img{height:44px; width:auto; display:block}
+/* The kit ships the logo as a raster on white. On a dark surface that reads as
+   a transparency bug, so it gets an explicit white plate instead. Replace with
+   a transparent or reversed logo if the brand team supplies one. */
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])) .mast-brand img{background:#fff; padding:5px 9px}
+}
+:root[data-theme="dark"] .mast-brand img{background:#fff; padding:5px 9px}
+.mast-brand .tool{font-family:var(--display); font-weight:700; font-size:14px;
+  letter-spacing:var(--tracking-nav); text-transform:uppercase; color:var(--ink);
+  padding-bottom:3px; border-bottom:2px solid var(--fs-red)}
 .mast-top{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap}
 .eyebrow{
   font-size:11px; letter-spacing:.18em; text-transform:uppercase;
   color:var(--muted); font-weight:600; margin:0 0 8px;
 }
 h1{
-  font-family:var(--serif); font-weight:400;
-  font-size:clamp(38px,7vw,74px); line-height:.94; margin:0;
-  letter-spacing:-.015em;
+  font-family:var(--display); font-weight:700; text-transform:uppercase;
+  font-size:clamp(30px,5vw,46px); line-height:1.05; margin:0;
+  letter-spacing:var(--tracking-display,.01em);
 }
-h1 em{font-style:italic; color:var(--ink-2)}
+h1 em{font-style:normal; color:var(--fs-red)}
 .mast-meta{
   margin:16px 0 0; color:var(--ink-2); font-size:14px;
   display:flex; gap:8px 18px; flex-wrap:wrap; align-items:center;
@@ -98,36 +138,39 @@ h1 em{font-style:italic; color:var(--ink-2)}
 .live{
   display:inline-flex; align-items:center; gap:7px; font-size:11px;
   letter-spacing:.1em; text-transform:uppercase; font-weight:650; color:var(--ink-2);
-  border:1px solid var(--rule); border-radius:999px; padding:5px 11px; background:var(--surface);
+  font-family:var(--display); border:1px solid var(--rule); border-radius:0;
+  padding:6px 11px; background:var(--surface);
 }
 .pulse{width:6px;height:6px;border-radius:50%;background:var(--good); flex:none;
   box-shadow:0 0 0 0 color-mix(in srgb, var(--good) 60%, transparent); animation:pulse 2.6s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .mast-actions{display:flex; gap:8px; align-items:center}
 button.ghost{
-  font-family:var(--sans); font-size:12px; font-weight:600; color:var(--ink-2);
-  background:var(--surface); border:1px solid var(--rule); border-radius:8px;
+  font-family:var(--display); font-size:12px; font-weight:700; color:var(--ink);
+  text-transform:uppercase; letter-spacing:var(--tracking-nav);
+  background:var(--surface); border:1px solid var(--rule); border-radius:0;
   padding:7px 12px; cursor:pointer; transition:.16s;
 }
 button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 .hero{
-  display:grid; gap:28px 48px; align-items:end; margin-bottom:34px;
+  display:grid; gap:10px 26px; align-items:baseline; margin-bottom:26px;
   grid-template-columns:1fr;
 }
 @media(min-width:820px){ .hero{grid-template-columns:auto 1fr} }
-.hero-fig{font-size:clamp(64px,11vw,118px); font-weight:250; line-height:.86;
-  letter-spacing:-.045em; margin:0; color:var(--accent)}
+.hero-fig{font-family:var(--display); font-size:clamp(34px,4.2vw,54px); font-weight:700;
+  line-height:1; letter-spacing:0; margin:0; color:var(--fs-red)}
 .hero-cap{max-width:56ch}
-.hero-cap p{margin:0 0 10px; font-size:17px; line-height:1.55; color:var(--ink-2)}
+.hero-cap p{margin:0 0 8px; font-size:15px; line-height:1.5; color:var(--ink-2)}
 .hero-cap p strong{color:var(--ink); font-weight:650}
-.hero-cap .lede{font-family:var(--serif); font-size:22px; line-height:1.34; color:var(--ink)}
+.hero-cap .lede{font-family:var(--display); font-weight:700; text-transform:none;
+  font-size:19px; line-height:1.3; letter-spacing:.01em; color:var(--ink)}
 
 /* ── KPI row ──────────────────────────────────────────────────────────── */
 .kpis{
   display:grid; grid-template-columns:repeat(2,1fr); gap:1px;
-  background:var(--rule); border:1px solid var(--rule); border-radius:12px;
+  background:var(--rule); border:1px solid var(--rule); border-radius:0;
   overflow:hidden; margin-bottom:34px;
 }
 @media(min-width:700px){ .kpis{grid-template-columns:repeat(3,1fr)} }
@@ -138,16 +181,21 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 .kpis-sec{margin-top:-22px; margin-bottom:34px}
 .kpis-sec .k-val{font-size:20px; font-weight:600}
 .kpis-sec .k-label{font-size:10px}
-.kpi .k-label{font-size:11px; letter-spacing:.07em; text-transform:uppercase;
+.kpi .k-label{font-family:var(--display); font-weight:700;
+  font-size:11px; letter-spacing:var(--tracking-nav); text-transform:uppercase;
   color:var(--muted); font-weight:650; margin:0 0 7px}
-.kpi .k-val{font-size:27px; font-weight:600; letter-spacing:-.02em; margin:0; color:var(--ink)}
+.kpi .k-val{font-family:var(--display); font-size:28px; font-weight:700; letter-spacing:0;
+  margin:0; color:var(--ink); font-variant-numeric:tabular-nums}
+/* Money wears the brand's hand-lettered price face — its one distinctive
+   type moment. Percentages and counts do not: they are not prices. */
+.kpi .k-val.money{font-family:var(--price); font-size:36px; line-height:.95; color:var(--fs-gray-900,var(--ink-2))}
 .kpi .k-sub{font-size:12px; color:var(--muted); margin:4px 0 0}
 
 /* ── Filters ──────────────────────────────────────────────────────────── */
 .filters{
   display:flex; gap:10px; flex-wrap:wrap; align-items:center; min-width:0;
   padding:13px 16px; background:var(--surface);
-  border:1px solid var(--rule); border-radius:12px; margin-bottom:26px;
+  border:1px solid var(--rule); border-radius:0; margin-bottom:26px;
   position:sticky; top:0; z-index:20; box-shadow:var(--shadow);
 }
 .filters .f-lab{font-size:11px; letter-spacing:.09em; text-transform:uppercase;
@@ -156,7 +204,9 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
    disclosure on its own line inside the wrapping filter bar. */
 .dims{flex-basis:100%; margin:0}
 .dims>summary{display:inline-flex; align-items:center; gap:7px; cursor:pointer;
-  font-size:12px; font-weight:600; color:var(--ink-2); padding:4px 0; width:max-content}
+  font-family:var(--display); font-size:12px; font-weight:700; color:var(--ink);
+  text-transform:uppercase; letter-spacing:var(--tracking-nav);
+  padding:4px 0; width:max-content}
 .dims>summary::marker{color:var(--muted)}
 .dims>summary .n{background:var(--accent); color:#fff; border-radius:999px;
   padding:1px 7px; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums}
@@ -167,9 +217,10 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 .periodo{display:inline-flex; gap:4px; align-items:center}
 .periodo .chip{padding:7px 9px}
 select, .chip{
-  font-family:var(--sans); font-size:13px; font-weight:500; color:var(--ink);
-  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
-  padding:7px 11px; cursor:pointer;
+  font-family:var(--display); font-size:13px; font-weight:700; color:var(--ink);
+  text-transform:uppercase; letter-spacing:var(--tracking-nav);
+  background:var(--plane); border:1px solid var(--rule); border-radius:0;
+  padding:8px 12px; cursor:pointer;
 }
 select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visible{
   outline:2px solid var(--accent); outline-offset:2px}
@@ -177,7 +228,7 @@ select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visi
 .search{position:relative; flex:1 1 210px; min-width:170px; max-width:320px}
 .search-in{
   font-family:var(--sans); font-size:13px; color:var(--ink); width:100%;
-  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
+  background:var(--plane); border:1px solid var(--rule); border-radius:0;
   padding:7px 28px 7px 30px;
 }
 .search-in::placeholder{color:var(--muted)}
@@ -197,23 +248,23 @@ select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visi
 .search .clr:hover{color:var(--ink)}
 .ac{
   position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:45;
-  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  background:var(--surface); border:1px solid var(--rule); border-radius:0;
   box-shadow:var(--shadow); padding:5px; max-height:300px; overflow-y:auto;
 }
 .ac[hidden]{display:none}
 .ac-opt{
-  display:flex; align-items:baseline; gap:8px; padding:7px 9px; border-radius:7px;
+  display:flex; align-items:baseline; gap:8px; padding:7px 9px; border-radius:0;
   font-size:13px; cursor:pointer; color:var(--ink);
 }
 .ac-opt[aria-selected="true"],.ac-opt:hover{background:color-mix(in srgb, var(--accent) 11%, transparent)}
-.ac-opt mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inherit; border-radius:3px}
+.ac-opt mark{background:color-mix(in srgb, var(--accent) 28%, transparent); color:inherit; border-radius:0}
 .ac-opt .br{color:var(--muted); font-size:11.5px}
 .ac-opt .cnt{margin-left:auto; color:var(--muted); font-size:11.5px; font-variant-numeric:tabular-nums}
 .ac-none{padding:9px; font-size:12.5px; color:var(--muted)}
 .ms{position:relative}
 .ms-btn{
   font-family:var(--sans); font-size:13px; font-weight:500; color:var(--ink);
-  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
+  background:var(--plane); border:1px solid var(--rule); border-radius:0;
   padding:7px 11px; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
 }
 .ms-btn:hover{border-color:var(--axis)}
@@ -226,11 +277,11 @@ select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visi
 .ms-pop{
   position:absolute; top:calc(100% + 6px); left:0; z-index:40; min-width:230px;
   max-height:320px; overflow-y:auto; background:var(--surface);
-  border:1px solid var(--rule); border-radius:10px; box-shadow:var(--shadow); padding:6px;
+  border:1px solid var(--rule); border-radius:0; box-shadow:var(--shadow); padding:6px;
 }
 .ms-pop[hidden]{display:none}
 .ms-opt{
-  display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:7px;
+  display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:0;
   font-size:13px; cursor:pointer; color:var(--ink); white-space:nowrap;
 }
 .ms-opt:hover{background:color-mix(in srgb, var(--accent) 9%, transparent)}
@@ -252,18 +303,19 @@ select:focus-visible,.chip:focus-visible,button:focus-visible,summary:focus-visi
 @media(min-width:880px){ .grid{grid-template-columns:1fr 1fr} }
 .card{
   min-width:0; scroll-margin-top:76px;
-  background:var(--surface); border:1px solid var(--rule); border-radius:14px;
+  background:var(--surface); border:1px solid var(--rule); border-radius:0;
   padding:20px 20px 16px; box-shadow:var(--shadow);
 }
 .card.wide{grid-column:1/-1; min-width:0}
 .card h2{
-  font-family:var(--serif); font-weight:400; font-size:23px; line-height:1.2;
+  font-family:var(--display); font-weight:700; font-size:20px; line-height:1.2;
+  text-transform:uppercase; letter-spacing:.01em;
   margin:0 0 3px; letter-spacing:-.01em;
 }
 .card .sub{font-size:13px; color:var(--muted); margin:0 0 16px}
 .legend{display:flex; gap:16px; flex-wrap:wrap; margin:0 0 12px; font-size:12.5px; color:var(--ink-2)}
 .legend span{display:inline-flex; align-items:center; gap:6px}
-.swatch{width:11px; height:11px; border-radius:3px; flex:none}
+.swatch{width:11px; height:11px; border-radius:0; flex:none}
 svg{display:block; width:100%; height:auto; overflow:visible}
 .tick{font-size:11px; fill:var(--muted); font-variant-numeric:tabular-nums}
 .cat{font-size:12px; fill:var(--ink-2)}
@@ -318,8 +370,9 @@ tbody tr:hover{background:color-mix(in srgb, var(--accent) 6%, transparent)}
 td a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--axis)}
 td a:hover{color:var(--accent); border-color:var(--accent)}
 .thumb{
-  width:46px; height:46px; border-radius:8px; flex:none; object-fit:contain;
-  background:color-mix(in srgb, var(--ink) 4%, transparent);
+  width:46px; height:46px; border-radius:0; flex:none; object-fit:contain;
+  /* Packshots sit on the brand's flat grey stage, as they do on the site. */
+  background:var(--stage);
   border:1px solid var(--rule);
 }
 .thumb[data-failed]{
@@ -335,7 +388,7 @@ td a:hover{color:var(--accent); border-color:var(--accent)}
 td.prod-cell{padding:8px}
 .badge{
   display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em;
-  padding:3px 8px; border-radius:6px; white-space:nowrap;
+  padding:3px 8px; border-radius:0; white-space:nowrap;
 }
 .badge.caro{background:color-mix(in srgb, var(--s2) 18%, transparent); color:var(--ink)}
 .badge.barato{background:color-mix(in srgb, var(--good) 18%, transparent); color:var(--ink)}
@@ -368,7 +421,7 @@ td.best{font-weight:700}
 .pager select{padding:5px 8px; font-size:12.5px}
 button.pg{
   font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--ink-2);
-  background:var(--plane); border:1px solid var(--rule); border-radius:8px;
+  background:var(--plane); border:1px solid var(--rule); border-radius:0;
   min-width:34px; height:32px; padding:0 11px; cursor:pointer; transition:.15s;
 }
 button.pg:hover:not(:disabled){color:var(--ink); border-color:var(--axis)}
@@ -376,7 +429,7 @@ button.pg:disabled{opacity:.3; cursor:not-allowed}
 .pager .of{font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums;
   padding:0 4px; min-width:66px; text-align:center}
 .tag{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.04em;
-  padding:2px 6px; border-radius:5px; background:color-mix(in srgb, var(--s2) 16%, transparent);
+  padding:2px 6px; border-radius:0; background:color-mix(in srgb, var(--s2) 16%, transparent);
   color:var(--ink); margin-left:6px}
 
 /* ── Tooltip ──────────────────────────────────────────────────────────── */
@@ -384,8 +437,8 @@ button.pg:disabled{opacity:.3; cursor:not-allowed}
   position:fixed; pointer-events:none; opacity:0; transform:translateY(3px);
   transition:opacity .12s, transform .12s; z-index:90;
   background:var(--ink); color:var(--plane); font-size:12.5px; line-height:1.45;
-  padding:8px 11px; border-radius:8px; max-width:280px;
-  box-shadow:0 8px 28px -8px rgba(0,0,0,.45);
+  padding:8px 11px; border-radius:0; max-width:280px;
+  box-shadow:var(--shadow-chip);
 }
 #tip.on{opacity:1; transform:translateY(0)}
 #tip b{font-weight:700} #tip .t-k{opacity:.66}
@@ -409,9 +462,13 @@ footer a{color:var(--ink-2)}
 
 <div class="wrap">
   <header class="mast">
+    <div class="mast-brand">
+      <img src="assets/forum-sport.webp" alt="Forum Sport · El deporte nos_une">
+      <span class="tool">Laboratorio de pricing</span>
+    </div>
     <div class="mast-top">
       <div>
-        <p class="eyebrow">Forum Sport · Laboratorio de pricing</p>
+        <p class="eyebrow">Running y trail hombre · Temporada en curso</p>
         <h1>Pricing <em>dinámico</em></h1>
       </div>
       <div class="mast-actions">
@@ -769,13 +826,14 @@ function bindTip(el, html){
 const SVGNS="http://www.w3.org/2000/svg";
 const el=(n,a={})=>{const e=document.createElementNS(SVGNS,n);
   for(const k in a) e.setAttribute(k,a[k]); return e;};
-// Bar grows from a square baseline and gets a 4px rounded data-end.
-function hbarPath(x0,y,w,h,r=4){
+// Square data-ends: the Forum Sport system is square everywhere, which
+// overrides the usual 4px rounded data-end.
+function hbarPath(x0,y,w,h,r=0){
   r=Math.min(r,Math.max(0,w),h/2); const x1=x0+w;
   if(w<=r) return `M${x0},${y}H${x1}V${y+h}H${x0}Z`;
   return `M${x0},${y}H${x1-r}Q${x1},${y} ${x1},${y+r}V${y+h-r}Q${x1},${y+h} ${x1-r},${y+h}H${x0}Z`;
 }
-function vbarPath(x,yTop,w,h,r=4){
+function vbarPath(x,yTop,w,h,r=0){
   r=Math.min(r,w/2,Math.max(0,h)); const yB=yTop+h;
   if(h<=r) return `M${x},${yTop}H${x+w}V${yB}H${x}Z`;
   return `M${x},${yB}V${yTop+r}Q${x},${yTop} ${x+r},${yTop}H${x+w-r}Q${x+w},${yTop} ${x+w},${yTop+r}V${yB}Z`;
@@ -1379,8 +1437,10 @@ function render(){
     ["Margen medio", pct(avg(rows,r=>r.margen)*100), "sintético"],
   ];
   const k=document.createElement("div"); k.className="kpis";
+  // Money, and only money, wears the brand's price face.
+  const money = v => /€/.test(String(v)) ? " money" : "";
   k.innerHTML=kpis.map(([l,v,sub])=>
-    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
+    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val${money(v)}">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
   app.append(k);
 
   // The catalogue figures the competitive view replaced, kept as a second row:
@@ -1396,7 +1456,7 @@ function render(){
      pct(rows.filter(r=>r.nivel_stock==="muy bajo"||r.nivel_stock==="bajo").length/rows.length*100),
      "del catálogo"],
   ].map(([l,v,sub])=>
-    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
+    `<div class="kpi"><p class="k-label">${l}</p><p class="k-val${money(v)}">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
   if(vs.length) app.append(cat);
 
   const grid=document.createElement("div"); grid.className="grid"; app.append(grid);

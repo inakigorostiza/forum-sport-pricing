@@ -31,7 +31,8 @@ on top of it, a Dynamic Pricing Calculator with a landing page.
 | 9 | Competitor price scraping | Done — 10 competitors live |
 | 10 | Re-examining the "unscrapable" sellers | Done — 16 live, 38,5 % of catalogue |
 | 11 | Dimension filters + positioning time series | Done |
-| 12 | Dynamic Pricing Calculator | Not started |
+| 12 | Forum Sport design system applied | Done |
+| 13 | Dynamic Pricing Calculator | Not started |
 
 ---
 
@@ -1049,7 +1050,48 @@ rastreo en sí son ~29 min/día para todos.
 `SUPABASE_SERVICE_ROLE_KEY` del repositorio. Sin ellos no se ejecuta nada y la
 serie se queda donde está.
 
-## Phase 12 — Dynamic Pricing Calculator (not started)
+## Phase 12 — El sistema de diseño de Forum Sport
+
+La página pasa de su estilo propio (crema, serif, esquinas redondeadas,
+sombras) al sistema de marca: página blanca, tinta #222, rojo #E32219,
+Roboto Condensed en versales para títulos y controles, Roboto para el texto,
+**todo cuadrado** y prácticamente plano, con filetes de 1px #E3E3E3.
+
+La cifra grande del hero se redujo a un tamaño secundario: era lo primero que
+se leía y no es lo más importante de la página.
+
+> **Lección — un sistema de marca aporta parámetros, no excusas para no
+> validar.** La marca trae exactamente dos tonos, rojo y azul. Cada rampa del
+> gráfico se derivó de esos dos en OKLCH y se pasó por el validador de la skill
+> `dataviz`, en claro contra #FFFFFF y en oscuro contra la tinta #222222. El
+> modo oscuro está escalonado a propósito, no es un volteo automático. La
+> primera rampa ordinal que propuse falló por contraste en el extremo claro
+> (1,69:1) y la segunda por escalones de luminosidad demasiado juntos; ninguna
+> de las dos se veía mal a ojo.
+
+> **Lección — el verde de «ganamos» tiene un coste de accesibilidad.** Por
+> petición, «somos más baratos» pasa de azul a verde. Rojo/verde es justo el
+> par que peor distinguen las personas con daltonismo: medido, el par queda en
+> ΔE 7,9 bajo deuteranopia en claro y en 5,9 con el verde que había elegido
+> para oscuro — por debajo del suelo de 6. En oscuro hubo que aclarar el verde
+> hasta ΔE 11,9. Es legal porque **nunca es sólo color**: cada caso lleva
+> etiqueta («más barato» / «más caro») y signo (−24,99 €). Si alguna vez se
+> quita esa etiqueta, el color deja de ser suficiente.
+>
+> Detalle contraintuitivo que midió el validador: oscurecer el verde lo empeora,
+> porque bajo protanopia el rojo se lee oscuro y ambos convergen. El verde hay
+> que aclararlo, no oscurecerlo.
+
+El kit vive en `Forum Sport Design System/` (17 MB con capturas del site y un
+UI kit en React). Está excluido de Vercel: nunca forma parte de la página
+publicada. Del kit sólo se copia `assets/forum-sport.webp`.
+
+Dos sustituciones quedan marcadas: la tipografía de precios de la marca es un
+rotulado a mano que no se entregó —se usa Caveat, y sólo para importes en
+euros, no para porcentajes—, y el logo disponible es el lockup de **FS Club**,
+que arrastra una submarca que no corresponde a una herramienta interna.
+
+## Phase 13 — Dynamic Pricing Calculator (not started)
 
 Everything is in place: `margen`, `neto`, `descuento_pct`, `nivel_stock` and
 `cobertura_stock` are the levers, and the landing page already frames the
