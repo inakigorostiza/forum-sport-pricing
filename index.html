@@ -105,8 +105,11 @@ body{
 
 /* ── Masthead ─────────────────────────────────────────────────────────── */
 header.mast{border-bottom:1px solid var(--rule); padding:0 0 18px; margin-bottom:28px}
-.mast-brand{display:flex; align-items:center; gap:16px; height:66px;
-  border-bottom:1px solid var(--rule); margin-bottom:18px}
+.mast-brand{display:flex; align-items:center; gap:16px; min-height:66px;
+  border-bottom:1px solid var(--rule); margin-bottom:18px; flex-wrap:wrap}
+/* Las acciones comparten fila con la marca y se van al extremo. */
+.mast-brand .mast-actions{margin-left:auto}
+@media(max-width:620px){ .mast-brand .mast-actions{margin-left:0; padding-bottom:12px} }
 .mast-brand img{height:44px; width:auto; display:block}
 /* The kit ships the logo as a raster on white. On a dark surface that reads as
    a transparency bug, so it gets an explicit white plate instead. Replace with
@@ -118,11 +121,6 @@ header.mast{border-bottom:1px solid var(--rule); padding:0 0 18px; margin-bottom
 .mast-brand .tool{font-family:var(--display); font-weight:700; font-size:14px; margin:0;
   letter-spacing:var(--tracking-nav); text-transform:uppercase; color:var(--ink);
   padding-bottom:3px; border-bottom:2px solid var(--fs-red)}
-.mast-top{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap}
-.eyebrow{
-  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--muted); font-weight:600; margin:0 0 8px;
-}
 h1{
   font-family:var(--display); font-weight:700; text-transform:uppercase;
   font-size:clamp(30px,5vw,46px); line-height:1.05; margin:0;
@@ -141,9 +139,11 @@ h1 em{font-style:normal; color:var(--fs-red)}
   font-family:var(--display); border:1px solid var(--rule); border-radius:0;
   padding:6px 11px; background:var(--surface);
 }
-.pulse{width:6px;height:6px;border-radius:50%;background:var(--good); flex:none;
-  box-shadow:0 0 0 0 color-mix(in srgb, var(--good) 60%, transparent); animation:pulse 2.6s infinite}
-@keyframes pulse{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+/* Punto estático, no pulsante. El latido prometía un dato que cambia mientras
+   lo miras; lo que hay detrás es un rastreo diario, y la propia página avisa
+   700px más abajo de que solo lleva tres días de histórico. Un indicador quieto
+   con una etiqueta exacta dice la verdad y no cuesta nada. */
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--good); flex:none}
 .mast-actions{display:flex; gap:8px; align-items:center}
 /* Language switch. A segmented pair rather than a dropdown: with exactly two
    options a <select> hides the alternative behind a click, and the point of
@@ -192,6 +192,14 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 }
 .hero-note strong{color:var(--ink-2); font-weight:700}
 @media(max-width:900px){ .hero-note{text-align:left; flex-basis:100%} }
+/* La brecha mayor: el único dato del pliegue sobre el que se puede actuar hoy,
+   así que se lee como una frase y no como un pie de foto. */
+.hero-brecha{
+  margin:-18px 0 26px; font-size:15px; line-height:1.45; color:var(--ink-2);
+  font-family:var(--sans);
+}
+.hero-brecha b{color:var(--ink); font-weight:700}
+
 
 /* ── KPI row ──────────────────────────────────────────────────────────── */
 .kpis{
@@ -201,6 +209,11 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 }
 @media(min-width:700px){ .kpis{grid-template-columns:repeat(3,1fr)} }
 @media(min-width:1050px){ .kpis{grid-template-columns:repeat(6,1fr)} }
+/* La tira principal son cuatro, y cuatro huecos en una rejilla de seis dejan
+   dos celdas grises al final. El contexto plegado sí son seis. */
+@media(min-width:1050px){ .kpis:not(.kpis-sec){grid-template-columns:repeat(4,1fr)} }
+details.ctx{margin:0 0 30px}
+details.ctx .kpis-sec{margin:10px 0 0}
 .kpi{background:var(--surface); padding:16px 16px 18px}
 /* Secondary row: same grid, quieter, for the catalogue context beneath the
    competitive headline. */
@@ -248,11 +261,31 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
   background:var(--plane); border:1px solid var(--rule); border-radius:0;
   font-variant-numeric:tabular-nums}
 .param input:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-/* Confianza: la barra hace el número comparable de un vistazo. */
+/* Confianza: la barra hace el número comparable de un vistazo.
+   El color es el umbral, no decoración. Antes era el mismo azul al 20 % que al
+   90 %, así que la barra no decía nada que el número no dijera ya; y la tarjeta
+   gobierna su propio KPI con un corte en el 50 % («293 con confianza ≥ 50 %»)
+   que la fila no mostraba por ninguna parte. La muesca marca ese corte. */
 .conf{display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
   font-variant-numeric:tabular-nums}
-.conf-bar{display:inline-block; width:46px; height:6px; background:var(--grid); flex:none}
-.conf-bar i{display:block; height:100%; background:var(--accent)}
+.conf-bar{display:inline-block; width:46px; height:6px; background:var(--grid);
+  flex:none; position:relative}
+.conf-bar i{display:block; height:100%; background:var(--dv-mid)}
+.conf-bar::after{                       /* la muesca del 50 % */
+  content:""; position:absolute; left:50%; top:-2px; bottom:-2px; width:1px;
+  background:var(--ink-2); opacity:.55;
+}
+.conf.c-baja  .conf-bar i{background:var(--s2)}      /* < 40: no hay mercado */
+.conf.c-media .conf-bar i{background:var(--dv-mid)}  /* 40–59: a mirar */
+.conf.c-alta  .conf-bar i{background:var(--good)}    /* ≥ 60: sostenido por dato */
+/* Marca de evidencia débil. Hairline, sin relleno: es una advertencia, no una
+   alarma, y la fila sigue siendo legible con ella puesta. */
+.flag{
+  display:inline-block; font-family:var(--display); font-size:10px; font-weight:700;
+  letter-spacing:.05em; text-transform:uppercase; white-space:nowrap;
+  padding:1px 5px; margin-right:6px; border:1px solid var(--s2); color:var(--s2);
+}
+tr.debil td{background:color-mix(in srgb, var(--s2) 4%, transparent)}
 .card .sub .warn{color:var(--s2); font-weight:600}
 .card .note{font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.5}
 .chip[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent)}
@@ -478,9 +511,14 @@ td.best{font-weight:700}
    are stated once per table. Below each breakpoint the least load-bearing
    columns are dropped rather than squeezed: eight columns on a phone is eight
    illegible columns. The data is still in the table view and in the tooltip. */
-.t-rec  th:nth-child(1){width:23%} .t-rec th:nth-child(8){width:19%}
-.t-comp th:nth-child(1){width:25%} .t-comp th:nth-child(7){width:14%}
+.t-rec  th:nth-child(1){width:21%} .t-rec th:nth-child(7){width:12%}
+.t-rec  th:nth-child(8){width:19%}
+.t-comp th:nth-child(1){width:24%} .t-comp th:nth-child(7){width:15%}
 .t-cat  th:nth-child(1){width:34%}
+/* El nombre del competidor es la única celda de texto libre que queda en la
+   fila, y algunos son largos de verdad. Envuelve en vez de recortarse, y el
+   título lleva el nombre completo para el caso extremo. */
+.t-comp td.rival{white-space:normal; overflow-wrap:anywhere}
 /* The "why" column is prose, so it wraps instead of ellipsing. */
 .t-rec td:nth-child(8){white-space:normal}
 
@@ -492,6 +530,10 @@ td.best{font-weight:700}
   /* competition: drop the euro gap (the % stays) and the reading age */
   .t-comp th:nth-child(4), .t-comp td:nth-child(4),
   .t-comp th:nth-child(8), .t-comp td:nth-child(8){display:none}
+  /* Con dos columnas menos el reparto cambia: la de confianza se queda corta
+     y recorta el símbolo de porcentaje. Más ancho de columna, barra más corta. */
+  .t-rec th:nth-child(7){width:15%}
+  .conf-bar{width:30px}
 }
 @media (max-width:720px){
   .t-rec th:nth-child(4), .t-rec td:nth-child(4),
@@ -502,15 +544,38 @@ td.best{font-weight:700}
   .thumb{width:34px; height:34px}
   tr.grp-cont td.prod-cell{padding-left:28px}
   th,td{padding:7px 5px}
-  /* Quedan cuatro columnas: el nombre del producto puede quedarse con la
-     mitad, que es lo que hace falta para leerlo. */
-  .t-rec th:nth-child(1), .t-comp th:nth-child(1), .t-cat th:nth-child(1){width:42%}
+  .t-rec th:nth-child(1), .t-comp th:nth-child(1), .t-cat th:nth-child(1){width:36%}
   /* La barra de confianza es redundante cuando el número está al lado y, a
      este ancho, le roba al número los píxeles del símbolo de porcentaje. */
   .conf-bar{display:none}
   .f-count{margin-left:0}
   th{letter-spacing:.02em}
 }
+
+/* Debajo de 560px no caben cinco columnas de cifras sin cortar los importes,
+   y un precio cortado es peor que un precio ausente: «180,00 €» recortado a
+   «180,0…» se lee como otro número. Antes de esto, 3.015 celdas se recortaban
+   a 430px y 3.575 a 360px, con el símbolo del euro fuera de la celda.
+   Así que caen más columnas y las que quedan se ensanchan. */
+@media (max-width:560px){
+  table{font-size:12px}
+  th,td{padding:6px 4px}
+  /* comparativa: nuestro precio contra el suyo, y quién es. El % se deduce de
+     los dos importes que están uno al lado del otro. */
+  .t-comp th:nth-child(5), .t-comp td:nth-child(5),
+  .t-comp th:nth-child(7), .t-comp td:nth-child(7){display:none}
+  .t-comp th:nth-child(1){width:34%}
+  /* El nombre del rival pierde su columna, así que pasa debajo de su precio. */
+  .rival-sm{display:block}
+  .t-rec th:nth-child(1), .t-cat th:nth-child(1){width:32%}
+  /* Las tablas desplegables son etiquetas y cifras dentro de un <details>,
+     donde el alto es gratis. Que envuelvan: una fecha recortada a
+     «2026-09-2…» no es una fecha corta, es una fecha equivocada. */
+  .t-simple td, .t-simple th{white-space:normal; overflow-wrap:anywhere}
+}
+/* El nombre del rival solo existe cuando su columna no. */
+.rival-sm{display:none; color:var(--muted); font-size:10.5px; letter-spacing:.02em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
 .comp-note{
   font-size:12px; color:var(--muted); margin:12px 0 0; padding-top:10px;
@@ -569,13 +634,8 @@ footer a{color:var(--ink-2)}
     <div class="mast-brand">
       <img src="assets/forum-sport.webp" alt="Forum Sport · El deporte nos_une">
       <h1 class="tool">Laboratorio de pricing</h1>
-    </div>
-    <div class="mast-top">
-      <div>
-        <p class="eyebrow">Running y trail hombre · Temporada en curso</p>
-      </div>
       <div class="mast-actions">
-        <span class="live"><span class="pulse"></span> Datos en vivo</span>
+        <span class="live"><span class="pulse"></span> Datos diarios</span>
         <div class="lang" id="lang" role="group" aria-label="Idioma">
           <button type="button" data-lang="es" aria-pressed="true">ES</button>
           <button type="button" data-lang="en" aria-pressed="false">EN</button>
@@ -622,9 +682,7 @@ const LOC = () => LANG === "es" ? "es-ES" : "en-GB";
 const T = {
 /* cabecera, pie, estados ---------------------------------------------- */
 "app.titulo":    {es:"Laboratorio de pricing", en:"Pricing lab"},
-"app.eyebrow":   {es:"Running y trail hombre · Temporada en curso",
-                  en:"Men’s running and trail · Current season"},
-"app.vivo":      {es:"Datos en vivo",        en:"Live data"},
+"app.vivo":      {es:"Datos diarios",        en:"Daily data"},
 "app.tema":      {es:"Tema",                 en:"Theme"},
 "app.temaAria":  {es:"Cambiar tema",         en:"Change theme"},
 "app.idioma":    {es:"Idioma",               en:"Language"},
@@ -748,6 +806,9 @@ const T = {
                 en:"<strong>{n}</strong> models · <strong>{r}</strong> {rl} · average gap <strong>{gap}</strong>"},
 "h.peor":      {es:" · mayor brecha <strong>{m}</strong> ({p} sobre {c})",
                 en:" · widest gap <strong>{m}</strong> ({p} over {c})"},
+"h.brecha":    {es:"Mayor brecha: <b>{m}</b>, un <b>{p}</b> por encima de {c}.",
+                en:"Widest gap: <b>{m}</b>, <b>{p}</b> above {c}."},
+"k.contexto":  {es:"Contexto del catálogo", en:"Catalogue context"},
 "h.competidor":{es:"competidor",  en:"competitor"},
 "h.competidores":{es:"competidores", en:"competitors"},
 "h.ledePvp":   {es:"de los modelos se venden por debajo de su PVP.",
@@ -831,6 +892,16 @@ const T = {
 "m.thMargen":  {es:"Margen rec.",  en:"Rec. margin"},
 "m.thConf":    {es:"Confianza",    en:"Confidence"},
 "m.thPorQue":  {es:"Por qué",      en:"Why"},
+"m.debil":     {es:"Evidencia débil", en:"Weak evidence"},
+"m.debilAyuda":{es:"{n} de los {t} ajustes mayores se apoyan en poca evidencia "
+                  +"—un solo competidor, o menos del 50 % de confianza— y se "
+                  +"marcan como tales. Siguen en la lista, pero no la encabezan.",
+                en:"{n} of the {t} largest adjustments rest on weak evidence "
+                  +"—a single competitor, or under 50 % confidence— and are marked "
+                  +"as such. They stay in the list, but they do not lead it."},
+"m.saltoGrande":{es:"mueve el precio un {p} sobre un solo dato de mercado",
+                 en:"moves the price by {p} on a single market observation"},
+"m.umbral":    {es:"umbral de confianza: 50 %", en:"confidence threshold: 50 %"},
 "m.inviable":  {es:"Inviable: el margen mínimo supera el PVP",
                 en:"Infeasible: the minimum margin exceeds the list price"},
 "m.barrMargen":{es:"Limitado por el suelo de margen (coste sintético)",
@@ -950,6 +1021,8 @@ const T = {
 "pg.porPagina":{es:"Por página", en:"Per page"},
 "pg.filasAria":{es:"Filas por página", en:"Rows per page"},
 "pg.rango":    {es:"{a}–{b} de {t} modelos", en:"{a}–{b} of {t} models"},
+"pg.rangoPrecios":{es:"{a}–{b} de {t} precios observados",
+                   en:"{a}–{b} of {t} observed prices"},
 "pg.sinRes":   {es:"Sin resultados", en:"No results"},
 };
 
@@ -1870,10 +1943,19 @@ const RAMP5=["var(--o1)","var(--o2)","var(--o3)","var(--o4)","var(--o5)"];
    onSort existe para las tablas que no tienen todas sus filas en el DOM: la
    del catálogo está paginada, así que reordenar los <tr> visibles ordenaría
    una página en lugar de la tabla. */
-function ordenable(tabla, {onSort=null, inicial=null}={}){
+/* render() vacía #app y reconstruye cada tabla, así que la ordenación que el
+   usuario acababa de elegir se perdía en cuanto tocaba un filtro: ordenas por
+   confianza, marcas «solo en rebaja», y vuelves al orden de fábrica sin que
+   nada lo anuncie. El estado vive fuera del DOM, indexado por el nombre de la
+   tabla, y se restituye al reconstruirla. */
+const ORDEN = new Map();          // clave de tabla -> {col, dir}
+
+function ordenable(tabla, {onSort=null, inicial=null, clave=null}={}){
   const ths = [...tabla.tHead.rows[0].cells];
-  let col = inicial ? inicial.col : -1;
-  let dir = inicial ? inicial.dir : -1;
+  const guardado = clave ? ORDEN.get(clave) : null;
+  const arranque = guardado || inicial;
+  let col = arranque ? arranque.col : -1;
+  let dir = arranque ? arranque.dir : -1;
 
   const valor = (tr,i) => {
     const td = tr.cells[i];
@@ -1883,6 +1965,7 @@ function ordenable(tabla, {onSort=null, inicial=null}={}){
   const aplicar = () => {
     ths.forEach((th,i)=>th.setAttribute("aria-sort",
       i!==col ? "none" : dir>0 ? "ascending" : "descending"));
+    if(clave && col >= 0) ORDEN.set(clave, {col, dir});
     if(onSort){ onSort(col, dir); return; }
     const tb = tabla.tBodies[0], filas = [...tb.rows];
     const crudos = filas.map(tr=>valor(tr,col));
@@ -1907,8 +1990,66 @@ function ordenable(tabla, {onSort=null, inicial=null}={}){
     th.onclick = ir;
     th.onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); ir(); } };
   });
-  if(inicial) aplicar();
+  if(arranque) aplicar();
   return aplicar;
+}
+
+/* ── paginador ─────────────────────────────────────────────────────────
+   Uno solo para toda la página. Había tres respuestas distintas a «demasiadas
+   filas» conviviendo —cortar a 40, paginar, y renderizar las 1.058—, lo que
+   obliga al lector a averiguar en qué tabla está antes de saber si lo que ve
+   es todo. La de 1.058 además medía 53.554px y enterraba cinco tarjetas a
+   59.000px de altura, donde nadie iba a encontrarlas.
+
+   `total` es una función, no un número: la tabla que lo usa se reordena y se
+   refiltra debajo, y un total congelado deja el paginador mintiendo. */
+let pagerSeq = 0;
+function crearPager({total, por=25, opciones=[12,25,50,100], rango=null, tabla=null, onDraw}){
+  const id = "per-" + (++pagerSeq);     // ids únicos: hay más de un paginador
+  let per = por, page = 0;
+  const paginas = () => Math.max(1, Math.ceil(total() / per));
+
+  const nodo = document.createElement("div"); nodo.className = "pager";
+  nodo.innerHTML = `
+    <button class="pg" data-go="first" type="button" aria-label="${t("pg.primera")}">«</button>
+    <button class="pg" data-go="prev"  type="button" aria-label="${t("pg.anterior")}">‹</button>
+    <span class="of" aria-hidden="true"></span>
+    <button class="pg" data-go="next"  type="button" aria-label="${t("pg.siguiente")}">›</button>
+    <button class="pg" data-go="last"  type="button" aria-label="${t("pg.ultima")}">»</button>
+    <span class="range grow" role="status" aria-live="polite"></span>
+    <label class="range" for="${id}">${t("pg.porPagina")}</label>
+    <select id="${id}" aria-label="${t("pg.filasAria")}">
+      ${opciones.map(o=>`<option value="${o}"${o===por?" selected":""}>${o}</option>`).join("")}
+    </select>`;
+  const of = nodo.querySelector(".of"), rng = nodo.querySelector(".range");
+  const btn = k => nodo.querySelector(`[data-go="${k}"]`);
+
+  function draw(){
+    page = Math.min(page, paginas()-1);
+    const inicio = page*per;
+    const vistos = onDraw(inicio, per);
+    const n = total();
+    of.textContent = `${page+1} / ${nf.format(paginas())}`;
+    rng.textContent = n
+      ? (rango||t)("pg.rango",{a:nf.format(inicio+1), b:nf.format(inicio+vistos), t:nf.format(n)})
+      : t("pg.sinRes");
+    btn("first").disabled = btn("prev").disabled = page === 0;
+    btn("last").disabled  = btn("next").disabled = page >= paginas()-1;
+  }
+  const go = k => {
+    const ultima = paginas()-1;
+    page = k==="first" ? 0 : k==="prev" ? Math.max(0,page-1)
+         : k==="next"  ? Math.min(ultima,page+1) : ultima;
+    draw();
+    // Mantener la cabecera a la vista al paginar desde el final de la lista.
+    if(tabla) tabla.scrollIntoView({block:"nearest", behavior:"smooth"});
+  };
+  nodo.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  nodo.querySelector("#"+CSS.escape(id)).onchange = e => {
+    const primera = page*per;          // dejar al lector donde estaba, aproximadamente
+    per = Number(e.target.value); page = Math.floor(primera/per); draw();
+  };
+  return {nodo, draw, primeraPagina(){ page = 0; }};
 }
 
 /* Una celda es el texto a mostrar, o [texto, valor por el que ordenar]. */
@@ -1919,7 +2060,9 @@ function tableFor(cols,rows){
   const tb=document.createElement("table"); tb.className="t-simple";
   tb.innerHTML=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead>`
     +`<tbody>${rows.map(r=>`<tr>${r.map(celda).join("")}</tr>`).join("")}</tbody>`;
-  ordenable(tb);
+  // La clave no puede ser el texto de las cabeceras: cambia al cambiar de
+  // idioma y el orden elegido se perdería al pulsar EN.
+  ordenable(tb, {clave: "simple:"+cols.length+":"+(rows[0]||[]).length});
   const w=document.createElement("div"); w.className="t-wrap"; w.append(tb); return w;
 }
 function card(title,sub,node,tbl,wide=false){
@@ -1931,6 +2074,21 @@ function card(title,sub,node,tbl,wide=false){
     d.innerHTML=`<summary>${t("g.tabla")}</summary>`; d.append(tbl); c.append(d); }
   return c;
 }
+
+/* La altura de la barra de filtros se medía una sola vez por render(), así que
+   abrir «Más filtros» la hacía crecer sin que nadie volviera a mirar: la
+   cabecera pegajosa de las tablas quedaba tapada 42px en escritorio y 158px en
+   un móvil de 360. Se vuelve a medir al plegar/desplegar y al cambiar de ancho.
+
+   Fuera de render() a propósito: render() corre en cada pulsación de tecla, y
+   suscribirse a resize ahí dentro acumularía un oyente por tecla. */
+const medirBarra = () => {
+  const f = document.querySelector(".filters");
+  if(!f) return;
+  const h = f.getBoundingClientRect().height;
+  if(h) document.documentElement.style.setProperty("--filters-h", `${Math.round(h)}px`);
+};
+addEventListener("resize", () => requestAnimationFrame(medirBarra), {passive:true});
 
 /* ── render ───────────────────────────────────────────────────────────── */
 function render(){
@@ -2037,10 +2195,12 @@ function render(){
 
   // Park the sticky table headers directly under the filter bar. Measured
   // rather than hard-coded: the bar wraps to two lines on narrow screens.
-  requestAnimationFrame(()=>{
-    const h = f.getBoundingClientRect().height;
-    if(h) document.documentElement.style.setProperty("--filters-h", `${Math.round(h)}px`);
-  });
+  // Se medía una sola vez por render(), así que abrir «Más filtros» hacía
+  // crecer la barra sin que nadie volviera a mirar: la cabecera pegajosa de
+  // las tablas quedaba 42px por debajo en escritorio y 158px en un móvil de
+  // 360, es decir, tapada por la propia barra de filtros.
+  requestAnimationFrame(medirBarra);
+  dimBox.addEventListener("toggle", () => requestAnimationFrame(medirBarra));
 
   // The row above was just rebuilt, so the input the user is typing in is a new
   // element. Restore focus and caret, or every keystroke would drop the cursor.
@@ -2079,15 +2239,17 @@ function render(){
   const hero=document.createElement("div"); hero.className="hero";
   if(vs.length){
     const pctCaros = caros.length/vs.length*100;
+    /* El dato más accionable del pliegue —qué producto nos está haciendo más
+       daño— estaba a 13px en gris, alineado a la derecha y partido a mitad de
+       nombre. Sube a línea propia, legible, debajo de la cifra. El recuento
+       de apoyo se queda donde estaba, que es donde le corresponde. */
     hero.innerHTML=`<p class="hero-fig">${pct(pctCaros)}</p>
       <p class="lede">${t("h.lede")}</p>
       <p class="hero-note">${t("h.nota",{
         n:nf.format(vs.length), r:nf.format(rivales),
         rl:rivales===1?t("h.competidor"):t("h.competidores"),
-        gap:(gapMedio>0?"+":"")+pct(gapMedio)})}${
-      peor&&peor.delta_pct>0
-        ? t("h.peor",{m:peor.nombre_modelo, p:pct(peor.delta_pct), c:peor.competidor})
-        : ""}</p>`;
+        gap:(gapMedio>0?"+":"")+pct(gapMedio)})}</p>`;
+
   } else {
     // Nothing crawled for this slice: fall back to the catalogue story.
     const pctReb0 = rows.filter(r=>r.en_rebaja).length/rows.length*100;
@@ -2096,16 +2258,23 @@ function render(){
       <p class="hero-note">${t("h.notaPvp")}</p>`;
   }
   app.append(hero);
+  if(vs.length && peor && peor.delta_pct > 0){
+    const br=document.createElement("p"); br.className="hero-brecha";
+    br.innerHTML = t("h.brecha",{m:peor.nombre_modelo,
+                                 p:pct(peor.delta_pct), c:peor.competidor});
+    app.append(br);               // después de insertar el titular, no antes
+  }
 
   const reb=rows.filter(r=>r.en_rebaja);
   const share = n => vs.length ? pct(n/vs.length*100) : "—";
+  /* Eran seis, y las dos que sobran —cuántos competidores y en cuántos
+     empatamos— ya están dichas en la línea del titular. Cuatro caben en una
+     fila y se leen de una vez; seis se escanean. */
   const kpis = vs.length ? [
     [t("k.comparados"), nf.format(vs.length),
      t("k.delCat",{p:pct(vs.length/rows.length*100)})],
-    [t("k.competidores"), nf.format(rivales), t("k.conPrecio")],
     [t("k.masCaros"), nf.format(caros.length), share(caros.length)],
     [t("k.masBaratos"), nf.format(baratos.length), share(baratos.length)],
-    [t("k.mismoPrecio"), nf.format(iguales0.length), share(iguales0.length)],
     [t("k.difMedia"), `${gapMedio>0?"+":""}${pct(gapMedio)}`, t("k.frenteBarato")],
   ] : [
     [t("k.modelos"), nf.format(rows.length), t("k.sku",{n:nf.format(rows.reduce((s,r)=>s+r.num_skus,0))})],
@@ -2136,7 +2305,18 @@ function render(){
      t("k.delCatalogo")],
   ].map(([l,v,sub])=>
     `<div class="kpi"><p class="k-label">${l}</p><p class="k-val${money(v)}">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
-  if(vs.length) app.append(cat);
+  /* Plegada, no borrada. Son datos de contexto —PVP medio, margen medio,
+     reparto de stock— que nadie consulta para decidir un precio, pero que
+     explican el catálogo cuando hacen falta. Mientras estuvieron abiertos,
+     «PVP MEDIO 146 €» era, por el tipo manuscrito a 36px, la cifra más
+     prominente de toda la página: una media de tarifa sobre la que nadie
+     actúa, gritando por encima de la respuesta. */
+  if(vs.length){
+    const d=document.createElement("details"); d.className="dims ctx";
+    const sm=document.createElement("summary"); sm.textContent=t("k.contexto");
+    d.append(sm, cat);
+    app.append(d);
+  }
 
   const grid=document.createElement("div"); grid.className="grid"; app.append(grid);
 
@@ -2253,9 +2433,32 @@ function render(){
     box.append(reset);
     sec.append(box);
 
-    // Los mayores ajustes primero: es donde está el dinero.
-    const orden=[...recs].sort((a,b)=>Math.abs(b.delta_eur)-Math.abs(a.delta_eur));
-    const top=orden.slice(0,40);
+    /* Los mayores ajustes primero: es donde está el dinero. Pero ordenar solo
+       por |Δ€| encabeza la lista con el consejo peor sostenido que existe —el
+       movimiento más grande es casi siempre el que se apoya en un único
+       competidor—, y esa es exactamente la fila que un category manager tiene
+       que defender delante de su director.
+
+       Así que la evidencia va primero y el importe después. Nada se oculta:
+       las filas débiles siguen en la lista, marcadas, detrás de las que el
+       dato sostiene. El corte del 50 % es el mismo que ya gobierna el KPI de
+       esta tarjeta, no un número nuevo.
+
+       El orden de los dos pasos importa. Ordenar por evidencia ANTES de cortar
+       a 40 no degrada las filas débiles: las expulsa de la tabla, porque hay
+       ajustes bien sostenidos de sobra para llenar las 40 plazas. Así que
+       primero se eligen las 40 por importe —son las mismas que antes— y
+       después se reordenan. Se avisa, no se esconde. */
+    const SALTO_GRANDE = 25;            // % de variación que pide dos opiniones
+    for(const x of recs){
+      x.saltoGrande = Math.abs(x.delta_pct) > SALTO_GRANDE && x.n_comp <= 1;
+      x.debil = x.n_comp <= 1 || x.confianza < 50;
+    }
+    const top=[...recs]
+      .sort((a,b)=>Math.abs(b.delta_eur)-Math.abs(a.delta_eur))
+      .slice(0,40)
+      .sort((a,b)=>(a.debil - b.debil) || Math.abs(b.delta_eur)-Math.abs(a.delta_eur));
+    const topDebiles = top.filter(x=>x.debil).length;
     const byId=new Map(rows.map(r=>[r.modelo,r]));
     // `tb`, no `t`: en este fichero `t()` es la función de traducción, y una
     // variable local llamada `t` la tapa dentro de la plantilla de abajo.
@@ -2272,7 +2475,8 @@ function render(){
         : x.barrera==="outlet" ? t("m.barrOutlet")
         : x.ref ? t("m.objetivo",{p:pct(x.objetivo)})
         : t("m.sinComp");
-      return `<tr>
+      const cconf = x.confianza < 40 ? "c-baja" : x.confianza < 60 ? "c-media" : "c-alta";
+      return `<tr class="${x.debil?"debil":""}">
         <td class="prod-cell" data-sort="${r.nombre_modelo.replace(/"/g,"&quot;")}"><span class="prod-name">
           <a href="${r.url}" target="_blank" rel="noopener">${r.nombre_modelo}</a>
           <small>${r.marca} · ${r.abcd_digital||t("m.sinRotacion")} · ${t("m.stock",{v:nivelLab(r.nivel_stock)})}</small>
@@ -2282,15 +2486,20 @@ function render(){
         <td class="${cls}" data-sort="${x.delta_eur}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
         <td data-sort="${x.posicion_rec??""}">${x.posicion_rec?pct(x.posicion_rec):"—"}</td>
         <td data-sort="${x.margen_rec}">${pct(x.margen_rec)}</td>
-        <td data-sort="${x.confianza}"><span class="conf"><span class="conf-bar"><i style="width:${x.confianza}%"></i></span>
+        <td data-sort="${x.confianza}"><span class="conf ${cconf}"
+            title="${t("m.umbral")}"><span class="conf-bar"><i style="width:${x.confianza}%"></i></span>
             ${x.confianza} %</span></td>
-        <td class="t-k" data-sort="${motivo.replace(/"/g,"&quot;")}">${motivo}${x.notas.length?` · ${x.notas[0]}`:""}</td>
+        <td class="t-k" data-sort="${motivo.replace(/"/g,"&quot;")}">${
+          x.debil?`<span class="flag">${t("m.debil")}</span>`:""}${motivo}${
+          x.saltoGrande?` · ${t("m.saltoGrande",{p:(x.delta_pct>0?"+":"")+pct(x.delta_pct)})}`
+                       :x.notas.length?` · ${x.notas[0]}`:""}</td>
       </tr>`;}).join("")}</tbody>`;
-    ordenable(tb);
+    ordenable(tb, {clave:"rec"});
     const w=document.createElement("div"); w.className="t-wrap"; w.append(tb);
     sec.append(w);
     const nota=document.createElement("p"); nota.className="note";
-    nota.textContent=t("m.nota",{n:nf.format(top.length), total:nf.format(recs.length)});
+    nota.textContent=t("m.nota",{n:nf.format(top.length), total:nf.format(recs.length)})
+      + (topDebiles ? " " + t("m.debilAyuda",{n:nf.format(topDebiles), t:nf.format(top.length)}) : "");
     sec.append(nota);
     grid.append(sec);
   }
@@ -2442,11 +2651,13 @@ function render(){
             : ""}</td>
           <td class="${x.compGana?"best":""}" data-sort="${x.precio_comp}">${x.compGana
             ? `<span class="star" title="${t("fc.precioBajo")}">★</span>`:""}<a href="${x.url_comp}"
-            target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a></td>
+            target="_blank" rel="noopener">${eur2.format(x.precio_comp)}</a>
+            <small class="rival-sm" title="${x.competidor.replace(/"/g,"&quot;")}">${x.competidor}</small></td>
           <td class="${x.cls}" data-sort="${x.delta_eur}">${x.eq?"":(x.delta_eur>0?"+":"")}${eur2.format(x.delta_eur)}</td>
           <td class="${x.cls}" data-sort="${x.delta_pct}">${x.eq?"":(x.delta_pct>0?"+":"")}${pct(x.delta_pct)}</td>
           <td data-sort="${x.delta_pct}"><span class="badge ${x.badge}">${x.label}</span></td>
-          <td data-sort="${x.competidor.replace(/"/g,"&quot;")}"><a href="${x.url_comp}" target="_blank" rel="noopener"
+          <td class="rival" data-sort="${x.competidor.replace(/"/g,"&quot;")}"
+              title="${x.competidor.replace(/"/g,"&quot;")}"><a href="${x.url_comp}" target="_blank" rel="noopener"
                  title="${t("fc.verEn",{m:x.nombre_modelo, c:x.competidor})}">${x.competidor}</a></td>
           <td class="edad${x.edad.stale?" stale":""}" title="${x.edad.full}"
               data-sort="${Date.parse(x.observed_at)||0}">${x.edad.txt}</td></tr>`;
@@ -2454,22 +2665,47 @@ function render(){
       const CLAVES_C = [x=>x.nombre_modelo, x=>x.precio_fs, x=>x.precio_comp,
                         x=>x.delta_eur, x=>x.delta_pct, x=>x.delta_pct,
                         x=>x.competidor, x=>Date.parse(x.observed_at)||0];
-      const pintar = orden => {
-        tb.tBodies[0].innerHTML =
-          (orden ? [...comp].sort(orden) : comp).map(x=>fila(x, !orden)).join("");
-      };
-      pintar(null);
-      ordenable(tb,{onSort:(col,dir)=>{
+      /* Agrupada, la unidad de paginación es el MODELO, no la fila: partir un
+         producto entre dos páginas dejaría sus rivales huérfanos al otro lado
+         de un clic. Ordenada, la tabla ya está aplanada y se pagina por fila.
+         El contador dice cuál de las dos cosas está contando. */
+      const GRUPOS = [...comp.reduce((m,x)=>{
+        if(!m.has(x.modelo)) m.set(x.modelo, []);
+        m.get(x.modelo).push(x); return m;
+      }, new Map()).values()];
+      let ordenActual = null;              // null = agrupado por modelo
+
+      const pager = crearPager({
+        tabla: tb,
+        total: () => ordenActual ? comp.length : GRUPOS.length,
+        rango: (k,v) => ordenActual ? t("pg.rangoPrecios",v) : t("pg.rango",v),
+        onDraw: (inicio, por) => {
+          const trozo = ordenActual
+            ? [...comp].sort(ordenActual).slice(inicio, inicio+por)
+            : GRUPOS.slice(inicio, inicio+por).flat();
+          tb.tBodies[0].innerHTML = trozo.map(x=>fila(x, !ordenActual)).join("");
+          // Lo que el contador debe sumar: modelos agrupada, filas ordenada.
+          return ordenActual ? trozo.length
+               : GRUPOS.slice(inicio, inicio+por).length;
+        },
+      });
+
+      ordenable(tb,{clave:"comp", onSort:(col,dir)=>{
         const k=CLAVES_C[col];
-        pintar((a,b)=>{
+        ordenActual = (a,b)=>{
           const x=k(a), y=k(b);
           const c = typeof x==="string" ? x.localeCompare(y,LANG,{numeric:true}) : x-y;
           return dir*c || a.nombre_modelo.localeCompare(b.nombre_modelo,LANG)
                        || a.precio_comp-b.precio_comp;
-        });
+        };
+        // Ordenar y quedarse en la página 7 ordena algo que no se ve: la fila
+        // que acaba de subir a la primera posición estaría seis páginas atrás.
+        pager.primeraPagina();
+        pager.draw();
       }});
+      pager.draw();
       const w=document.createElement("div"); w.className="t-wrap"; w.append(tb);
-      c.append(w);
+      c.append(w, pager.nodo);
       const note=document.createElement("p"); note.className="comp-note";
       note.textContent=t("fc.nota",{
         f:fecha.toLocaleDateString(LOC(),{day:"numeric",month:"long",year:"numeric"})});
@@ -2545,9 +2781,6 @@ function render(){
     // browsable. Still ordered by discount, so the head of the table is the
     // same "mayores descuentos" view it replaces.
     const all=[...rows];
-    let per=12, page=0;
-    const pages=()=>Math.max(1,Math.ceil(all.length/per));
-
     const row=r=>`<tr>
       <td class="prod-cell"><span class="prod">
         <img class="thumb" src="${r.img_thumb}" alt="" loading="lazy" decoding="async"
@@ -2569,45 +2802,14 @@ function render(){
       <th>${t("cat.thStock")}</th></tr></thead><tbody></tbody>`;
     const tbody=tb.querySelector("tbody");
 
-    const pager=document.createElement("div"); pager.className="pager";
-    pager.innerHTML=`
-      <button class="pg" data-go="first" type="button" aria-label="${t("pg.primera")}">«</button>
-      <button class="pg" data-go="prev"  type="button" aria-label="${t("pg.anterior")}">‹</button>
-      <span class="of" aria-hidden="true"></span>
-      <button class="pg" data-go="next"  type="button" aria-label="${t("pg.siguiente")}">›</button>
-      <button class="pg" data-go="last"  type="button" aria-label="${t("pg.ultima")}">»</button>
-      <span class="range grow" role="status" aria-live="polite"></span>
-      <label class="range" for="per">${t("pg.porPagina")}</label>
-      <select id="per" aria-label="${t("pg.filasAria")}">
-        <option value="12">12</option><option value="25">25</option>
-        <option value="50">50</option><option value="100">100</option>
-      </select>`;
-    const of=pager.querySelector(".of"), range=pager.querySelector(".range");
-    const btn=k=>pager.querySelector(`[data-go="${k}"]`);
-
-    function draw(){
-      page=Math.min(page,pages()-1);
-      const start=page*per, slice=all.slice(start,start+per);
-      tbody.innerHTML=slice.map(row).join("");
-      of.textContent=`${page+1} / ${nf.format(pages())}`;
-      range.textContent=all.length
-        ? t("pg.rango",{a:nf.format(start+1), b:nf.format(start+slice.length), t:nf.format(all.length)})
-        : t("pg.sinRes");
-      btn("first").disabled=btn("prev").disabled = page===0;
-      btn("last").disabled =btn("next").disabled = page>=pages()-1;
-    }
-    const go=k=>{ const last=pages()-1;
-      page = k==="first"?0 : k==="prev"?Math.max(0,page-1)
-           : k==="next" ?Math.min(last,page+1) : last;
-      draw();
-      // Keep the table head in view when paging from further down the row list.
-      tb.scrollIntoView({block:"nearest", behavior:"smooth"});
-    };
-    pager.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
-    pager.querySelector("#per").onchange=e=>{
-      const firstRow=page*per;            // keep the reader roughly where they were
-      per=Number(e.target.value); page=Math.floor(firstRow/per); draw();
-    };
+    const pager=crearPager({
+      tabla: tb, por: 12, total: () => all.length,
+      onDraw: (inicio, por) => {
+        const trozo = all.slice(inicio, inicio+por);
+        tbody.innerHTML = trozo.map(row).join("");
+        return trozo.length;
+      },
+    });
 
     // Esta tabla no tiene sus filas en el DOM: solo las 12 de la página. Si se
     // reordenaran los <tr> visibles se ordenaría una página, no la tabla, y la
@@ -2622,7 +2824,7 @@ function render(){
                   r=>r.en_rebaja?r.descuento_pct:null,
                   r=>r.precio_rebaja*(1-r.margen),
                   r=>ORD_STOCK.indexOf(r.nivel_stock)];
-    ordenable(tb,{inicial:{col:3,dir:-1}, onSort:(col,dir)=>{
+    ordenable(tb,{clave:"cat", inicial:{col:3,dir:-1}, onSort:(col,dir)=>{
       const k=CLAVES[col];
       all.sort((a,b)=>{
         const x=k(a), y=k(b);
@@ -2633,14 +2835,14 @@ function render(){
         // descuento cambian de sitio entre ordenaciones sin motivo visible.
         return dir*c || a.nombre_modelo.localeCompare(b.nombre_modelo,LANG);
       });
-      page=0; draw();
+      pager.primeraPagina(); pager.draw();
     }});
 
     const c=document.createElement("section"); c.className="card wide";
     c.innerHTML=`<h2>${t("cat.titulo")}</h2><p class="sub">${t("cat.sub")}</p>`;
     const w=document.createElement("div"); w.className="t-wrap"; w.append(tb);
-    c.append(w, pager); grid.append(c);
-    draw();
+    c.append(w, pager.nodo); grid.append(c);
+    pager.draw();
   }
 
   document.getElementById("state")?.remove();
@@ -2653,7 +2855,6 @@ function render(){
 function pintarEstaticos(){
   document.documentElement.lang = LANG;
   document.querySelector("h1.tool").textContent = t("app.titulo");
-  document.querySelector(".eyebrow").textContent = t("app.eyebrow");
   document.querySelector(".live").innerHTML = `<span class="pulse"></span> ${t("app.vivo")}`;
   const th = document.getElementById("theme");
   th.textContent = t("app.tema"); th.setAttribute("aria-label", t("app.temaAria"));
