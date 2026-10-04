@@ -115,7 +115,7 @@ header.mast{border-bottom:1px solid var(--rule); padding:0 0 18px; margin-bottom
   :root:where(:not([data-theme="light"])) .mast-brand img{background:#fff; padding:5px 9px}
 }
 :root[data-theme="dark"] .mast-brand img{background:#fff; padding:5px 9px}
-.mast-brand .tool{font-family:var(--display); font-weight:700; font-size:14px;
+.mast-brand .tool{font-family:var(--display); font-weight:700; font-size:14px; margin:0;
   letter-spacing:var(--tracking-nav); text-transform:uppercase; color:var(--ink);
   padding-bottom:3px; border-bottom:2px solid var(--fs-red)}
 .mast-top{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap}
@@ -224,6 +224,22 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 .dims>summary .n{background:var(--accent); color:#fff; border-radius:999px;
   padding:1px 7px; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums}
 .dim-row{display:flex; flex-wrap:wrap; gap:8px; padding:9px 0 2px}
+/* Parámetros del motor */
+.params{flex-basis:auto; margin:4px 0 16px}
+.param-grid{display:grid; gap:8px 14px; padding:10px 0 12px;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.param{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  font-size:12.5px; color:var(--ink-2)}
+.param input{width:86px; flex:none; text-align:right; font-family:var(--sans);
+  font-size:13px; padding:5px 7px; color:var(--ink);
+  background:var(--plane); border:1px solid var(--rule); border-radius:0;
+  font-variant-numeric:tabular-nums}
+.param input:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+/* Confianza: la barra hace el número comparable de un vistazo. */
+.conf{display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.conf-bar{display:inline-block; width:46px; height:6px; background:var(--grid); flex:none}
+.conf-bar i{display:block; height:100%; background:var(--accent)}
 .card .sub .warn{color:var(--s2); font-weight:600}
 .card .note{font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.5}
 .chip[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent)}
@@ -477,12 +493,11 @@ footer a{color:var(--ink-2)}
   <header class="mast">
     <div class="mast-brand">
       <img src="assets/forum-sport.webp" alt="Forum Sport · El deporte nos_une">
-      <span class="tool">Laboratorio de pricing</span>
+      <h1 class="tool">Laboratorio de pricing</h1>
     </div>
     <div class="mast-top">
       <div>
         <p class="eyebrow">Running y trail hombre · Temporada en curso</p>
-        <h1>Pricing <em>dinámico</em></h1>
       </div>
       <div class="mast-actions">
         <span class="live"><span class="pulse"></span> Datos en vivo</span>
@@ -560,6 +575,7 @@ let COMP = [];                     // competitor comparison (public view only)
 let HIST = [];                     // daily positioning history
 let HIST_COMPLETO = true;          // false when only the cheapest rival per day was fetched
 let HIST_RANGO = null;             // the window currently in HIST, or null for "everything"
+let paramsOpen = false;            // render() rebuilds the DOM; keep the panel open across it
 // Sets, so each filter takes 1..n values. An empty set means "no restriction",
 // which keeps the default cheap: no membership test runs until something is picked.
 const F = { q:"", marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false,
@@ -638,7 +654,7 @@ async function loadComparison(){
   const u = `${URL_}/rest/v1/comparativa_publica`
     + `?select=modelo,marca,nombre_modelo,img_thumb,url_fs,precio_fs,pvp,`
     + `competidor,precio_comp,url_comp,delta_eur,delta_pct,somos_mas_baratos,`
-    + `nivel_stock,skus_vistos,skus_disponibles,promo,observed_at`
+    + `nivel_stock,skus_vistos,skus_disponibles,promo,observed_at,match_method`
     // A non-unique sort key is not a stable paging order: rows tied on
     // delta_pct could repeat or vanish between pages, so break the tie.
     + `&order=delta_pct.desc,modelo.asc,competidor.asc`;
@@ -833,6 +849,163 @@ function bindTip(el, html){
   });
   const hide=()=>tip.classList.remove("on");
   el.addEventListener("mouseleave",hide); el.addEventListener("blur",hide);
+}
+
+/* ── Motor de precio recomendado ───────────────────────────────────────
+   Esto NO es un optimizador de precio. Un óptimo económico es el argmax de
+   (p − coste) · q(p), y q(p) — la demanda — no existe en ningún sitio de este
+   proyecto: no hay unidades vendidas, ni ingresos, ni tráfico, ni conversión.
+   Sin demanda no hay elasticidad, y sin elasticidad no hay óptimo.
+
+   Lo que sí sostienen los datos es un recomendador por reglas con barreras
+   duras: una posición objetivo frente al rival más barato, modulada por
+   rotación y stock, recortada por barreras que no se negocian. Es la mitad
+   "reglas" de la arquitectura híbrida que hoy se considera buena práctica; la
+   mitad "ML dentro de las barreras" queda para cuando lleguen las ventas.
+
+   Vive en el cliente, en una sola implementación, porque los parámetros son
+   editables y mover un control tiene que recalcular al instante. Escribir las
+   reglas también en SQL significaría tenerlas dos veces: este proyecto ya pagó
+   ese error dos veces (migraciones 012 y 016). */
+
+const PARAMS_DEF = {
+  // Posición objetivo, en % del rival más barato, por rotación (abcd_digital).
+  // Medido: hoy estamos en AA 109,8 · A 106,8 · B 109,9 · C 110,5 · D 115,0,
+  // así que todos estos objetivos son un recorte, y el más hondo cae sobre los
+  // más vendidos — que son los que fijan la percepción de precio.
+  obj_AA:100, obj_A:102, obj_B:105, obj_C:108, obj_D:112, obj_sin:106,
+  // Ajuste en puntos porcentuales por nivel de stock. Descontar producto que
+  // apenas tienes es regalar margen; de ahí el signo positivo abajo.
+  stk_muy_alto:-4, stk_alto:-2, stk_medio:0, stk_bajo:2, stk_muy_bajo:4,
+  aj_outlet:-3,          // outlet empuja a la baja
+  aj_temporada_vieja:-3, // temporada anterior a la vigente
+  margen_min:10,         // % mínimo sobre el coste sintético
+  redondeo:1,            // escalón del precio final, en euros
+};
+const PARAMS_KEY = "fs-pricing-params";
+let P = {...PARAMS_DEF};
+try{ const g=JSON.parse(localStorage.getItem(PARAMS_KEY)||"{}");
+     for(const k in PARAMS_DEF) if(typeof g[k]==="number") P[k]=g[k]; }catch{}
+const guardarParams = () => { try{ localStorage.setItem(PARAMS_KEY, JSON.stringify(P)); }catch{} };
+
+const ANO_VIGENTE = 2026;
+const OBJ_POR_ABCD = r => {
+  const k = r.abcd_digital || r.abcd_tienda;
+  return k==="AA"?P.obj_AA : k==="A"?P.obj_A : k==="B"?P.obj_B
+       : k==="C"?P.obj_C  : k==="D"?P.obj_D : P.obj_sin;
+};
+const AJ_STOCK = r => ({"muy alto":P.stk_muy_alto, "alto":P.stk_alto, "medio":P.stk_medio,
+                        "bajo":P.stk_bajo, "muy bajo":P.stk_muy_bajo})[r.nivel_stock] ?? 0;
+
+/* Confianza 0–100: una suma de hechos medibles sobre la CALIDAD DEL DATO, no
+   una corazonada sobre el precio. Cada factor responde a una pregunta concreta:
+   ¿hay mercado?, ¿es el mismo producto?, ¿sigue vigente?, ¿los rivales se
+   ponen de acuerdo?, ¿sabemos si el producto rota? */
+function confianza(r, comps){
+  const n = comps.length;
+  let c = 0, notas = [];
+  c += n===0 ? 0 : n===1 ? 15 : n===2 ? 26 : n<=4 ? 34 : 40;
+  if(n===0) notas.push("sin precios de competencia");
+  if(n===1) notas.push("un solo competidor");
+
+  if(n){
+    // gtin13 es talla exacta; ref_prov empareja a nivel de modelo y puede
+    // cruzar nuestro color con otro suyo.
+    const exacto = comps.some(x=>x.match_method==="gtin13");
+    c += exacto ? 15 : 8;
+    if(!exacto) notas.push("emparejado por código de artículo, no por EAN");
+
+    const dias = Math.max(0, Math.round(
+      (Date.now() - Math.max(...comps.map(x=>Date.parse(x.observed_at)||0))) / 86400000));
+    c += dias<=1 ? 20 : dias<=7 ? 14 : dias<=14 ? 8 : dias<=30 ? 3 : 0;
+    if(dias>7) notas.push(`dato de hace ${dias} días`);
+  }
+  if(n>=2){
+    const ps = comps.map(x=>x.precio_comp).filter(v=>v>0);
+    const disp = (Math.max(...ps)-Math.min(...ps))/Math.min(...ps)*100;
+    c += disp<5 ? 15 : disp<15 ? 10 : disp<30 ? 5 : 0;
+    if(disp>=15) notas.push(`los rivales discrepan un ${nf1.format(disp)} %`);
+  }
+  c += r.abcd_digital ? 10 : r.abcd_tienda ? 5 : 0;
+  if(!r.abcd_digital && !r.abcd_tienda) notas.push("sin clasificación de rotación");
+
+  // Un único punto de mercado no puede corroborarse por mucho que sea fresco y
+  // exacto: por encima de 45 estaríamos fingiendo certeza.
+  if(n<=1) c = Math.min(c, n===0 ? 25 : 45);
+  return {valor: Math.max(0, Math.min(100, Math.round(c))), notas};
+}
+
+function recomendar(r, comps){
+  const coste   = r.precio_rebaja * (1 - r.margen);   // sintético: ver aviso en la tarjeta
+  const actual  = r.precio_rebaja;
+  const conf    = confianza(r, comps);
+  let objetivo  = OBJ_POR_ABCD(r) + AJ_STOCK(r);
+  if(r.outlet) objetivo += P.aj_outlet;
+  const vieja = r.ano_temporada && r.ano_temporada !== 9998 && r.ano_temporada < ANO_VIGENTE;
+  if(vieja) objetivo += P.aj_temporada_vieja;
+
+  const ref = comps.length ? Math.min(...comps.map(x=>x.precio_comp).filter(v=>v>0)) : null;
+  let bruto;
+  if(ref){
+    bruto = ref * objetivo/100;
+  } else {
+    // Sin mercado no hay posición objetivo que perseguir: el ancla es el precio
+    // actual y solo se mueve por señales internas.
+    //
+    // Y esas señales SOLO pueden bajar el precio. Subirlo sin una sola
+    // referencia de mercado sería adivinar: "tengo poco stock" justifica no
+    // regalar margen, no cobrar más. Sin el tope, el +4 pp de "stock muy bajo"
+    // —el nivel de 1.027 de 1.483 modelos— habría recomendado subir el precio
+    // de ~900 productos sin ninguna evidencia detrás.
+    const ajuste = AJ_STOCK(r) + (r.outlet?P.aj_outlet:0) + (vieja?P.aj_temporada_vieja:0);
+    bruto = actual * (1 + Math.min(0, ajuste)/100);
+  }
+
+  // ── barreras duras ────────────────────────────────────────────────────
+  const capPvp    = r.precio;
+  const capOutlet = r.outlet ? actual : Infinity;          // outlet solo baja
+  const pisoCoste = coste / (1 - Math.min(0.95, P.margen_min/100));
+  let barrera = null;
+
+  // Si el suelo de margen supera el techo de PVP el producto no puede venderse
+  // con ese margen sin pasarse de tarifa. No se devuelve un precio por encima
+  // del PVP en silencio: se recomienda el PVP y se dice que es inviable.
+  const inviable = pisoCoste > capPvp + 1e-9;
+
+  let p = bruto;
+  if(p > capPvp)    { p = capPvp;    barrera = "PVP"; }
+  if(p > capOutlet) { p = capOutlet; barrera = "outlet"; }
+  if(p < pisoCoste) { p = Math.min(pisoCoste, capPvp); barrera = "margen"; }
+
+  const paso = Math.max(0.01, P.redondeo || 1);
+  let precio_rec = Math.round(p/paso)*paso;
+  // Redondear no puede saltarse una barrera.
+  if(precio_rec > capPvp) precio_rec = Math.floor(capPvp/paso)*paso;
+  if(r.outlet && precio_rec > actual) precio_rec = Math.floor(actual/paso)*paso;
+  if(!inviable && precio_rec < pisoCoste) precio_rec = Math.ceil(pisoCoste/paso)*paso;
+  precio_rec = Math.round(precio_rec*100)/100;
+
+  const margen_rec = precio_rec>0 ? (precio_rec - coste)/precio_rec*100 : 0;
+  return {
+    modelo:r.modelo, precio_rec, actual, ref, objetivo,
+    delta_eur: Math.round((precio_rec-actual)*100)/100,
+    delta_pct: actual>0 ? (precio_rec-actual)/actual*100 : 0,
+    posicion_rec: ref ? precio_rec/ref*100 : null,
+    margen_rec, barrera, inviable,
+    confianza: conf.valor, notas: conf.notas,
+    n_comp: comps.length,
+  };
+}
+
+/* Recomendaciones para la vista actual. Agrupa comparativa_publica por modelo
+   una sola vez: render() se llama en cada pulsación de tecla. */
+function recomendaciones(modelos){
+  const porModelo = new Map();
+  for(const c of COMP){
+    if(!porModelo.has(c.modelo)) porModelo.set(c.modelo, []);
+    porModelo.get(c.modelo).push(c);
+  }
+  return modelos.map(r => recomendar(r, porModelo.get(r.modelo) || []));
 }
 
 /* ── svg helpers ──────────────────────────────────────────────────────── */
@@ -1519,6 +1692,123 @@ function render(){
       det.innerHTML="<summary>Ver los datos como tabla</summary>"; det.append(tbl);
       sec.append(det);
     }
+    grid.append(sec);
+  }
+
+  /* 0b · Precio recomendado ---------------------------------------------- */
+  {
+    const recs = recomendaciones(rows);
+    const sec = document.createElement("section"); sec.className="card wide";
+    const suben  = recs.filter(x=>x.delta_eur >  0.004);
+    const bajan  = recs.filter(x=>x.delta_eur < -0.004);
+    const igual  = recs.length - suben.length - bajan.length;
+    const conRef = recs.filter(x=>x.ref);
+    const posRec = conRef.length
+      ? conRef.reduce((s,x)=>s+x.posicion_rec,0)/conRef.length : null;
+    const posAct = conRef.length
+      ? conRef.reduce((s,x)=>s+x.actual/x.ref*100,0)/conRef.length : null;
+    const fiables = recs.filter(x=>x.confianza>=50).length;
+
+    sec.innerHTML = `<h2>Precio recomendado</h2>
+      <p class="sub"><b>Esto no es un precio óptimo.</b> Un óptimo exige saber cuánto
+      se vende a cada precio, y en este dataset no hay ni una sola unidad vendida:
+      sin demanda no hay elasticidad. Lo que hay es un recomendador por reglas —
+      posición objetivo frente al rival más barato según rotación y stock, recortada
+      por barreras que no se negocian. El coste con el que se calcula el margen es
+      <b>sintético</b> (<code>precio × (1 − margen)</code>, y el margen solo toma
+      cuatro valores), así que el suelo de margen es aproximado.</p>`;
+
+    const kpi = document.createElement("div"); kpi.className="kpis";
+    kpi.innerHTML = [
+      ["Modelos", nf.format(recs.length), `${nf.format(fiables)} con confianza ≥ 50 %`],
+      ["A la baja", nf.format(bajan.length), bajan.length?`${eur2.format(bajan.reduce((s,x)=>s+x.delta_eur,0)/bajan.length)} de media`:"—"],
+      ["Al alza", nf.format(suben.length), suben.length?`${eur2.format(suben.reduce((s,x)=>s+x.delta_eur,0)/suben.length)} de media`:"—"],
+      ["Sin cambio", nf.format(igual), "ya en su objetivo"],
+      ["Posición actual", posAct?nf1.format(posAct)+" %":"—", "sobre el rival más barato"],
+      ["Posición recomendada", posRec?nf1.format(posRec)+" %":"—",
+        posRec&&posAct?`${posRec<posAct?"−":"+"}${nf1.format(Math.abs(posRec-posAct))} pp`:"—"],
+    ].map(([l,v,sub])=>
+      `<div class="kpi"><p class="k-label">${l}</p><p class="k-val">${v}</p><p class="k-sub">${sub}</p></div>`).join("");
+    sec.append(kpi);
+
+    /* Parámetros editables. Cambiarlos recalcula al instante porque el motor
+       vive aquí, no en el servidor. */
+    const box = document.createElement("details"); box.className="dims params";
+    if(paramsOpen) box.open = true;
+    box.innerHTML = `<summary>Parámetros del motor</summary>`;
+    const grid2 = document.createElement("div"); grid2.className="param-grid";
+    const campos = [
+      ["Objetivo AA (% del rival)","obj_AA",50,200,1],
+      ["Objetivo A","obj_A",50,200,1],
+      ["Objetivo B","obj_B",50,200,1],
+      ["Objetivo C","obj_C",50,200,1],
+      ["Objetivo D","obj_D",50,200,1],
+      ["Objetivo sin clasificar","obj_sin",50,200,1],
+      ["Stock muy alto (pp)","stk_muy_alto",-30,30,1],
+      ["Stock alto (pp)","stk_alto",-30,30,1],
+      ["Stock medio (pp)","stk_medio",-30,30,1],
+      ["Stock bajo (pp)","stk_bajo",-30,30,1],
+      ["Stock muy bajo (pp)","stk_muy_bajo",-30,30,1],
+      ["Outlet (pp)","aj_outlet",-30,30,1],
+      ["Temporada anterior (pp)","aj_temporada_vieja",-30,30,1],
+      ["Margen mínimo (%)","margen_min",0,80,1],
+      ["Redondeo (€)","redondeo",0.01,10,0.01],
+    ];
+    for(const [lab,k,min,max,step] of campos){
+      const w=document.createElement("label"); w.className="param";
+      w.innerHTML=`<span>${lab}</span>`;
+      const i=document.createElement("input");
+      i.type="number"; i.value=P[k]; i.min=min; i.max=max; i.step=step;
+      i.onchange=()=>{ const v=parseFloat(i.value);
+        if(!Number.isFinite(v)) { i.value=P[k]; return; }
+        P[k]=Math.max(min,Math.min(max,v)); guardarParams(); paramsOpen=true; render(); };
+      w.append(i); grid2.append(w);
+    }
+    box.append(grid2);
+    const reset=document.createElement("button");
+    reset.className="ghost"; reset.type="button"; reset.textContent="Restablecer";
+    reset.onclick=()=>{ P={...PARAMS_DEF}; guardarParams(); paramsOpen=true; render(); };
+    box.append(reset);
+    sec.append(box);
+
+    // Los mayores ajustes primero: es donde está el dinero.
+    const orden=[...recs].sort((a,b)=>Math.abs(b.delta_eur)-Math.abs(a.delta_eur));
+    const top=orden.slice(0,40);
+    const byId=new Map(rows.map(r=>[r.modelo,r]));
+    const t=document.createElement("table");
+    t.innerHTML=`<thead><tr><th>Modelo</th><th>Actual</th><th>Recomendado</th>
+      <th>Dif.</th><th>Posición rec.</th><th>Margen rec.</th><th>Confianza</th>
+      <th>Por qué</th></tr></thead><tbody>${top.map(x=>{
+      const r=byId.get(x.modelo);
+      const cls=x.delta_eur<-0.004?"delta-dn":x.delta_eur>0.004?"delta-up":"";
+      const motivo = x.inviable ? "Inviable: el margen mínimo supera el PVP"
+        : x.barrera==="margen" ? "Limitado por el suelo de margen (coste sintético)"
+        : x.barrera==="PVP" ? "Limitado por el PVP"
+        : x.barrera==="outlet" ? "Outlet: solo puede bajar"
+        : x.ref ? `Objetivo ${nf1.format(x.objetivo)} % del rival más barato`
+        : "Sin competencia: solo señales internas";
+      return `<tr>
+        <td class="prod-cell"><span class="prod-name">
+          <a href="${r.url}" target="_blank" rel="noopener">${r.nombre_modelo}</a>
+          <small>${r.marca} · ${r.abcd_digital||"sin rotación"} · stock ${r.nivel_stock}</small>
+        </span></td>
+        <td>${eur2.format(x.actual)}</td>
+        <td><b>${eur2.format(x.precio_rec)}</b></td>
+        <td class="${cls}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
+        <td>${x.posicion_rec?nf1.format(x.posicion_rec)+" %":"—"}</td>
+        <td>${nf1.format(x.margen_rec)} %</td>
+        <td><span class="conf"><span class="conf-bar"><i style="width:${x.confianza}%"></i></span>
+            ${x.confianza} %</span></td>
+        <td class="t-k">${motivo}${x.notas.length?` · ${x.notas[0]}`:""}</td>
+      </tr>`;}).join("")}</tbody>`;
+    const w=document.createElement("div"); w.className="t-wrap"; w.append(t);
+    sec.append(w);
+    const nota=document.createElement("p"); nota.className="note";
+    nota.textContent=`Mostrando los ${nf.format(top.length)} mayores ajustes de `
+      +`${nf.format(recs.length)} modelos. La confianza mide la calidad del dato de `
+      +`mercado — número de rivales, si el emparejado es por EAN o por código, `
+      +`antigüedad y cuánto se parecen entre sí — no el acierto del precio.`;
+    sec.append(nota);
     grid.append(sec);
   }
 

@@ -13,7 +13,9 @@
       "Bash(grep -E \"\\\\-[0-9]{4,}$\")",
       "Bash(shuf -n 12 /tmp/urls.txt)",
       "Bash(awk '{print length\": \"$0}' /tmp/urls.txt)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "mcp__supabase__list_projects",
+      "mcp__github__search_repositories"
     ]
   }
 }
