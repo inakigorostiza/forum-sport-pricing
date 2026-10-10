@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -199,6 +199,49 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 @media(max-width:720px){
   .sec{padding:10px 14px 11px}
   .sec-sub{display:none}          /* en móvil el título ya nombra la sección */
+}
+
+/* ── Panel de rastreo ─────────────────────────────────────────────────── */
+.sc-puerta{display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; margin:12px 0 4px}
+.sc-token{
+  width:300px; max-width:100%; font-family:var(--sans); font-size:13px;
+  padding:7px 9px; color:var(--ink); background:var(--plane);
+  border:1px solid var(--rule); border-radius:0;
+}
+.sc-token:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.sc-lanzar{
+  display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap;
+  padding:10px 0 14px;
+}
+.sc-lanzar .param{flex-direction:column; align-items:flex-start; gap:4px;
+  justify-content:flex-start}
+.sc-lanzar select{min-width:150px}
+.sc-lim{width:110px; font-family:var(--sans); font-size:13px; padding:5px 7px;
+  color:var(--ink); background:var(--plane); border:1px solid var(--rule);
+  border-radius:0; text-align:right; font-variant-numeric:tabular-nums}
+.sc-go{height:31px}
+.sc-num{width:100%; max-width:74px; font-family:var(--sans); font-size:12.5px;
+  padding:4px 6px; color:var(--ink); background:var(--plane);
+  border:1px solid var(--rule); border-radius:0; text-align:right;
+  font-variant-numeric:tabular-nums}
+.t-scrape th:nth-child(1){width:20%} .t-scrape th:nth-child(7){width:17%}
+.t-scrape th:nth-child(8){width:7%}
+.t-scrape td{vertical-align:middle}
+.t-scrape td:last-child{text-align:center}
+.t-scrape .edad{display:block}
+.t-scrape td small{display:block; color:var(--muted); font-size:11px;
+  white-space:normal; line-height:1.35; margin-top:2px}
+@media(max-width:900px){
+  /* Retardo y tope de sitemap son ajuste fino: en pantalla estrecha estorban
+     más de lo que aportan, y el estado y el botón de lanzar no. */
+  .t-scrape th:nth-child(5), .t-scrape td:nth-child(5),
+  .t-scrape th:nth-child(6), .t-scrape td:nth-child(6){display:none}
+  .t-scrape th:nth-child(1){width:30%}
+}
+@media(max-width:620px){
+  .t-scrape th:nth-child(4), .t-scrape td:nth-child(4),
+  .t-scrape th:nth-child(7), .t-scrape td:nth-child(7){display:none}
+  .t-scrape th:nth-child(1){width:46%}
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
@@ -707,31 +750,31 @@ footer a{color:var(--ink-2)}
   <header class="mast">
     <div class="mast-brand">
       <img src="assets/forum-sport.webp" alt="Forum Sport · El deporte nos_une">
-      <h1 class="tool">Laboratorio de pricing</h1>
+      <h1 class="tool">Pricing lab</h1>
       <div class="mast-actions">
-        <span class="live"><span class="pulse"></span> Datos diarios</span>
-        <div class="lang" id="lang" role="group" aria-label="Idioma">
-          <button type="button" data-lang="es" aria-pressed="true">ES</button>
-          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <span class="live"><span class="pulse"></span> Daily data</span>
+        <div class="lang" id="lang" role="group" aria-label="Language">
+          <button type="button" data-lang="es" aria-pressed="false">ES</button>
+          <button type="button" data-lang="en" aria-pressed="true">EN</button>
         </div>
-        <button class="ghost" id="theme" type="button" aria-label="Cambiar tema">Tema</button>
+        <button class="ghost" id="theme" type="button" aria-label="Change theme">Theme</button>
       </div>
     </div>
     <p class="mast-meta" id="meta">
-      <span>Cargando catálogo…</span>
+      <span>Loading catalogue…</span>
     </p>
   </header>
 
-  <nav class="secciones" id="nav" aria-label="Secciones"></nav>
+  <nav class="secciones" id="nav" aria-label="Sections"></nav>
 
   <main id="app" role="tabpanel" tabindex="-1">
-    <div class="state" id="state">Conectando con Supabase…</div>
+    <div class="state" id="state">Connecting to Supabase…</div>
   </main>
 
   <footer>
     <span id="pie">
-      Catálogo de running y trail · origen <code>Dataset_FS_pricing_dinámico.xlsx</code> ·
-      1.483 modelos verificados con 43/43 comprobaciones
+      Running and trail catalogue · source <code>Dataset_FS_pricing_dinámico.xlsx</code> ·
+      1,483 models verified against 43/43 checks
     </span>
     <a class="sig" href="https://deerflow.tech" target="_blank" rel="noopener noreferrer">✦ Created by Deerflow</a>
   </footer>
@@ -751,7 +794,9 @@ const ANON  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
    miles, la posición del símbolo de moneda y «hace 3 días» son parte de la
    traducción, no decoración alrededor de ella. */
 const IDIOMAS = ["es","en"];
-let LANG = "es";
+// Inglés por defecto. El castellano sigue completo y a un clic; lo que cambia
+// es qué ve alguien que abre la página sin haber elegido nunca.
+let LANG = "en";
 try{ const g = localStorage.getItem("fs-lang"); if(IDIOMAS.includes(g)) LANG = g; }catch{}
 const LOC = () => LANG === "es" ? "es-ES" : "en-GB";
 
@@ -771,6 +816,76 @@ const T = {
 "nav.pricing":   {es:"Herramienta de pricing", en:"Pricing tool"},
 "nav.pricingSub":{es:"Precio recomendado y los parámetros que lo fijan",
                   en:"Recommended price and the parameters behind it"},
+"nav.scraping":  {es:"Rastreo",              en:"Scraping"},
+"nav.scrapingSub":{es:"Estado de los competidores y lanzamiento manual",
+                   en:"Competitor health and manual runs"},
+
+/* ── panel de rastreo ────────────────────────────────────────────────── */
+"sc.titulo":   {es:"Rastreo de competidores", en:"Competitor scraping"},
+"sc.sub":      {es:"Esta sección no pasa por la clave pública: el navegador no puede leer la "
+                  +"configuración de rastreo, y por eso hace falta un token de operador. Publicar a "
+                  +"qué competidores se vigila, con qué retardo y con qué user-agent no es un dato "
+                  +"de precios, es la estrategia de vigilancia.",
+                en:"This section does not go through the public key: the browser cannot read the "
+                  +"crawl configuration, which is why an operator token is required. Publishing who "
+                  +"is watched, at what delay and with which user agent is not price data, it is the "
+                  +"monitoring strategy itself."},
+"sc.token":    {es:"Token de operador", en:"Operator token"},
+"sc.entrar":   {es:"Entrar",     en:"Unlock"},
+"sc.salir":    {es:"Cerrar sesión", en:"Sign out"},
+"sc.tokenMal": {es:"Token incorrecto.", en:"Wrong token."},
+"sc.pide":     {es:"Introduce el token de operador para ver y manejar el rastreo.",
+                en:"Enter the operator token to see and drive the crawl."},
+"sc.setup":    {es:"Falta configurar el proyecto", en:"The project still needs setting up"},
+"sc.setupComo":{es:"La función <code>scrape-control</code> ya está desplegada, pero le faltan sus "
+                  +"secretos. En Supabase → Edge Functions → Secrets, añade "
+                  +"<code>OPERATOR_TOKEN</code> (una cadena larga y aleatoria, la que teclearás aquí) "
+                  +"y <code>GITHUB_TOKEN</code> (un PAT de grano fino con permiso <code>actions: "
+                  +"write</code> sobre el repositorio). Hasta entonces esta sección no puede leer nada.",
+                en:"The <code>scrape-control</code> function is deployed but has no secrets yet. In "
+                  +"Supabase → Edge Functions → Secrets add <code>OPERATOR_TOKEN</code> (a long random "
+                  +"string, the one you will type here) and <code>GITHUB_TOKEN</code> (a fine-grained "
+                  +"PAT with <code>actions: write</code> on the repository). Until then this section "
+                  +"can read nothing."},
+"sc.lanzar":   {es:"Lanzar rastreo", en:"Run a crawl"},
+"sc.todos":    {es:"Todos los competidores", en:"All competitors"},
+"sc.fase":     {es:"Fase", en:"Phase"},
+"sc.refresh":  {es:"Refrescar precios", en:"Refresh prices"},
+"sc.discover": {es:"Descubrir productos", en:"Discover products"},
+"sc.limite":   {es:"Páginas máx. (vacío = sin límite)", en:"Max pages (blank = no limit)"},
+"sc.ejecutar": {es:"Ejecutar ahora", en:"Run now"},
+"sc.lanzado":  {es:"Lanzado: {q}. GitHub no devuelve el identificador de la ejecución, así que el "
+                  +"progreso se sigue en Actions.",
+                en:"Started: {q}. GitHub does not return a run id, so progress is followed in Actions."},
+"sc.verActions":{es:"Ver en GitHub Actions", en:"Open GitHub Actions"},
+"sc.refrescar":{es:"Actualizar estado", en:"Refresh status"},
+"sc.thComp":   {es:"Competidor", en:"Competitor"},
+"sc.thEstado": {es:"Estado",     en:"Health"},
+"sc.thActivo": {es:"Activo",     en:"Enabled"},
+"sc.thUA":     {es:"User-agent", en:"User agent"},
+"sc.thDelay":  {es:"Retardo (s)",en:"Delay (s)"},
+"sc.thTope":   {es:"Tope sitemap", en:"Sitemap cap"},
+"sc.thUltimo": {es:"Última ejecución", en:"Last run"},
+"sc.thAccion": {es:"Acción",     en:"Action"},
+"sc.ok":       {es:"Correcto",   en:"Healthy"},
+"sc.avisos":   {es:"Con errores",en:"Errors"},
+"sc.roto":     {es:"Caído",      en:"Failing"},
+"sc.nunca":    {es:"Sin datos",  en:"Never run"},
+"sc.apagado":  {es:"Desactivado",en:"Disabled"},
+"sc.uaHonest": {es:"Honesto",    en:"Honest"},
+"sc.uaBrowser":{es:"Navegador",  en:"Browser"},
+"sc.detalle":  {es:"{p} páginas · {f} encontradas · {m} casadas · {e} errores",
+                en:"{p} pages · {f} found · {m} matched · {e} errors"},
+"sc.sinTope":  {es:"sin tope",   en:"no cap"},
+"sc.resumen":  {es:"<b>{ok}</b> correctos · <b>{mal}</b> caídos · <b>{off}</b> desactivados "
+                  +"de <b>{n}</b>. Última ejecución registrada: {f}.",
+                en:"<b>{ok}</b> healthy · <b>{mal}</b> failing · <b>{off}</b> disabled "
+                  +"of <b>{n}</b>. Last recorded run: {f}."},
+"sc.avisoRoto":{es:"{n} competidores activos no devolvieron ni una página en su última ejecución. "
+                  +"Mientras sigan así, sus precios en el resto de la herramienta envejecen sin que "
+                  +"nada lo indique.",
+                en:"{n} enabled competitors returned no pages at all on their last run. While that "
+                  +"lasts, their prices elsewhere in the tool keep ageing with nothing to show it."},
 "app.cargando":  {es:"Cargando catálogo…",   en:"Loading catalogue…"},
 "app.conectando":{es:"Conectando con Supabase…", en:"Connecting to Supabase…"},
 "app.error":     {es:"No se pudo cargar el catálogo: ", en:"Could not load the catalogue: "},
@@ -1235,7 +1350,7 @@ let paramsOpen = false;            // render() rebuilds the DOM; keep the panel 
    puede enviar por correo, y el botón Atrás del navegador funciona. Los filtros
    son globales a propósito — se mantienen al cambiar de sección, porque
    "Nike, en rebaja" es la misma pregunta en las tres. */
-const SECCIONES = ["home", "explorer", "pricing"];
+const SECCIONES = ["home", "explorer", "pricing", "scraping"];
 let SECCION = SECCIONES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
 addEventListener("hashchange", () => {
   const h = location.hash.slice(1);
@@ -2364,8 +2479,20 @@ addEventListener("resize", () => requestAnimationFrame(medirBarra), {passive:tru
 
 /* ── render ───────────────────────────────────────────────────────────── */
 function render(){
-  const rows=filtered(), app=document.getElementById("app");
+  const app=document.getElementById("app");
   pintarNav();
+
+  /* El rastreo no mira el catálogo: no lleva barra de filtros, porque filtrar
+     por marca no cambia qué competidores hay que rastrear. */
+  if(SECCION === "scraping"){
+    app.innerHTML = "";
+    document.documentElement.style.setProperty("--filters-h", "0px");
+    seccionScraping(app);
+    document.getElementById("state")?.remove();
+    return;
+  }
+
+  const rows=filtered();
   // Capture focus BEFORE wiping: clearing the DOM fires the outgoing input's
   // blur handler, so any flag it maintains is already stale by the time the new
   // row is built.
@@ -3190,6 +3317,262 @@ function render(){
   }
 
   document.getElementById("state")?.remove();
+}
+
+/* ── Panel de rastreo ──────────────────────────────────────────────────
+   Todo lo de esta sección pasa por la Edge Function `scrape-control`, nunca
+   por PostgREST con la clave pública. `competitors` y `crawl_log` tienen RLS
+   sin una sola política a propósito: la página vive en una URL pública y sin
+   autenticación, y qué competidores se vigilan —con qué retardo y con qué
+   user-agent— es estrategia, no dato de precios.
+
+   El token vive en localStorage, que es del navegador de quien opera, y viaja
+   en una cabecera. Nunca entra en el HTML ni en el repositorio. */
+const OP_KEY = "fs-operator-token";
+let opToken = ""; try{ opToken = localStorage.getItem(OP_KEY) || ""; }catch{}
+let scEstado = null, scFallo = null, scCargando = false, scMensaje = null;
+
+async function scrapeApi(payload){
+  const r = await fetch(`${URL_}/functions/v1/scrape-control`, {
+    method: "POST",
+    headers: { apikey: ANON, Authorization: `Bearer ${ANON}`,
+               "Content-Type": "application/json", "x-operator-token": opToken },
+    body: JSON.stringify(payload),
+  });
+  let j = null; try{ j = await r.json(); }catch{}
+  if(!r.ok) throw Object.assign(new Error((j && (j.detail || j.error)) || r.status),
+                                {status: r.status, cuerpo: j});
+  return j;
+}
+
+async function cargarScraping(){
+  if(!opToken) return;
+  scCargando = true; scFallo = null;
+  try      { scEstado = await scrapeApi({action:"status"}); }
+  catch(e) { scFallo = e; scEstado = null; }
+  finally  { scCargando = false; if(SECCION === "scraping") render(); }
+}
+
+/* Salud de un competidor a partir de su última ejecución. Una sola ejecución
+   buena no dice que esté sano, pero una con cero páginas y errores sí dice que
+   está roto, y eso es lo que hay que ver de un vistazo. */
+function saludDe(c){
+  if(!c.enabled)            return {k:"apagado", cls:"igual"};
+  const u = (c.historial || [])[0];
+  if(!u)                    return {k:"nunca",   cls:"igual"};
+  if(u.errors > 0 && u.pages_fetched === 0) return {k:"roto",   cls:"caro"};
+  if(u.errors > 0)          return {k:"avisos",  cls:"caro"};
+  return {k:"ok", cls:"barato"};
+}
+
+function seccionScraping(app){
+  const sec = document.createElement("section"); sec.className = "card wide";
+  sec.innerHTML = `<h2>${t("sc.titulo")}</h2><p class="sub">${t("sc.sub")}</p>`;
+  app.append(sec);
+
+  /* ── sin token: sólo la puerta ─────────────────────────────────────── */
+  if(!opToken){
+    const f = document.createElement("form"); f.className = "sc-puerta";
+    f.innerHTML = `<label class="param"><span>${t("sc.token")}</span></label>`;
+    const i = document.createElement("input");
+    i.type = "password"; i.autocomplete = "off"; i.className = "sc-token";
+    i.setAttribute("aria-label", t("sc.token"));
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "submit"; b.textContent = t("sc.entrar");
+    f.querySelector("label").append(i);
+    f.append(b);
+    f.onsubmit = e => {
+      e.preventDefault();
+      opToken = i.value.trim(); if(!opToken) return;
+      try{ localStorage.setItem(OP_KEY, opToken); }catch{}
+      cargarScraping(); render();
+    };
+    const p = document.createElement("p"); p.className = "note"; p.textContent = t("sc.pide");
+    sec.append(p, f);
+    if(scFallo) mostrarFallo(sec);
+    return;
+  }
+
+  if(scFallo){ mostrarFallo(sec); botonSalir(sec); return; }
+  if(!scEstado){
+    const p = document.createElement("p"); p.className = "state";
+    p.textContent = t("app.cargando"); sec.append(p);
+    if(!scCargando) cargarScraping();
+    return;
+  }
+
+  /* ── resumen ───────────────────────────────────────────────────────── */
+  const comps = scEstado.competidores || [];
+  const salud = comps.map(c => ({c, s: saludDe(c)}));
+  const nOk   = salud.filter(x => x.s.k === "ok").length;
+  const nMal  = salud.filter(x => x.s.k === "roto" || x.s.k === "avisos").length;
+  const nOff  = salud.filter(x => x.s.k === "apagado").length;
+  const ultima = comps.flatMap(c => c.historial || [])
+    .map(h => h.started_at).sort().slice(-1)[0];
+  const res = document.createElement("p"); res.className = "sub";
+  res.innerHTML = t("sc.resumen", {ok:nOk, mal:nMal, off:nOff, n:comps.length,
+    f: ultima ? antiguedad(ultima).full : "—"});
+  sec.append(res);
+
+  const rotos = salud.filter(x => x.s.k === "roto").length;
+  if(rotos){
+    const w = document.createElement("p"); w.className = "note";
+    w.innerHTML = `<span class="warn">${t("sc.avisoRoto",{n:rotos})}</span>`;
+    sec.append(w);
+  }
+
+  /* ── lanzar ────────────────────────────────────────────────────────── */
+  const box = document.createElement("div"); box.className = "sc-lanzar";
+  const selC = document.createElement("select");
+  selC.setAttribute("aria-label", t("sc.thComp"));
+  selC.innerHTML = `<option value="">${t("sc.todos")}</option>` +
+    comps.map(c => `<option value="${c.slug}">${c.name}</option>`).join("");
+  const selF = document.createElement("select");
+  selF.setAttribute("aria-label", t("sc.fase"));
+  selF.innerHTML = `<option value="refresh">${t("sc.refresh")}</option>` +
+                   `<option value="discover">${t("sc.discover")}</option>`;
+  const inL = document.createElement("input");
+  inL.type = "number"; inL.min = 1; inL.max = 5000; inL.className = "sc-lim";
+  inL.placeholder = "—"; inL.setAttribute("aria-label", t("sc.limite"));
+  const go = document.createElement("button");
+  go.className = "chip sc-go"; go.type = "button"; go.textContent = t("sc.ejecutar");
+  go.onclick = async () => {
+    go.disabled = true; scMensaje = null;
+    try{
+      const r = await scrapeApi({action:"run", slug:selC.value,
+                                 phase:selF.value, limit:inL.value});
+      scMensaje = {ok:true, texto: t("sc.lanzado",{q: r.lanzado.competidor + " · " + r.lanzado.phase}),
+                   url: r.url};
+    }catch(e){ scMensaje = {ok:false, texto:String(e.message)}; }
+    finally{ go.disabled = false; render(); }
+  };
+  const etq = (clave, nodo) => {
+    const l = document.createElement("label"); l.className = "param";
+    l.innerHTML = `<span>${t(clave)}</span>`; l.append(nodo); return l;
+  };
+  box.append(etq("sc.thComp", selC), etq("sc.fase", selF), etq("sc.limite", inL), go);
+  const h = document.createElement("p"); h.className = "param-grupo";
+  h.textContent = t("sc.lanzar");
+  sec.append(h, box);
+
+  if(scMensaje){
+    const m = document.createElement("p"); m.className = "note";
+    m.innerHTML = scMensaje.ok
+      ? `${scMensaje.texto} <a href="${scMensaje.url}" target="_blank" rel="noopener">${t("sc.verActions")}</a>`
+      : `<span class="warn">${scMensaje.texto}</span>`;
+    sec.append(m);
+  }
+
+  /* ── tabla de competidores ─────────────────────────────────────────── */
+  const tb = document.createElement("table"); tb.className = "t-scrape";
+  tb.innerHTML = `<thead><tr><th>${t("sc.thComp")}</th><th>${t("sc.thEstado")}</th>
+    <th>${t("sc.thActivo")}</th><th>${t("sc.thUA")}</th><th>${t("sc.thDelay")}</th>
+    <th>${t("sc.thTope")}</th><th>${t("sc.thUltimo")}</th><th>${t("sc.thAccion")}</th>
+    </tr></thead><tbody></tbody>`;
+  const cuerpo = tb.querySelector("tbody");
+
+  // Un cambio de configuración se manda solo, no en lote: si falla uno, falla
+  // uno, y el operador ve cuál.
+  const guardar = async (slug, cambios, volver) => {
+    try{ await scrapeApi({action:"config", slug, cambios}); await cargarScraping(); }
+    catch(e){ scMensaje = {ok:false, texto:String(e.message)}; volver(); render(); }
+  };
+
+  for(const {c, s: sal} of salud){
+    const tr = document.createElement("tr");
+    const u = (c.historial || [])[0];
+    tr.innerHTML = `
+      <td class="prod-cell" data-sort="${c.name.replace(/"/g,"&quot;")}">
+        <span class="prod-name"><a href="${c.base_url}" target="_blank" rel="noopener">${c.name}</a>
+        <small>${c.slug} · ${c.classification}</small></span></td>
+      <td data-sort="${sal.k}"><span class="badge ${sal.cls}">${t("sc."+sal.k)}</span></td>`;
+
+    const tdAct = document.createElement("td");
+    const chk = document.createElement("input");
+    chk.type = "checkbox"; chk.checked = c.enabled;
+    chk.setAttribute("aria-label", `${t("sc.thActivo")} — ${c.name}`);
+    chk.onchange = () => guardar(c.slug, {enabled: chk.checked}, () => chk.checked = c.enabled);
+    tdAct.append(chk); tr.append(tdAct);
+
+    const tdUa = document.createElement("td");
+    const selU = document.createElement("select");
+    selU.setAttribute("aria-label", `${t("sc.thUA")} — ${c.name}`);
+    selU.innerHTML = ["honest","browser"].map(v =>
+      `<option value="${v}"${v===c.user_agent?" selected":""}>${
+        t(v==="honest"?"sc.uaHonest":"sc.uaBrowser")}</option>`).join("");
+    selU.onchange = () => guardar(c.slug, {user_agent: selU.value},
+                                  () => selU.value = c.user_agent);
+    tdUa.append(selU); tr.append(tdUa);
+
+    const num = (valor, min, max, step, clave) => {
+      const td = document.createElement("td");
+      const i = document.createElement("input");
+      i.type = "number"; i.value = valor ?? ""; i.min = min; i.max = max; i.step = step;
+      i.className = "sc-num"; i.placeholder = t("sc.sinTope");
+      i.setAttribute("aria-label", `${t(clave)} — ${c.name}`);
+      i.onchange = () => guardar(c.slug, {[clave === "sc.thDelay" ? "crawl_delay_s"
+                                                                 : "sitemap_max_children"]: i.value},
+                                 () => i.value = valor ?? "");
+      td.append(i); tr.append(td); return i;
+    };
+    num(c.crawl_delay_s, 0.5, 60, 0.5, "sc.thDelay");
+    num(c.sitemap_max_children, 1, 500, 1, "sc.thTope");
+
+    const tdU = document.createElement("td"); tdU.className = "t-k";
+    tdU.innerHTML = u
+      ? `<span class="edad" title="${antiguedad(u.started_at).full}">${antiguedad(u.started_at).txt}</span>
+         <small>${t("sc.detalle",{p:nf.format(u.pages_fetched), f:nf.format(u.offers_found),
+                                  m:nf.format(u.offers_matched), e:nf.format(u.errors)})}</small>`
+      : "—";
+    tr.append(tdU);
+
+    const tdA = document.createElement("td");
+    const b = document.createElement("button");
+    b.className = "pg"; b.type = "button"; b.textContent = "▶";
+    b.title = `${t("sc.ejecutar")} — ${c.name}`;
+    b.setAttribute("aria-label", `${t("sc.ejecutar")} — ${c.name}`);
+    b.onclick = async () => {
+      b.disabled = true;
+      try{
+        const r = await scrapeApi({action:"run", slug:c.slug, phase:"refresh"});
+        scMensaje = {ok:true, texto:t("sc.lanzado",{q:c.name}), url:r.url};
+      }catch(e){ scMensaje = {ok:false, texto:String(e.message)}; }
+      finally{ b.disabled = false; render(); }
+    };
+    tdA.append(b); tr.append(tdA);
+    cuerpo.append(tr);
+  }
+  ordenable(tb, {clave:"scrape"});
+  const w = document.createElement("div"); w.className = "t-wrap"; w.append(tb);
+  sec.append(w);
+
+  const pie = document.createElement("div"); pie.className = "pager";
+  const rf = document.createElement("button");
+  rf.className = "ghost"; rf.type = "button"; rf.textContent = t("sc.refrescar");
+  rf.onclick = () => { scEstado = null; cargarScraping(); render(); };
+  pie.append(rf); sec.append(pie);
+  botonSalir(sec);
+}
+
+function mostrarFallo(sec){
+  const p = document.createElement("p"); p.className = "note";
+  // 503 "setup" no es un error del operador: es que el proyecto aún no tiene
+  // sus secretos, y hay que decir cuáles y dónde.
+  if(scFallo.status === 503){
+    p.innerHTML = `<b>${t("sc.setup")}</b><br>${t("sc.setupComo")}`;
+  } else if(scFallo.status === 401){
+    p.innerHTML = `<span class="warn">${t("sc.tokenMal")}</span>`;
+  } else {
+    p.innerHTML = `<span class="warn">${String(scFallo.message)}</span>`;
+  }
+  sec.append(p);
+}
+function botonSalir(sec){
+  const b = document.createElement("button");
+  b.className = "ghost"; b.type = "button"; b.textContent = t("sc.salir");
+  b.onclick = () => { opToken = ""; scEstado = null; scFallo = null; scMensaje = null;
+                      try{ localStorage.removeItem(OP_KEY); }catch{} render(); };
+  sec.append(b);
 }
 
 /* La navegación de secciones. Patrón de pestañas completo —roles, aria-selected

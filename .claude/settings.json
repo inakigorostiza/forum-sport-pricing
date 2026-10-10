@@ -15,7 +15,9 @@
       "Bash(awk '{print length\": \"$0}' /tmp/urls.txt)",
       "Bash(python3 -c ' *)",
       "mcp__supabase__list_projects",
-      "mcp__github__search_repositories"
+      "mcp__github__search_repositories",
+      "mcp__claude_ai_Claude_Docs__batch",
+      "mcp__claude_ai_Claude_Docs__guide"
     ]
   }
 }
