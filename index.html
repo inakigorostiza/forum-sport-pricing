@@ -166,6 +166,41 @@ button.ghost{
 }
 button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 
+/* ── Navegación de secciones ──────────────────────────────────────────
+   Tres trabajos, tres paneles. Bajo una marca sin radios y sin sombras, la
+   pestaña activa se marca con la regla inferior y el peso del texto — no con
+   una pastilla, que sería la única esquina redondeada de la página. */
+.secciones{border-bottom:1px solid var(--rule); margin:0 0 24px}
+.sec-lista{display:flex; gap:0; flex-wrap:wrap}
+.sec{
+  display:flex; align-items:flex-start; gap:10px; text-align:left;
+  background:none; border:0; border-bottom:2px solid transparent; border-radius:0;
+  padding:12px 20px 13px; margin-bottom:-1px; cursor:pointer; transition:.16s;
+  font-family:var(--sans);
+}
+.sec:first-child{padding-left:0}
+.sec-n{
+  font-family:var(--display); font-size:11px; font-weight:700; color:var(--muted);
+  border:1px solid var(--rule); min-width:20px; height:20px; flex:none;
+  display:inline-flex; align-items:center; justify-content:center; margin-top:1px;
+}
+.sec-txt{display:flex; flex-direction:column; gap:2px; min-width:0}
+.sec-tit{
+  font-family:var(--display); font-size:13px; font-weight:700; color:var(--ink-2);
+  text-transform:uppercase; letter-spacing:var(--tracking-nav);
+}
+.sec-sub{font-size:11.5px; color:var(--muted); line-height:1.35}
+.sec:hover .sec-tit{color:var(--ink)}
+.sec[aria-selected="true"]{border-bottom-color:var(--accent)}
+.sec[aria-selected="true"] .sec-tit{color:var(--ink)}
+.sec[aria-selected="true"] .sec-n{
+  background:var(--accent); border-color:var(--accent); color:#fff}
+#app:focus{outline:none}
+@media(max-width:720px){
+  .sec{padding:10px 14px 11px}
+  .sec-sub{display:none}          /* en móvil el título ya nombra la sección */
+}
+
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 /* A full-width info bar, not a hero block: one baseline, hairline top and
    bottom, no fill. It states the headline and gets out of the way — the charts
@@ -212,6 +247,9 @@ button.ghost:hover{color:var(--ink); border-color:var(--axis)}
 /* La tira principal son cuatro, y cuatro huecos en una rejilla de seis dejan
    dos celdas grises al final. El contexto plegado sí son seis. */
 @media(min-width:1050px){ .kpis:not(.kpis-sec){grid-template-columns:repeat(4,1fr)} }
+/* La tira del motor son siete fichas. Fijar cuatro columnas deja una fila de
+   tres y una celda gris colgando; auto-fit reparte lo que haya. */
+.kpis-eng{grid-template-columns:repeat(auto-fit,minmax(148px,1fr))!important}
 details.ctx{margin:0 0 30px}
 details.ctx .kpis-sec{margin:10px 0 0}
 .kpi{background:var(--surface); padding:16px 16px 18px}
@@ -252,6 +290,21 @@ details.ctx .kpis-sec{margin:10px 0 0}
 .dim-row{display:flex; flex-wrap:wrap; gap:8px; padding:9px 0 2px}
 /* Parámetros del motor */
 .params{flex-basis:auto; margin:4px 0 16px}
+/* Quince campos sin un solo título eran tres familias distintas —objetivos en
+   %, ajustes en pp, barreras en €— en una sola rejilla indiferenciada. */
+.param-grupo{
+  font-family:var(--display); font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.07em; color:var(--muted);
+  margin:16px 0 0; padding-top:12px; border-top:1px solid var(--rule);
+}
+/* La matriz es una matriz: se lee como la hoja de la que viene, con sus filas
+   y sus columnas, no como quince campos sueltos. */
+.t-matriz{margin-top:8px}
+.t-matriz th{font-size:10px}
+.t-matriz td{padding:4px 6px}
+.t-matriz .param{justify-content:flex-end}
+.t-matriz .param input{width:100%; max-width:84px}
+.t-matriz td:first-child{font-family:var(--display); font-weight:700; color:var(--ink)}
 .param-grid{display:grid; gap:8px 14px; padding:10px 0 12px;
   grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 .param{display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -442,10 +495,11 @@ th:first-child,td:first-child{text-align:left; font-variant-numeric:normal}
 th{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
   font-weight:650; border-bottom:1px solid var(--axis);
   /* Headers wrap; they do not get cut. With table-layout:fixed a header that
-     does not fit is silently truncated, and "RECOMENDA…" is not a word. Some
-     of these are a single long word that normal wrapping cannot break, hence
-     overflow-wrap — two lines beats a lie. */
-  white-space:normal; overflow-wrap:anywhere}
+     does not fit is silently truncated, and "RECOMENDA…" is not a word.
+     Romper DENTRO de la palabra es el último recurso, no el primero: a 1440px
+     sobra sitio y aun así salía «RECOMENDAD / O». Así que aquí solo se permite
+     envolver por los espacios; partir letras queda para los anchos estrechos. */
+  white-space:normal}
 
 /* ── Sortable headers ─────────────────────────────────────────────────
    Every table on the page sorts by any of its columns. The arrow is always
@@ -511,45 +565,60 @@ td.best{font-weight:700}
    are stated once per table. Below each breakpoint the least load-bearing
    columns are dropped rather than squeezed: eight columns on a phone is eight
    illegible columns. The data is still in the table view and in the tooltip. */
-.t-rec  th:nth-child(1){width:21%} .t-rec th:nth-child(7){width:12%}
-.t-rec  th:nth-child(8){width:19%}
-.t-comp th:nth-child(1){width:24%} .t-comp th:nth-child(7){width:15%}
+/* 9 columnas: Modelo · Tramo · Actual · Recomendado · Dif. · Posición rec. ·
+   Margen rec. · Confianza · Por qué */
+.t-rec  th:nth-child(1){width:16%} .t-rec th:nth-child(2){width:7%}
+.t-rec  th:nth-child(4){width:11.5%}
+.t-rec  th:nth-child(8){width:12%} .t-rec th:nth-child(9){width:17%}
+.t-rec  td:nth-child(2){color:var(--muted); font-family:var(--display);
+  font-size:11px; font-weight:700; letter-spacing:.04em}
+.t-comp th:nth-child(1){width:20%} .t-comp th:nth-child(7){width:14%}
 .t-cat  th:nth-child(1){width:34%}
 /* El nombre del competidor es la única celda de texto libre que queda en la
    fila, y algunos son largos de verdad. Envuelve en vez de recortarse, y el
    título lleva el nombre completo para el caso extremo. */
 .t-comp td.rival{white-space:normal; overflow-wrap:anywhere}
 /* The "why" column is prose, so it wraps instead of ellipsing. */
-.t-rec td:nth-child(8){white-space:normal}
+.t-rec td:nth-child(9){white-space:normal}
 
 
 @media (max-width:1000px){
   /* recommended: drop recommended position and recommended margin */
-  .t-rec th:nth-child(5), .t-rec td:nth-child(5),
   .t-rec th:nth-child(6), .t-rec td:nth-child(6),
+  .t-rec th:nth-child(7), .t-rec td:nth-child(7),
   /* competition: drop the euro gap (the % stays) and the reading age */
   .t-comp th:nth-child(4), .t-comp td:nth-child(4),
   .t-comp th:nth-child(8), .t-comp td:nth-child(8){display:none}
   /* Con dos columnas menos el reparto cambia: la de confianza se queda corta
      y recorta el símbolo de porcentaje. Más ancho de columna, barra más corta. */
-  .t-rec th:nth-child(7){width:15%}
+  .t-rec th:nth-child(2){width:10%}
+  .t-rec th:nth-child(4){width:15%}
+  .t-rec th:nth-child(8){width:15%}
   .conf-bar{width:30px}
 }
 @media (max-width:720px){
-  .t-rec th:nth-child(4), .t-rec td:nth-child(4),
-  .t-rec th:nth-child(8), .t-rec td:nth-child(8),
+  .t-rec th:nth-child(5), .t-rec td:nth-child(5),
+  .t-rec th:nth-child(9), .t-rec td:nth-child(9),
   .t-comp th:nth-child(6), .t-comp td:nth-child(6),
   .t-cat  th:nth-child(2), .t-cat  td:nth-child(2),
   .t-cat  th:nth-child(5), .t-cat  td:nth-child(5){display:none}
   .thumb{width:34px; height:34px}
   tr.grp-cont td.prod-cell{padding-left:28px}
   th,td{padding:7px 5px}
-  .t-rec th:nth-child(1), .t-comp th:nth-child(1), .t-cat th:nth-child(1){width:36%}
+  /* Al caer columnas, los anchos de arriba dejan de valer: el 11,5 % pensado
+     para nueve columnas son 38px cuando quedan cinco, y «178,00 €» no cabe.
+     Lo visible aquí es Modelo · Tramo · Actual · Recomendado · Confianza. */
+  .t-rec th:nth-child(1){width:36%}
+  .t-rec th:nth-child(2){width:9%}
+  .t-rec th:nth-child(4){width:20%}
+  .t-rec th:nth-child(8){width:16%}
+  .t-comp th:nth-child(1), .t-cat th:nth-child(1){width:36%}
   /* La barra de confianza es redundante cuando el número está al lado y, a
      este ancho, le roba al número los píxeles del símbolo de porcentaje. */
   .conf-bar{display:none}
   .f-count{margin-left:0}
-  th{letter-spacing:.02em}
+  /* A este ancho sí: media palabra legible es mejor que media palabra oculta. */
+  th{letter-spacing:.02em; overflow-wrap:anywhere}
 }
 
 /* Debajo de 560px no caben cinco columnas de cifras sin cortar los importes,
@@ -563,11 +632,16 @@ td.best{font-weight:700}
   /* comparativa: nuestro precio contra el suyo, y quién es. El % se deduce de
      los dos importes que están uno al lado del otro. */
   .t-comp th:nth-child(5), .t-comp td:nth-child(5),
-  .t-comp th:nth-child(7), .t-comp td:nth-child(7){display:none}
+  .t-comp th:nth-child(7), .t-comp td:nth-child(7),
+  .t-rec  th:nth-child(2), .t-rec  td:nth-child(2){display:none}
   .t-comp th:nth-child(1){width:34%}
   /* El nombre del rival pierde su columna, así que pasa debajo de su precio. */
   .rival-sm{display:block}
-  .t-rec th:nth-child(1), .t-cat th:nth-child(1){width:32%}
+  /* Sin la columna de tramo quedan cuatro, y vuelven a repartirse. */
+  .t-rec th:nth-child(1){width:32%}
+  .t-rec th:nth-child(4){width:24%}
+  .t-rec th:nth-child(8){width:20%}
+  .t-cat th:nth-child(1){width:32%}
   /* Las tablas desplegables son etiquetas y cifras dentro de un <details>,
      donde el alto es gratis. Que envuelvan: una fecha recortada a
      «2026-09-2…» no es una fecha corta, es una fecha equivocada. */
@@ -648,9 +722,11 @@ footer a{color:var(--ink-2)}
     </p>
   </header>
 
-  <div id="app">
+  <nav class="secciones" id="nav" aria-label="Secciones"></nav>
+
+  <main id="app" role="tabpanel" tabindex="-1">
     <div class="state" id="state">Conectando con Supabase…</div>
-  </div>
+  </main>
 
   <footer>
     <span id="pie">
@@ -686,6 +762,15 @@ const T = {
 "app.tema":      {es:"Tema",                 en:"Theme"},
 "app.temaAria":  {es:"Cambiar tema",         en:"Change theme"},
 "app.idioma":    {es:"Idioma",               en:"Language"},
+"nav.aria":      {es:"Secciones",            en:"Sections"},
+"nav.home":      {es:"Resumen",              en:"Overview"},
+"nav.homeSub":   {es:"Cómo vamos frente al mercado", en:"How we stand against the market"},
+"nav.explorer":  {es:"Explorador de producto", en:"Product explorer"},
+"nav.explorerSub":{es:"Producto a producto, nosotros contra cada rival",
+                   en:"Product by product, us against each rival"},
+"nav.pricing":   {es:"Herramienta de pricing", en:"Pricing tool"},
+"nav.pricingSub":{es:"Precio recomendado y los parámetros que lo fijan",
+                  en:"Recommended price and the parameters behind it"},
 "app.cargando":  {es:"Cargando catálogo…",   en:"Loading catalogue…"},
 "app.conectando":{es:"Conectando con Supabase…", en:"Connecting to Supabase…"},
 "app.error":     {es:"No se pudo cargar el catálogo: ", en:"Could not load the catalogue: "},
@@ -847,18 +932,22 @@ const T = {
 "m.titulo":    {es:"Precio recomendado", en:"Recommended price"},
 "m.sub":       {es:"<b>Esto no es un precio óptimo.</b> Un óptimo exige saber cuánto se vende a cada "
                   +"precio, y en este dataset no hay ni una sola unidad vendida: sin demanda no hay "
-                  +"elasticidad. Lo que hay es un recomendador por reglas — posición objetivo frente al "
-                  +"rival más barato según rotación y stock, recortada por barreras que no se negocian. "
-                  +"El coste con el que se calcula el margen es <b>sintético</b> "
-                  +"(<code>precio × (1 − margen)</code>, y el margen solo toma cuatro valores), así que "
-                  +"el suelo de margen es aproximado.",
+                  +"elasticidad. Lo que hay es un recomendador por reglas — una posición objetivo por "
+                  +"rotación y stock, metida dentro del suelo y el techo que fija la matriz de tramos "
+                  +"de precio. Cuando el suelo de margen y el alineamiento máximo se cruzan, <b>manda "
+                  +"el margen</b> y la fila lo dice. El coste con el que se calcula el margen es "
+                  +"<b>sintético</b> (<code>precio de venta × (1 − margen)</code>, y el margen solo "
+                  +"toma cuatro valores), así que el suelo en euros —el que más manda en el tramo "
+                  +"alto— descansa sobre una aproximación.",
                 en:"<b>This is not an optimal price.</b> An optimum requires knowing how much sells at "
                   +"each price, and this dataset contains not a single unit sold: no demand means no "
                   +"elasticity. What it does support is a rule-based recommender — a target position "
-                  +"against the cheapest rival, set by rotation and stock, then cut back by guardrails "
-                  +"that are not negotiable. The cost the margin is computed from is <b>synthetic</b> "
-                  +"(<code>price × (1 − margin)</code>, and the margin only takes four values), so the "
-                  +"margin floor is approximate."},
+                  +"set by rotation and stock, held inside the floor and ceiling that the price-band "
+                  +"matrix fixes. Where the margin floor and the maximum alignment cross, <b>margin "
+                  +"wins</b> and the row says so. The cost the margin is computed from is "
+                  +"<b>synthetic</b> (<code>sale price × (1 − margin)</code>, and the margin only takes "
+                  +"four values), so the euro floor — the one that binds most in the top band — rests "
+                  +"on an approximation."},
 "m.conConf":   {es:"{n} con confianza ≥ 50 %", en:"{n} with confidence ≥ 50 %"},
 "m.baja":      {es:"A la baja", en:"Down"},
 "m.alza":      {es:"Al alza",   en:"Up"},
@@ -902,6 +991,49 @@ const T = {
 "m.saltoGrande":{es:"mueve el precio un {p} sobre un solo dato de mercado",
                  en:"moves the price by {p} on a single market observation"},
 "m.umbral":    {es:"umbral de confianza: 50 %", en:"confidence threshold: 50 %"},
+/* matriz de tramos */
+"m.matriz":    {es:"Matriz de tramos de precio", en:"Price-band matrix"},
+"m.matrizNota":{es:"Cada tramo exige su margen mínimo en porcentaje <b>y</b> en euros —los dos, "
+                  +"manda el más exigente— y fija el alineamiento máximo frente a la referencia. "
+                  +"Las fronteras son lo único editable del tramo: el primero empieza en 0 y el "
+                  +"último no termina, así que no puede haber huecos ni solapes. Un producto a "
+                  +"30,00 € exactos cae en el tramo 2.",
+                en:"Each band requires its minimum margin as a percentage <b>and</b> in euros — both, "
+                  +"the stricter one wins — and sets the maximum alignment against the reference. "
+                  +"The cut points are the only editable band value: the first band starts at 0 and "
+                  +"the last does not end, so gaps and overlaps are impossible. A product at exactly "
+                  +"€30.00 falls in band 2."},
+"m.thTramo":   {es:"Tramo",        en:"Band"},
+"m.thDesde":   {es:"Desde",        en:"From"},
+"m.thHasta":   {es:"Hasta",        en:"To"},
+"m.thMgPct":   {es:"Margen mín. %",en:"Min. margin %"},
+"m.thMgEur":   {es:"Margen mín. €",en:"Min. margin €"},
+"m.thC":       {es:"Parámetro C",  en:"Parameter C"},
+"m.grupoObj":  {es:"Posición objetivo por rotación (% de la referencia)",
+                en:"Target position by rotation (% of the reference)"},
+"m.grupoAj":   {es:"Ajustes (puntos porcentuales sobre el objetivo)",
+                en:"Adjustments (percentage points on the target)"},
+"m.grupoOtros":{es:"Referencia y redondeo", en:"Reference and rounding"},
+"m.referencia":{es:"Competidor de referencia", en:"Reference competitor"},
+"m.refMin":    {es:"El más barato", en:"Cheapest"},
+"m.refMedia":  {es:"Media de rivales", en:"Mean of rivals"},
+"m.refMediana":{es:"Mediana de rivales", en:"Median of rivals"},
+/* veredictos */
+"m.noAlineable":{es:"El margen mínimo del tramo {n} no permite alinearse con la referencia",
+                 en:"Band {n}’s minimum margin leaves no room to align with the reference"},
+"m.fueraTarifa":{es:"Ni al PVP se alcanza el margen mínimo del tramo {n}",
+                 en:"Even at list price, band {n}’s minimum margin is out of reach"},
+"m.outletBajo":{es:"Outlet por debajo del suelo del tramo {n}: solo puede bajar, así que no se sube",
+                en:"Outlet below band {n}’s floor: it can only go down, so it is not raised"},
+"m.barrC":     {es:"En el alineamiento máximo del tramo {n} ({p} de la referencia)",
+                en:"At band {n}’s maximum alignment ({p} of the reference)"},
+"m.barrSuelo": {es:"En el suelo de margen del tramo {n}",
+                en:"At band {n}’s margin floor"},
+"m.tramoN":    {es:"T{n}", en:"B{n}"},
+"m.noAlineables":{es:"No alineables", en:"Not alignable"},
+"m.noAlinSub": {es:"el margen gana al techo C", en:"margin beats the C ceiling"},
+"c.porCoste":  {es:"precio fijado por el coste, no por el mercado",
+                en:"price set by cost, not by the market"},
 "m.inviable":  {es:"Inviable: el margen mínimo supera el PVP",
                 en:"Infeasible: the minimum margin exceeds the list price"},
 "m.barrMargen":{es:"Limitado por el suelo de margen (coste sintético)",
@@ -1092,6 +1224,23 @@ let HIST = [];                     // daily positioning history
 let HIST_COMPLETO = true;          // false when only the cheapest rival per day was fetched
 let HIST_RANGO = null;             // the window currently in HIST, or null for "everything"
 let paramsOpen = false;            // render() rebuilds the DOM; keep the panel open across it
+
+/* ── Secciones ─────────────────────────────────────────────────────────
+   Tres trabajos distintos en una sola página: mirar cómo vamos, mirar un
+   producto concreto, y decidir un precio. Hasta ahora convivían en una columna
+   de diez tarjetas donde la tabla de comparativa enterraba todo lo que venía
+   detrás.
+
+   La sección vive en el hash de la URL, no en localStorage: así una vista se
+   puede enviar por correo, y el botón Atrás del navegador funciona. Los filtros
+   son globales a propósito — se mantienen al cambiar de sección, porque
+   "Nike, en rebaja" es la misma pregunta en las tres. */
+const SECCIONES = ["home", "explorer", "pricing"];
+let SECCION = SECCIONES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
+addEventListener("hashchange", () => {
+  const h = location.hash.slice(1);
+  if(SECCIONES.includes(h) && h !== SECCION){ SECCION = h; if(ROWS.length) render(); }
+});
 // Sets, so each filter takes 1..n values. An empty set means "no restriction",
 // which keeps the default cheap: no membership test runs until something is picked.
 const F = { q:"", marcas:new Set(), tipos:new Set(), competidores:new Set(), rebaja:false,
@@ -1387,23 +1536,59 @@ function bindTip(el, html){
    ese error dos veces (migraciones 012 y 016). */
 
 const PARAMS_DEF = {
-  // Posición objetivo, en % del rival más barato, por rotación (abcd_digital).
-  // Medido: hoy estamos en AA 109,8 · A 106,8 · B 109,9 · C 110,5 · D 115,0,
-  // así que todos estos objetivos son un recorte, y el más hondo cae sobre los
-  // más vendidos — que son los que fijan la percepción de precio.
+  // Posición objetivo, en % de la referencia de mercado, por rotación
+  // (abcd_digital). Medido: hoy estamos en AA 109,8 · A 106,8 · B 109,9 ·
+  // C 110,5 · D 115,0, así que todos estos objetivos son un recorte, y el más
+  // hondo cae sobre los más vendidos — los que fijan la percepción de precio.
   obj_AA:100, obj_A:102, obj_B:105, obj_C:108, obj_D:112, obj_sin:106,
   // Ajuste en puntos porcentuales por nivel de stock. Descontar producto que
   // apenas tienes es regalar margen; de ahí el signo positivo abajo.
   stk_muy_alto:-4, stk_alto:-2, stk_medio:0, stk_bajo:2, stk_muy_bajo:4,
   aj_outlet:-3,          // outlet empuja a la baja
   aj_temporada_vieja:-3, // temporada anterior a la vigente
-  margen_min:10,         // % mínimo sobre el coste sintético
   redondeo:1,            // escalón del precio final, en euros
+  referencia:"min",      // qué competidor es "la referencia": min | media | mediana
+
+  /* ── Matriz de tramos de precio ──────────────────────────────────────
+     La política de Forum Sport no es un suelo de margen único: es una matriz
+     por tramo de precio donde cada tramo exige un margen mínimo EN PORCENTAJE
+     Y OTRO EN EUROS —los dos, no el que convenga— y fija un alineamiento
+     máximo frente a la referencia de mercado.
+
+     Los dos suelos no son redundantes. Medido sobre el catálogo, el suelo en
+     euros es el que manda en 212 modelos, y en el tramo alto en 64 de 79: los
+     pares (20 %, 20 €) y (18 %, 36 €) se cruzan exactamente en 100 € y 200 €,
+     que son las fronteras de sus tramos. Están calibrados, no aproximados.
+
+     `cortes` son solo las cuatro fronteras interiores. El primer tramo empieza
+     en 0 y el último no termina, así que la partición es contigua y exhaustiva
+     por construcción y no hay forma de editar un hueco o un solape. */
+  cortes:[30, 60, 100, 200],        // €; frontera entre tramo i y tramo i+1
+  mg_pct:[30, 27, 24, 20, 18],      // % mínimo sobre el coste sintético
+  mg_eur:[2,  8,  14, 20, 36],      // € mínimos sobre el coste sintético
+  c_max :[102,101,100, 99, 98],     // alineamiento MÁXIMO vs la referencia, %
 };
-const PARAMS_KEY = "fs-pricing-params";
-let P = {...PARAMS_DEF};
-try{ const g=JSON.parse(localStorage.getItem(PARAMS_KEY)||"{}");
-     for(const k in PARAMS_DEF) if(typeof g[k]==="number") P[k]=g[k]; }catch{}
+const N_TRAMOS = 5;
+// v2: la forma guardada cambió —desapareció margen_min, apareció la matriz—, y
+// un blob antiguo cargado sobre la forma nueva dejaría el motor medio
+// configurado sin decirlo.
+const PARAMS_KEY = "fs-pricing-params-v2";
+let P = JSON.parse(JSON.stringify(PARAMS_DEF));
+try{
+  const g = JSON.parse(localStorage.getItem(PARAMS_KEY) || "{}");
+  for(const k in PARAMS_DEF){
+    const def = PARAMS_DEF[k], got = g[k];
+    if(Array.isArray(def)){
+      // Longitud y tipo, o se descarta entero: media matriz es peor que ninguna.
+      if(Array.isArray(got) && got.length === def.length
+         && got.every(v => typeof v === "number" && Number.isFinite(v))) P[k] = got.slice();
+    } else if(typeof def === "number"){
+      if(typeof got === "number" && Number.isFinite(got)) P[k] = got;
+    } else if(typeof def === "string"){
+      if(typeof got === "string") P[k] = got;
+    }
+  }
+}catch{}
 const guardarParams = () => { try{ localStorage.setItem(PARAMS_KEY, JSON.stringify(P)); }catch{} };
 
 const ANO_VIGENTE = 2026;
@@ -1414,6 +1599,28 @@ const OBJ_POR_ABCD = r => {
 };
 const AJ_STOCK = r => ({"muy alto":P.stk_muy_alto, "alto":P.stk_alto, "medio":P.stk_medio,
                         "bajo":P.stk_bajo, "muy bajo":P.stk_muy_bajo})[r.nivel_stock] ?? 0;
+
+/* Tramo de un precio. Convención [inicio, final): un producto a 30,00 € exactos
+   cae en el tramo 2, no en el 1. Es justo el detalle que luego nadie sabe
+   responder, así que la tarjeta lo dice en voz alta. */
+const tramoDe = precio => {
+  for(let i=0; i<P.cortes.length; i++) if(precio < P.cortes[i]) return i;
+  return P.cortes.length;
+};
+
+/* La referencia de mercado. El mínimo es el rival más barato —lo que el motor
+   usaba siempre—; media y mediana reparten el peso entre todos los rivales
+   observados. Con un solo competidor las tres coinciden, que es el caso de 279
+   de los 571 modelos comparados. */
+const REFERENCIAS = ["min", "media", "mediana"];
+function referenciaDe(comps){
+  const ps = comps.map(x => x.precio_comp).filter(v => v > 0).sort((a,b) => a-b);
+  if(!ps.length) return null;
+  if(P.referencia === "media")   return ps.reduce((s,v) => s+v, 0) / ps.length;
+  if(P.referencia === "mediana"){ const i = ps.length >> 1;
+    return ps.length % 2 ? ps[i] : (ps[i-1] + ps[i]) / 2; }
+  return ps[0];
+}
 
 /* Confianza 0–100: una suma de hechos medibles sobre la CALIDAD DEL DATO, no
    una corazonada sobre el precio. Cada factor responde a una pregunta concreta:
@@ -1462,7 +1669,15 @@ function recomendar(r, comps){
   const vieja = r.ano_temporada && r.ano_temporada !== 9998 && r.ano_temporada < ANO_VIGENTE;
   if(vieja) objetivo += P.aj_temporada_vieja;
 
-  const ref = comps.length ? Math.min(...comps.map(x=>x.precio_comp).filter(v=>v>0)) : null;
+  // El tramo lo fija el PRECIO DE VENTA ACTUAL, no el PVP: la política se
+  // aplica sobre lo que el cliente paga hoy. Consecuencia asumida: un producto
+  // puede cambiar de tramo —y por tanto de reglas— al entrar en rebaja.
+  const tramo = tramoDe(r.precio_rebaja);
+  const mgPct = P.mg_pct[tramo] / 100;
+  const mgEur = P.mg_eur[tramo];
+  const cMax  = P.c_max[tramo]  / 100;
+
+  const ref = referenciaDe(comps);
   let bruto;
   if(ref){
     bruto = ref * objetivo/100;
@@ -1479,38 +1694,95 @@ function recomendar(r, comps){
     bruto = actual * (1 + Math.min(0, ajuste)/100);
   }
 
-  // ── barreras duras ────────────────────────────────────────────────────
-  const capPvp    = r.precio;
-  const capOutlet = r.outlet ? actual : Infinity;          // outlet solo baja
-  const pisoCoste = coste / (1 - Math.min(0.95, P.margen_min/100));
-  let barrera = null;
+  /* ── Intervalo admisible ──────────────────────────────────────────────
+     Antes esto era un recorte secuencial: tope PVP, luego tope outlet, luego
+     suelo de margen, uno detrás de otro. Con un único suelo global casi siempre
+     converge; con DOS suelos y un techo de alineamiento, un recorte puede
+     volver a violar el anterior. Así que el suelo y el techo se calculan una
+     sola vez y el precio se mete dentro, en vez de empujarlo a trompicones. */
+  const sueloPct = coste / (1 - Math.min(0.95, mgPct));   // margen sobre ingreso
+  const sueloEur = coste + mgEur;                         // margen absoluto
+  const L = Math.max(sueloPct, sueloEur);                 // los dos, el más exigente
 
-  // Si el suelo de margen supera el techo de PVP el producto no puede venderse
-  // con ese margen sin pasarse de tarifa. No se devuelve un precio por encima
-  // del PVP en silencio: se recomienda el PVP y se dice que es inviable.
-  const inviable = pisoCoste > capPvp + 1e-9;
+  /* Dos clases de techo, y la diferencia importa cuando el suelo los supera.
 
-  let p = bruto;
-  if(p > capPvp)    { p = capPvp;    barrera = "PVP"; }
-  if(p > capOutlet) { p = capOutlet; barrera = "outlet"; }
-  if(p < pisoCoste) { p = Math.min(pisoCoste, capPvp); barrera = "margen"; }
+     El DURO no se rompe nunca: ni se vende por encima del PVP, ni se sube el
+     precio de un producto en liquidación —subir un outlet para cumplir un
+     suelo de margen contradice el motivo por el que ese producto está en
+     outlet—. El de ALINEAMIENTO sí lo rompe el margen: es la decisión de
+     política que gobierna esta matriz.
 
-  const paso = Math.max(0.01, P.redondeo || 1);
-  let precio_rec = Math.round(p/paso)*paso;
-  // Redondear no puede saltarse una barrera.
-  if(precio_rec > capPvp) precio_rec = Math.floor(capPvp/paso)*paso;
-  if(r.outlet && precio_rec > actual) precio_rec = Math.floor(actual/paso)*paso;
-  if(!inviable && precio_rec < pisoCoste) precio_rec = Math.ceil(pisoCoste/paso)*paso;
+     Mezclarlos en un solo mínimo costó 93 outlets con subida de precio. */
+  const techoDuro = Math.min(r.precio, r.outlet ? actual : Infinity);
+  const techoAlin = ref ? ref * cMax : Infinity;
+  const U = Math.min(techoDuro, techoAlin);
+
+  const paso   = Math.max(0.01, P.redondeo || 1);
+  const arriba = v => Math.ceil (v/paso - 1e-9) * paso;
+  const abajo  = v => Math.floor(v/paso + 1e-9) * paso;
+
+  let precio_rec, veredicto, barrera = null;
+
+  if(L > U + 1e-9){
+    /* El suelo de margen exige más de lo que el techo permite cobrar. No es un
+       caso raro: pasa en 495 modelos. La política elegida es que MANDA EL
+       MARGEN sobre el alineamiento, y la fila lo dice en vez de devolver un
+       precio que incumple una de las dos reglas en silencio. */
+    barrera = "margen";
+    if(L <= techoDuro + 1e-9){
+      precio_rec = arriba(L);
+      veredicto  = "no_alineable";          // rompemos C a propósito, con aviso
+    } else {
+      // Ni rompiendo C se llega al suelo: el techo duro lo impide. Aquí no hay
+      // precio que cumpla, y decirlo es más útil que inventar uno.
+      precio_rec = abajo(techoDuro);
+      veredicto  = (r.outlet && actual < r.precio - 1e-9
+                    && Math.abs(techoDuro - actual) < 1e-9)
+                 ? "outlet_bajo_suelo" : "fuera_de_tarifa";
+    }
+  } else {
+    const p = Math.min(Math.max(bruto, L), U);
+    if      (p <= L + 1e-9)                              barrera = "margen";
+    else if (ref && Math.abs(p - ref*cMax)   < 1e-9)     barrera = "C";
+    else if (Math.abs(p - r.precio)          < 1e-9)     barrera = "PVP";
+    else if (r.outlet && Math.abs(p - actual) < 1e-9)    barrera = "outlet";
+
+    precio_rec = Math.round(p/paso) * paso;
+    // Redondear no puede saltarse una barrera, en ninguna de las dos direcciones.
+    if(precio_rec < L - 1e-9) precio_rec = arriba(L);
+    if(precio_rec > U + 1e-9) precio_rec = abajo(U);
+    // Un intervalo más estrecho que el escalón puede no contener ningún múltiplo.
+    // Misma regla que arriba: manda el margen, pero nunca sobre el techo duro.
+    if(precio_rec < L - 1e-9){
+      barrera = "margen";
+      if(arriba(L) <= techoDuro + 1e-9){ precio_rec = arriba(L); veredicto = "no_alineable"; }
+      else { precio_rec = abajo(techoDuro); veredicto = "fuera_de_tarifa"; }
+    }
+    veredicto = veredicto || (ref ? "ok" : "sin_mercado");
+  }
   precio_rec = Math.round(precio_rec*100)/100;
+
+  /* Cuando una barrera manda, el precio sale del COSTE, no del mercado. La
+     confianza mide calidad del dato de mercado, así que anunciar un 81 % sobre
+     un número que el mercado no ha tocado sería prestarle a esa conclusión una
+     credibilidad que no ha ganado. */
+  let valor = conf.valor, notas = conf.notas;
+  if(veredicto === "no_alineable" || veredicto === "fuera_de_tarifa"
+     || veredicto === "outlet_bajo_suelo"){
+    valor = Math.min(valor, 50);
+    notas = [t("c.porCoste"), ...notas];
+  }
 
   const margen_rec = precio_rec>0 ? (precio_rec - coste)/precio_rec*100 : 0;
   return {
     modelo:r.modelo, precio_rec, actual, ref, objetivo,
+    tramo, suelo:L, techo:U, veredicto,
     delta_eur: Math.round((precio_rec-actual)*100)/100,
     delta_pct: actual>0 ? (precio_rec-actual)/actual*100 : 0,
     posicion_rec: ref ? precio_rec/ref*100 : null,
-    margen_rec, barrera, inviable,
-    confianza: conf.valor, notas: conf.notas,
+    margen_rec, barrera,
+    inviable: veredicto === "fuera_de_tarifa" || veredicto === "outlet_bajo_suelo",
+    confianza: valor, notas,
     n_comp: comps.length,
   };
 }
@@ -2093,6 +2365,7 @@ addEventListener("resize", () => requestAnimationFrame(medirBarra), {passive:tru
 /* ── render ───────────────────────────────────────────────────────────── */
 function render(){
   const rows=filtered(), app=document.getElementById("app");
+  pintarNav();
   // Capture focus BEFORE wiping: clearing the DOM fires the outgoing input's
   // blur handler, so any flag it maintains is already stale by the time the new
   // row is built.
@@ -2216,6 +2489,7 @@ function render(){
   }
 
   /* hero + kpis · Forum Sport frente a la competencia ------------------ */
+  if(SECCION === "home"){
   // Compared at MODEL level against the cheapest rival for that model, so a
   // product watched at three shops counts once, not three times.
   const ids0 = new Set(rows.map(r=>r.modelo));
@@ -2318,12 +2592,14 @@ function render(){
     app.append(d);
   }
 
+  }   // fin del titular y los KPIs, solo en Resumen
+
   const grid=document.createElement("div"); grid.className="grid"; app.append(grid);
 
   /* 0 · POSICIONAMIENTO ONLINE % en el tiempo --------------------------
      La métrica que pide Forum Sport: nuestro precio dividido por el del
      competidor de referencia (para el MVP, el más barato encontrado). */
-  {
+  if(SECCION === "home"){
     const pts = serieDiaria(rows);
     const sec = document.createElement("section"); sec.className="card wide";
     const dias = pts.length;
@@ -2365,7 +2641,7 @@ function render(){
   }
 
   /* 0b · Precio recomendado ---------------------------------------------- */
-  {
+  if(SECCION === "pricing"){
     const recs = recomendaciones(rows);
     const sec = document.createElement("section"); sec.className="card wide";
     const suben  = recs.filter(x=>x.delta_eur >  0.004);
@@ -2377,15 +2653,20 @@ function render(){
     const posAct = conRef.length
       ? conRef.reduce((s,x)=>s+x.actual/x.ref*100,0)/conRef.length : null;
     const fiables = recs.filter(x=>x.confianza>=50).length;
+    // El conflicto entre el suelo de margen y el techo C no es un caso límite:
+    // en el catálogo completo son 411 de los 742 modelos comparables. Si no se
+    // cuenta en la cabecera, el lector lo descubre fila a fila.
+    const noAlin = recs.filter(x=>x.veredicto!=="ok" && x.veredicto!=="sin_mercado").length;
 
     sec.innerHTML = `<h2>${t("m.titulo")}</h2><p class="sub">${t("m.sub")}</p>`;
 
-    const kpi = document.createElement("div"); kpi.className="kpis";
+    const kpi = document.createElement("div"); kpi.className="kpis kpis-eng";
     kpi.innerHTML = [
       [t("k.modelos"), nf.format(recs.length), t("m.conConf",{n:nf.format(fiables)})],
       [t("m.baja"), nf.format(bajan.length), bajan.length?t("m.media",{v:eur2.format(bajan.reduce((s,x)=>s+x.delta_eur,0)/bajan.length)}):"—"],
       [t("m.alza"), nf.format(suben.length), suben.length?t("m.media",{v:eur2.format(suben.reduce((s,x)=>s+x.delta_eur,0)/suben.length)}):"—"],
       [t("m.sinCambio"), nf.format(igual), t("m.enObjetivo")],
+      [t("m.noAlineables"), nf.format(noAlin), t("m.noAlinSub")],
       [t("m.posActual"), posAct?pct(posAct):"—", t("m.sobreRival")],
       [t("m.posRec"), posRec?pct(posRec):"—",
         posRec&&posAct?`${posRec<posAct?"−":"+"}${nf1.format(Math.abs(posRec-posAct))} pp`:"—"],
@@ -2398,38 +2679,94 @@ function render(){
     const box = document.createElement("details"); box.className="dims params";
     if(paramsOpen) box.open = true;
     box.innerHTML = `<summary>${t("m.params")}</summary>`;
-    const grid2 = document.createElement("div"); grid2.className="param-grid";
-    const campos = [
-      ["m.pObjAA","obj_AA",50,200,1],
-      ["m.pObjA","obj_A",50,200,1],
-      ["m.pObjB","obj_B",50,200,1],
-      ["m.pObjC","obj_C",50,200,1],
-      ["m.pObjD","obj_D",50,200,1],
-      ["m.pObjSin","obj_sin",50,200,1],
-      ["m.pStkMA","stk_muy_alto",-30,30,1],
-      ["m.pStkA","stk_alto",-30,30,1],
-      ["m.pStkM","stk_medio",-30,30,1],
-      ["m.pStkB","stk_bajo",-30,30,1],
-      ["m.pStkMB","stk_muy_bajo",-30,30,1],
-      ["m.pOutlet","aj_outlet",-30,30,1],
-      ["m.pVieja","aj_temporada_vieja",-30,30,1],
-      ["m.pMargen","margen_min",0,80,1],
-      ["m.pRedondeo","redondeo",0.01,10,0.01],
-    ];
-    for(const [lab,k,min,max,step] of campos){
-      const w=document.createElement("label"); w.className="param";
-      w.innerHTML=`<span>${t(lab)}</span>`;
-      const i=document.createElement("input");
-      i.type="number"; i.value=P[k]; i.min=min; i.max=max; i.step=step;
-      i.onchange=()=>{ const v=parseFloat(i.value);
-        if(!Number.isFinite(v)) { i.value=P[k]; return; }
-        P[k]=Math.max(min,Math.min(max,v)); guardarParams(); paramsOpen=true; render(); };
-      w.append(i); grid2.append(w);
+
+    const aplicar = () => { guardarParams(); paramsOpen = true; render(); };
+    const grupo = clave => {
+      const h = document.createElement("p"); h.className = "param-grupo";
+      h.textContent = t(clave); box.append(h);
+      const g = document.createElement("div"); g.className = "param-grid";
+      box.append(g); return g;
+    };
+    // Un input numérico con su rango. Devuelve el <label>, ya cableado.
+    const num = (etiqueta, valor, min, max, step, set) => {
+      const w = document.createElement("label"); w.className = "param";
+      w.innerHTML = `<span>${etiqueta}</span>`;
+      const i = document.createElement("input");
+      i.type="number"; i.value=valor; i.min=min; i.max=max; i.step=step;
+      i.onchange = () => {
+        const v = parseFloat(i.value);
+        if(!Number.isFinite(v)){ i.value = valor; return; }   // vacío o basura: se revierte
+        set(Math.max(min, Math.min(max, v))); aplicar();
+      };
+      w.append(i); return w;
+    };
+
+    /* ── La matriz, como tabla ───────────────────────────────────────────
+       Quince inputs sueltos en una rejilla no son una matriz: la matriz tiene
+       filas y columnas y hay que poder leerla como la hoja de la que viene. */
+    const hm = document.createElement("p"); hm.className="param-grupo";
+    hm.textContent = t("m.matriz"); box.append(hm);
+    const tm = document.createElement("table"); tm.className = "t-matriz";
+    tm.innerHTML = `<thead><tr><th>${t("m.thTramo")}</th><th>${t("m.thDesde")}</th>
+      <th>${t("m.thHasta")}</th><th>${t("m.thMgPct")}</th><th>${t("m.thMgEur")}</th>
+      <th>${t("m.thC")}</th></tr></thead><tbody></tbody>`;
+    const tmb = tm.querySelector("tbody");
+    for(let i=0; i<N_TRAMOS; i++){
+      const tr = document.createElement("tr");
+      const desde = i === 0 ? eur.format(0) : eur.format(P.cortes[i-1]);
+      tr.innerHTML = `<td>${t("m.tramoN",{n:i+1})}</td><td class="t-k">${desde}</td>`;
+      // "Hasta" es el corte, y es editable salvo en el último tramo, que no
+      // termina. Editar solo los cortes hace imposible un hueco o un solape.
+      const tdH = document.createElement("td");
+      if(i < P.cortes.length){
+        // Un corte no puede cruzar a sus vecinos, o la partición dejaría de
+        // estar ordenada y tramoDe() devolvería cualquier cosa.
+        const min = i === 0 ? 0.01 : P.cortes[i-1] + 0.01;
+        const max = i === P.cortes.length-1 ? 100000 : P.cortes[i+1] - 0.01;
+        tdH.append(num("", P.cortes[i], min, max, 1, v => P.cortes[i] = v));
+      } else { tdH.className = "t-k"; tdH.textContent = "∞"; }
+      tr.append(tdH);
+      for(const [clave, min, max, step] of
+          [["mg_pct",0,90,1], ["mg_eur",0,500,1], ["c_max",50,200,1]]){
+        const td = document.createElement("td");
+        td.append(num("", P[clave][i], min, max, step, v => P[clave][i] = v));
+        tr.append(td);
+      }
+      tmb.append(tr);
     }
-    box.append(grid2);
+    const wm = document.createElement("div"); wm.className = "t-wrap"; wm.append(tm);
+    box.append(wm);
+    const nm = document.createElement("p"); nm.className = "note";
+    nm.innerHTML = t("m.matrizNota"); box.append(nm);
+
+    const gObj = grupo("m.grupoObj");
+    for(const [lab,k] of [["m.pObjAA","obj_AA"],["m.pObjA","obj_A"],["m.pObjB","obj_B"],
+                          ["m.pObjC","obj_C"],["m.pObjD","obj_D"],["m.pObjSin","obj_sin"]])
+      gObj.append(num(t(lab), P[k], 50, 200, 1, v => P[k] = v));
+
+    const gAj = grupo("m.grupoAj");
+    for(const [lab,k] of [["m.pStkMA","stk_muy_alto"],["m.pStkA","stk_alto"],
+                          ["m.pStkM","stk_medio"],["m.pStkB","stk_bajo"],
+                          ["m.pStkMB","stk_muy_bajo"],["m.pOutlet","aj_outlet"],
+                          ["m.pVieja","aj_temporada_vieja"]])
+      gAj.append(num(t(lab), P[k], -30, 30, 1, v => P[k] = v));
+
+    const gOtr = grupo("m.grupoOtros");
+    const wRef = document.createElement("label"); wRef.className = "param";
+    wRef.innerHTML = `<span>${t("m.referencia")}</span>`;
+    const selRef = document.createElement("select");
+    selRef.innerHTML = REFERENCIAS.map(v =>
+      `<option value="${v}"${v===P.referencia?" selected":""}>${
+        t(v==="min"?"m.refMin":v==="media"?"m.refMedia":"m.refMediana")}</option>`).join("");
+    selRef.onchange = () => { P.referencia = selRef.value; aplicar(); };
+    wRef.append(selRef); gOtr.append(wRef);
+    gOtr.append(num(t("m.pRedondeo"), P.redondeo, 0.01, 10, 0.01, v => P.redondeo = v));
+
     const reset=document.createElement("button");
     reset.className="ghost"; reset.type="button"; reset.textContent=t("m.reset");
-    reset.onclick=()=>{ P={...PARAMS_DEF}; guardarParams(); paramsOpen=true; render(); };
+    // Copia profunda: {...PARAMS_DEF} compartiría los arrays de la matriz con
+    // los valores por defecto, y el primer cambio los corrompería para siempre.
+    reset.onclick=()=>{ P=JSON.parse(JSON.stringify(PARAMS_DEF)); aplicar(); };
     box.append(reset);
     sec.append(box);
 
@@ -2463,17 +2800,22 @@ function render(){
     // `tb`, no `t`: en este fichero `t()` es la función de traducción, y una
     // variable local llamada `t` la tapa dentro de la plantilla de abajo.
     const tb=document.createElement("table"); tb.className="t-rec";
-    tb.innerHTML=`<thead><tr><th>${t("g.thModelo")}</th>
+    tb.innerHTML=`<thead><tr><th>${t("g.thModelo")}</th><th>${t("m.thTramo")}</th>
       <th>${t("m.thActual")}</th><th>${t("m.thRec")}</th>
       <th>${t("m.thDif")}</th><th>${t("m.thPosRec")}</th><th>${t("m.thMargen")}</th>
       <th>${t("m.thConf")}</th><th>${t("m.thPorQue")}</th></tr></thead><tbody>${top.map(x=>{
       const r=byId.get(x.modelo);
       const cls=x.delta_eur<-0.004?"delta-dn":x.delta_eur>0.004?"delta-up":"";
-      const motivo = x.inviable ? t("m.inviable")
-        : x.barrera==="margen" ? t("m.barrMargen")
-        : x.barrera==="PVP" ? t("m.barrPvp")
-        : x.barrera==="outlet" ? t("m.barrOutlet")
-        : x.ref ? t("m.objetivo",{p:pct(x.objetivo)})
+      const nT = x.tramo + 1;
+      const motivo =
+          x.veredicto==="outlet_bajo_suelo" ? t("m.outletBajo",{n:nT})
+        : x.veredicto==="fuera_de_tarifa" ? t("m.fueraTarifa",{n:nT})
+        : x.veredicto==="no_alineable"    ? t("m.noAlineable",{n:nT})
+        : x.barrera==="margen"            ? t("m.barrSuelo",{n:nT})
+        : x.barrera==="C"                 ? t("m.barrC",{n:nT, p:pct(P.c_max[x.tramo])})
+        : x.barrera==="PVP"               ? t("m.barrPvp")
+        : x.barrera==="outlet"            ? t("m.barrOutlet")
+        : x.ref                           ? t("m.objetivo",{p:pct(x.objetivo)})
         : t("m.sinComp");
       const cconf = x.confianza < 40 ? "c-baja" : x.confianza < 60 ? "c-media" : "c-alta";
       return `<tr class="${x.debil?"debil":""}">
@@ -2481,6 +2823,8 @@ function render(){
           <a href="${r.url}" target="_blank" rel="noopener">${r.nombre_modelo}</a>
           <small>${r.marca} · ${r.abcd_digital||t("m.sinRotacion")} · ${t("m.stock",{v:nivelLab(r.nivel_stock)})}</small>
         </span></td>
+        <td data-sort="${x.tramo}" title="${eur.format(x.tramo===0?0:P.cortes[x.tramo-1])} – ${
+          x.tramo===P.cortes.length?"∞":eur.format(P.cortes[x.tramo])}">${t("m.tramoN",{n:x.tramo+1})}</td>
         <td data-sort="${x.actual}">${eur2.format(x.actual)}</td>
         <td data-sort="${x.precio_rec}"><b>${eur2.format(x.precio_rec)}</b></td>
         <td class="${cls}" data-sort="${x.delta_eur}">${x.delta_eur>0?"+":""}${eur2.format(x.delta_eur)}</td>
@@ -2509,7 +2853,7 @@ function render(){
      competidor más barato. Divergente y centrada en la paridad: a la izquierda
      somos más baratos, a la derecha más caros, y la altura dice cuántos
      modelos hay en cada situación. */
-  if(COMP.length){
+  if(SECCION === "home" && COMP.length){
     const ids1 = new Set(rows.map(r=>r.modelo));
     const mejor = new Map();
     for(const c of COMP){
@@ -2568,7 +2912,7 @@ function render(){
   }
 
   /* 2 · Frente a la competencia ------------------------------------------ */
-  if(COMP.length){
+  if(SECCION === "explorer" && COMP.length){
     const ids = new Set(rows.map(r=>r.modelo));
     // Three states, not two: an identical price is a match, not a narrow win.
     // Compared on cents to avoid float noise making 0,00 € look like a win.
@@ -2715,7 +3059,7 @@ function render(){
   }
 
   /* 3 · Modelos por marca ------------------------------------------------ */
-  {
+  if(SECCION === "home"){
     const m=[...by(rows,r=>r.marca).entries()].sort((a,b)=>b[1]-a[1]);
     const top=m.slice(0,12).map(([k,v])=>({k,v}));
     const rest=m.slice(12).reduce((s,[,v])=>s+v,0);
@@ -2727,7 +3071,7 @@ function render(){
   }
 
   /* 4 · Bandas de precio ------------------------------------------------- */
-  {
+  if(SECCION === "home"){
     const items=BANDS.map(([lo,hi,k])=>({k,v:rows.filter(r=>r.precio>=lo&&r.precio<hi).length}))
       .filter(d=>d.v);
     grid.append(card(t("bp.titulo"), t("bp.sub"),
@@ -2737,7 +3081,7 @@ function render(){
   }
 
   /* 5 · Nivel de margen (ordinal ramp) ----------------------------------- */
-  {
+  if(SECCION === "home"){
     const items=ORD_MARGEN.map(k=>({k:nivelLab(k),raw:k,v:rows.filter(r=>r.nivel_margen===k).length}))
       .filter(d=>d.v);
     const idx=d=>ORD_MARGEN.indexOf(d.raw);
@@ -2749,7 +3093,7 @@ function render(){
   }
 
   /* 6 · Nivel de stock (ordinal ramp) ------------------------------------ */
-  {
+  if(SECCION === "home"){
     const items=ORD_STOCK.map(k=>({k:nivelLab(k),raw:k,v:rows.filter(r=>r.nivel_stock===k).length}))
       .filter(d=>d.v);
     const idx=d=>ORD_STOCK.indexOf(d.raw);
@@ -2761,7 +3105,7 @@ function render(){
   }
 
   /* 7 · Running vs trail ------------------------------------------------- */
-  {
+  if(SECCION === "home"){
     const items=[...by(rows,r=>r.tipo_producto).entries()]
       .sort((a,b)=>b[1]-a[1])
       .map(([k,v],i)=>({k:t("tipo."+k)==="tipo."+k ? k[0].toUpperCase()+k.slice(1) : t("tipo."+k), v,
@@ -2776,7 +3120,7 @@ function render(){
   }
 
   /* 8 · Catálogo paginado ------------------------------------------------ */
-  {
+  if(SECCION === "explorer"){
     // The whole filtered slice, not a top-N: paging is what makes 1.483 rows
     // browsable. Still ordered by discount, so the head of the table is the
     // same "mayores descuentos" view it replaces.
@@ -2846,6 +3190,52 @@ function render(){
   }
 
   document.getElementById("state")?.remove();
+}
+
+/* La navegación de secciones. Patrón de pestañas completo —roles, aria-selected
+   y flechas— porque es exactamente lo que es: un grupo de paneles excluyentes
+   sobre los mismos datos filtrados. */
+function pintarNav(){
+  const nav = document.getElementById("nav");
+  nav.setAttribute("aria-label", t("nav.aria"));
+  nav.innerHTML = "";
+  const lista = document.createElement("div");
+  lista.className = "sec-lista"; lista.setAttribute("role", "tablist");
+  SECCIONES.forEach((k, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "sec"; b.id = "tab-" + k;
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(k === SECCION));
+    // Una sola pestaña en el orden de tabulación: dentro del grupo se navega
+    // con las flechas, que es lo que un lector de pantalla espera aquí.
+    b.tabIndex = k === SECCION ? 0 : -1;
+    b.innerHTML = `<span class="sec-n">${i+1}</span>
+      <span class="sec-txt"><span class="sec-tit">${t("nav."+k)}</span>
+      <span class="sec-sub">${t("nav."+k+"Sub")}</span></span>`;
+    b.onclick = () => ir(k);
+    b.onkeydown = e => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if(!d) return;
+      e.preventDefault();
+      const j = (SECCIONES.indexOf(k) + d + SECCIONES.length) % SECCIONES.length;
+      ir(SECCIONES[j]);
+      document.getElementById("tab-" + SECCIONES[j])?.focus();
+    };
+    lista.append(b);
+  });
+  nav.append(lista);
+  const app = document.getElementById("app");
+  app.setAttribute("aria-labelledby", "tab-" + SECCION);
+}
+function ir(k){
+  if(k === SECCION) return;
+  SECCION = k;
+  // El hash es el estado: replaceState dejaría el botón Atrás sin nada que hacer.
+  location.hash = k;
+  render();
+  // Volver arriba: cambiar de sección a mitad de una tabla deja al lector
+  // mirando el pie de otra cosa.
+  scrollTo({top:0, behavior:"smooth"});
 }
 
 /* ── cadenas fuera de #app ────────────────────────────────────────────
