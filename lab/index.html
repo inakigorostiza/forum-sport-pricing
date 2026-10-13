@@ -36,7 +36,7 @@
   --radius:4px; --radius-sm:2px;
   --shadow-card:0 8px 28px rgba(10,26,60,.10);
   --ease:cubic-bezier(.2,.7,.2,1); --t:220ms;
-  --nav-h:52px;
+  --nav-h:58px;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 24px)}
@@ -143,7 +143,7 @@ strong{font-weight:700; color:var(--ie-navy)}
   position:absolute; bottom:0; height:2px; background:var(--ie-red);
   transition:transform var(--t) var(--ease), width var(--t) var(--ease);
 }
-.navlogo{flex:none; height:22px; margin-right:14px}
+.navlogo{flex:none; height:30px; margin-right:18px}
 
 /* ── hero ───────────────────────────────────────────────────────────── */
 .hero{
@@ -153,7 +153,7 @@ strong{font-weight:700; color:var(--ie-navy)}
 .hero .btn-ghost{color:#fff}
 .hero-top{display:flex; align-items:center; justify-content:space-between;
   gap:var(--s-3); margin-bottom:var(--s-12); flex-wrap:wrap}
-.hero-top img{height:34px}
+.hero-top img{height:46px}
 .hero-tag{font-size:var(--fs-eyebrow); font-weight:700; text-transform:uppercase;
   letter-spacing:var(--track-eyebrow); color:#8fa3cc}
 
@@ -177,25 +177,14 @@ strong{font-weight:700; color:var(--ie-navy)}
 }
 
 /* ── video facade ───────────────────────────────────────────────────── */
+/* El vídeo va incrustado, no detrás de un póster: la primera sección de la
+   página es "mira lo que vas a construir", y una captura con un botón de play
+   no es eso. */
 .video{
   position:relative; border:1px solid var(--g-300); border-radius:var(--radius);
-  overflow:hidden; background:var(--ie-navy); aspect-ratio:16/9; cursor:pointer;
-  width:100%; padding:0;
+  overflow:hidden; background:var(--ie-navy); aspect-ratio:16/9; width:100%;
 }
-.video img{width:100%; height:100%; object-fit:cover; object-position:top center;
-  transition:opacity var(--t) var(--ease)}
 .video iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
-.video .bar{
-  position:absolute; left:0; right:0; bottom:0;
-  background:var(--ie-navy); color:#fff; text-align:left;
-  font-size:.8125rem; font-weight:700; text-transform:uppercase;
-  letter-spacing:var(--track-btn); padding:16px 22px;
-  display:flex; align-items:center; gap:10px;
-  transition:background var(--t) var(--ease);
-}
-.video:hover .bar{background:var(--ie-navy-700)}
-.video:hover .arw{transform:translateX(3px)}
-.video .arw{transition:transform var(--t) var(--ease)}
 .cap{
   font-size:.6875rem; font-weight:700; text-transform:uppercase;
   letter-spacing:.09em; color:var(--g-600); margin:var(--s-2) 0 0;
@@ -311,7 +300,7 @@ strong{font-weight:700; color:var(--ie-navy)}
 footer{background:var(--ie-navy); color:#c9d2e6; padding:var(--s-8) 0;
   font-size:.875rem}
 footer .wrap{display:flex; justify-content:space-between; gap:var(--s-3); flex-wrap:wrap; align-items:center}
-footer img{height:28px}
+footer img{height:36px}
 
 /* ── narrow screens ─────────────────────────────────────────────────
    The oversized numerals are the one thing that does not scale down on its
@@ -391,10 +380,13 @@ code{
       yours does the same three things: shows the catalogue, shows what every rival
       charges for the same shoe, and recommends a price with the reason attached.</p>
 
-    <button class="video rv" id="video" aria-label="Play the walkthrough video">
-      <img src="assets/shots/overview.webp" alt="The finished pricing tool, showing the headline figure and the positioning chart" width="1440" height="900">
-      <span class="bar">Play the walkthrough <span class="arw">&rarr;</span></span>
-    </button>
+    <div class="video rv">
+      <iframe src="https://www.youtube-nocookie.com/embed/nhxEy5DFKs8?rel=0&amp;modestbranding=1"
+              title="End-to-end AI Marketing Lab — walkthrough of the finished tool"
+              loading="lazy" allowfullscreen
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
     <p class="cap">Fig. 01 — The finished tool, end to end.</p>
 
     <div class="grid3 rv">
@@ -1359,16 +1351,6 @@ document.querySelectorAll('.prompt').forEach(box => {
   });
 });
 
-/* ── Video facade ────────────────────────────────────────────────────
-   The poster is a real screenshot of the tool, so the section says something
-   before anyone presses play — and YouTube's own furniture stays off an IE
-   page until it is asked for. */
-document.getElementById('video').addEventListener('click', function () {
-  this.innerHTML = '<iframe src="https://www.youtube.com/embed/nhxEy5DFKs8?autoplay=1&rel=0&modestbranding=1" '
-    + 'title="End-to-end AI Marketing Lab walkthrough" allow="accelerometer; autoplay; clipboard-write; '
-    + 'encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-  this.style.cursor = 'default';
-}, { once: true });
 </script>
 </body>
 </html>
