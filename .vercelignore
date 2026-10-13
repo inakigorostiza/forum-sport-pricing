@@ -23,3 +23,7 @@ supabase/
 # The design system kit: 17 MB of brand source, screenshots of the live site and
 # a React UI kit. Never part of the deployed page.
 Forum Sport Design System/
+# Same reasoning: 1,7 MB of IE's brand kit — logos, tokens and the written
+# manual. The lab page at /lab carries its own copy of the two logos and has
+# the token VALUES inlined, so nothing here is needed at runtime.
+IE Design System/

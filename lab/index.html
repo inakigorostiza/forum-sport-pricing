@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>End-to-end AI Marketing Lab · IE Business School</title>
+<meta name="description" content="Six weeks. You build and publish a working dynamic pricing tool for a real retailer, without writing code.">
+<link rel="icon" href="assets/ie-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Expanded:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── IE Business School tokens ──────────────────────────────────────────
+   Copied from `IE Design System/tokens/`. Inlined on purpose: this page has
+   to stand on its own, so the kit itself can stay out of the deployment.
+   Navy carries the brand, red is the only accent and never a background
+   field, grayscale on white does everything else. */
+:root{
+  --ie-navy:#0a1a3c; --ie-navy-700:#16264f; --ie-blue:#0097dc;
+  --ie-ink:#1a1a1a; --ie-red:#e3342f; --ie-red-700:#c02622;
+  --g-900:#2c2c2c; --g-600:#6b6b6b; --g-300:#d8d8d8; --g-100:#f4f4f4; --white:#fff;
+
+  --font-sans:"Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
+  --font-display:"Archivo Expanded","Archivo","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --fs-eyebrow:.75rem; --fs-body:1rem; --fs-lead:1.25rem;
+  --fs-h3:1.5rem; --fs-h2:clamp(1.5rem,5.2vw,2.25rem); --fs-h1:clamp(2rem,5vw,4rem);
+  --fs-stat:clamp(3rem,7vw,5.5rem);
+  --lh-tight:1.05; --lh-snug:1.2; --lh-body:1.6;
+  --track-eyebrow:.12em; --track-tight:-.01em; --track-btn:.04em;
+
+  --s-1:.5rem; --s-2:1rem; --s-3:1.5rem; --s-4:2rem;
+  --s-6:3rem; --s-8:4rem; --s-12:6rem; --s-16:8rem;
+  --container:1200px; --container-text:760px;
+  --radius:4px; --radius-sm:2px;
+  --shadow-card:0 8px 28px rgba(10,26,60,.10);
+  --ease:cubic-bezier(.2,.7,.2,1); --t:220ms;
+  --nav-h:52px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 24px)}
+body{
+  margin:0; background:var(--white); color:var(--ie-ink);
+  font-family:var(--font-sans); font-size:var(--fs-body); line-height:var(--lh-body);
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block; max-width:100%}
+a{color:var(--ie-red); text-decoration:none}
+a:hover{color:var(--ie-red-700)}
+:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(227,52,47,.40); border-radius:var(--radius-sm)}
+
+/* ── layout ─────────────────────────────────────────────────────────── */
+.wrap{max-width:var(--container); margin:0 auto; padding:0 24px}
+.prose{max-width:var(--container-text)}
+section{padding:var(--s-12) 0}
+@media(min-width:900px){ section{padding:var(--s-16) 0} }
+.tint{background:var(--g-100)}
+/* El héroe es una superficie navy igual que .navy: si no comparte estas reglas,
+   el titular se pinta en tinta sobre tinta y desaparece. */
+.navy,.hero{background:var(--ie-navy); color:var(--white)}
+.navy .lead,.navy p,.hero .lead,.hero p{color:#c9d2e6}
+.navy h2,.navy h1,.hero h1,.hero h2{color:var(--white)}
+.navy .eyebrow,.hero .eyebrow{color:#8fa3cc}
+
+/* ── type ───────────────────────────────────────────────────────────── */
+.eyebrow{
+  font-size:var(--fs-eyebrow); font-weight:700; text-transform:uppercase;
+  letter-spacing:var(--track-eyebrow); color:var(--g-600);
+  margin:0 0 var(--s-2);
+}
+.navy .eyebrow{color:#8fa3cc}
+h1,h2,h3{overflow-wrap:break-word}
+h1{
+  font-family:var(--font-display); font-size:var(--fs-h1); font-weight:800;
+  line-height:var(--lh-tight); letter-spacing:var(--track-tight);
+  text-transform:uppercase; margin:0 0 var(--s-3);
+}
+h2{
+  font-family:var(--font-display); font-size:var(--fs-h2); font-weight:700;
+  line-height:var(--lh-snug); letter-spacing:var(--track-tight);
+  text-transform:uppercase; margin:0 0 var(--s-3); color:var(--ie-navy);
+}
+h3{
+  font-size:var(--fs-h3); font-weight:700; line-height:var(--lh-snug);
+  text-transform:uppercase; letter-spacing:.02em; margin:var(--s-6) 0 var(--s-2);
+  color:var(--ie-navy);
+}
+h4{
+  font-size:var(--fs-eyebrow); font-weight:700; text-transform:uppercase;
+  letter-spacing:var(--track-eyebrow); color:var(--g-600);
+  margin:var(--s-4) 0 var(--s-2);
+}
+p{margin:0 0 var(--s-2)}
+.lead{font-size:var(--fs-lead); line-height:1.5; color:var(--g-900)}
+strong{font-weight:700; color:var(--ie-navy)}
+.navy strong{color:var(--white)}
+
+/* ── buttons ────────────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--font-sans); font-size:.875rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:var(--track-btn);
+  padding:14px 26px; border-radius:var(--radius); border:1px solid transparent;
+  cursor:pointer; transition:background var(--t) var(--ease),
+    color var(--t) var(--ease), border-color var(--t) var(--ease), transform var(--t) var(--ease);
+}
+/* El rojo de marca puro con texto blanco da 4,38:1 — por debajo de AA. El
+   rojo oscuro es token de marca igualmente y da 6,0:1, así que el botón lo usa
+   y el rojo puro queda para las marcas que no llevan texto encima: el
+   subrayado del índice, los filetes y los numerales. */
+.btn-primary{background:var(--ie-red-700); color:#fff}
+.btn-primary:hover{background:#a81e1b; color:#fff}
+.btn-primary:active{transform:translateY(1px)}
+.btn-ghost{background:transparent; color:#fff; border-color:rgba(255,255,255,.45)}
+.btn-ghost:hover{background:#fff; color:var(--ie-navy); border-color:#fff}
+.btn .arw{transition:transform var(--t) var(--ease)}
+.btn:hover .arw{transform:translateX(3px)}
+.btn-row{display:flex; gap:var(--s-2); flex-wrap:wrap; margin-top:var(--s-4)}
+
+/* ── sticky section nav ─────────────────────────────────────────────── */
+.secnav{
+  position:sticky; top:0; z-index:60; height:var(--nav-h);
+  background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--g-300);
+  opacity:0; pointer-events:none;
+  transition:opacity var(--t) var(--ease), transform var(--t) var(--ease);
+  transform:translateY(-8px);
+}
+.secnav.on{opacity:1; pointer-events:auto; transform:none}
+.secnav .wrap{display:flex; align-items:center; gap:2px; height:100%; overflow-x:auto;
+  scrollbar-width:none}
+.secnav .wrap::-webkit-scrollbar{display:none}
+.secnav a{
+  position:relative; flex:none; color:var(--g-600);
+  font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.08em; padding:0 12px; line-height:var(--nav-h);
+  transition:color var(--t) var(--ease);
+}
+.secnav a:hover{color:var(--ie-navy)}
+.secnav a[aria-current="true"]{color:var(--ie-navy)}
+.secnav .mark{
+  position:absolute; bottom:0; height:2px; background:var(--ie-red);
+  transition:transform var(--t) var(--ease), width var(--t) var(--ease);
+}
+.navlogo{flex:none; height:22px; margin-right:14px}
+
+/* ── hero ───────────────────────────────────────────────────────────── */
+.hero{
+  background:linear-gradient(180deg,var(--ie-navy-700) 0%,var(--ie-navy) 100%);
+  padding:var(--s-8) 0 var(--s-12);
+}
+.hero .btn-ghost{color:#fff}
+.hero-top{display:flex; align-items:center; justify-content:space-between;
+  gap:var(--s-3); margin-bottom:var(--s-12); flex-wrap:wrap}
+.hero-top img{height:34px}
+.hero-tag{font-size:var(--fs-eyebrow); font-weight:700; text-transform:uppercase;
+  letter-spacing:var(--track-eyebrow); color:#8fa3cc}
+
+/* ── key facts ──────────────────────────────────────────────────────── */
+.facts{
+  display:grid; grid-template-columns:repeat(2,1fr);
+  border:1px solid var(--g-300); border-radius:var(--radius); overflow:hidden;
+  background:var(--g-300); gap:1px;
+}
+@media(min-width:860px){ .facts{grid-template-columns:repeat(4,1fr)} }
+.fact{background:var(--white); padding:var(--s-4) var(--s-3) var(--s-3)}
+.fact .n{
+  font-family:var(--font-display); font-size:var(--fs-stat); font-weight:800;
+  line-height:.95; letter-spacing:-.02em; color:var(--ie-navy);
+  font-variant-numeric:tabular-nums; margin:0;
+}
+.fact .c{
+  font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--g-600); line-height:1.35;
+  margin:var(--s-2) 0 0; padding-top:var(--s-1); border-top:1px solid var(--g-300);
+}
+
+/* ── video facade ───────────────────────────────────────────────────── */
+.video{
+  position:relative; border:1px solid var(--g-300); border-radius:var(--radius);
+  overflow:hidden; background:var(--ie-navy); aspect-ratio:16/9; cursor:pointer;
+  width:100%; padding:0;
+}
+.video img{width:100%; height:100%; object-fit:cover; object-position:top center;
+  transition:opacity var(--t) var(--ease)}
+.video iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.video .bar{
+  position:absolute; left:0; right:0; bottom:0;
+  background:var(--ie-navy); color:#fff; text-align:left;
+  font-size:.8125rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:var(--track-btn); padding:16px 22px;
+  display:flex; align-items:center; gap:10px;
+  transition:background var(--t) var(--ease);
+}
+.video:hover .bar{background:var(--ie-navy-700)}
+.video:hover .arw{transform:translateX(3px)}
+.video .arw{transition:transform var(--t) var(--ease)}
+.cap{
+  font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--g-600); margin:var(--s-2) 0 0;
+}
+
+/* ── hairline grids ─────────────────────────────────────────────────── */
+.grid3{display:grid; gap:1px; background:var(--g-300);
+  border:1px solid var(--g-300); border-radius:var(--radius); overflow:hidden;
+  margin-top:var(--s-6)}
+@media(min-width:800px){ .grid3{grid-template-columns:repeat(3,1fr)} }
+.grid3 > div{background:var(--white); padding:var(--s-3)}
+.tint .grid3 > div{background:var(--g-100)}
+.grid3 h4{margin-top:0}
+.grid3 p{margin:0; font-size:.9375rem}
+
+/* ── reveal (fade + 8px, once) ──────────────────────────────────────── */
+.rv{opacity:0; transform:translateY(8px);
+  transition:opacity var(--t) var(--ease), transform var(--t) var(--ease)}
+.rv.in{opacity:1; transform:none}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important; transition:none!important}
+  .rv{opacity:1!important; transform:none!important}
+}
+
+/* ── figures, tables, pull quotes, callouts ─────────────────────────── */
+.statline{display:flex; align-items:baseline; gap:var(--s-3); flex-wrap:wrap;
+  margin:var(--s-6) 0 var(--s-4); padding-bottom:var(--s-3);
+  border-bottom:1px solid var(--g-300)}
+.bignum{font-family:var(--font-display); font-size:var(--fs-stat); font-weight:800;
+  line-height:.9; letter-spacing:-.02em; color:var(--ie-navy);
+  font-variant-numeric:tabular-nums; margin:0}
+.bigcap{font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--g-600); max-width:22ch; margin:0}
+.fig{border:1px solid var(--g-300); border-radius:var(--radius);
+  background:var(--white); padding:var(--s-3); margin-top:var(--s-4); overflow-x:auto}
+.tint .fig{background:var(--white)}
+.figsvg{width:100%; height:auto; min-width:560px}
+.tbl{border:1px solid var(--g-300); border-radius:var(--radius);
+  overflow:hidden; background:var(--white)}
+.tbl table{width:100%; border-collapse:collapse; font-size:.9375rem}
+.tbl th{
+  background:var(--ie-navy); color:#fff; text-align:left; vertical-align:bottom;
+  font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; padding:12px 16px;
+}
+.tbl td{padding:14px 16px; border-top:1px solid var(--g-300); vertical-align:top}
+.tbl tbody tr:nth-child(odd) td{background:#fcfcfc}
+.pull{margin:var(--s-6) 0 0; padding:0 0 0 var(--s-3);
+  border-left:2px solid var(--ie-red); max-width:var(--container-text)}
+.pull p{font-family:var(--font-display); font-size:var(--fs-h3); font-weight:700;
+  line-height:var(--lh-snug); color:var(--ie-navy); margin:0}
+.pull cite{display:block; margin-top:var(--s-1); font-style:normal;
+  font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--g-600)}
+.warn{margin-top:var(--s-6); padding:var(--s-3) var(--s-3) var(--s-3) var(--s-4);
+  border-left:2px solid var(--ie-red); background:var(--g-100);
+  border-radius:0 var(--radius) var(--radius) 0; max-width:var(--container-text)}
+.tint .warn{background:var(--white)}
+.warn p{margin:0; font-size:.9375rem}
+.shot{border:1px solid var(--g-300); border-radius:var(--radius); overflow:hidden;
+  margin-top:var(--s-4); background:var(--white)}
+.shot img{width:100%; height:auto}
+.two{display:grid; gap:var(--s-3)}
+@media(min-width:860px){ .two{grid-template-columns:1fr 1fr} }
+
+/* ── week blocks ────────────────────────────────────────────────────── */
+.wk-goal{font-size:var(--fs-lead); line-height:1.5; color:var(--ie-navy);
+  font-weight:600; max-width:var(--container-text); margin:0 0 var(--s-6)}
+.chk{list-style:none; padding:0; margin:0; display:grid; gap:10px}
+.chk li{position:relative; padding-left:30px; font-size:.9375rem}
+.chk li::before{content:""; position:absolute; left:0; top:3px; width:16px; height:16px;
+  border:1px solid var(--g-600); border-radius:var(--radius-sm)}
+.steps{list-style:none; counter-reset:st; padding:0; margin:0; display:grid; gap:14px}
+.steps li{counter-increment:st; position:relative; padding-left:48px; font-size:1rem}
+.steps li::before{content:counter(st,decimal-leading-zero);
+  position:absolute; left:0; top:-2px; font-family:var(--font-display);
+  font-size:1.125rem; font-weight:800; color:var(--ie-red);
+  font-variant-numeric:tabular-nums}
+.how{display:grid; gap:1px; background:var(--g-300); border:1px solid var(--g-300);
+  border-radius:var(--radius); overflow:hidden; margin-top:var(--s-2)}
+.how > div{background:var(--white); padding:var(--s-3); display:grid; gap:var(--s-1)}
+.tint .how > div{background:var(--g-100)}
+@media(min-width:800px){ .how > div{grid-template-columns:200px 1fr; gap:var(--s-3)} }
+.how b{font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--g-600)}
+.how p{margin:0; font-size:.9375rem}
+
+/* ── the prompts: the most distinct object on the page ──────────────── */
+.prompt{border:1px solid var(--ie-navy); border-radius:var(--radius);
+  margin-top:var(--s-3); background:var(--white); overflow:hidden}
+.tint .prompt{background:var(--white)}
+.prompt-h{display:flex; align-items:center; justify-content:space-between; gap:var(--s-2);
+  background:var(--ie-navy); color:#fff; padding:10px 14px}
+.prompt-h span{font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em}
+.copy{font-family:var(--font-sans); font-size:.625rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.09em; color:var(--ie-navy);
+  background:#fff; border:0; border-radius:var(--radius-sm);
+  padding:6px 12px; cursor:pointer; transition:background var(--t) var(--ease), color var(--t) var(--ease)}
+.copy:hover{background:var(--g-100)}
+.copy[data-done]{background:var(--ie-red); color:#fff}
+.prompt pre{margin:0; padding:var(--s-3); font-family:var(--font-mono);
+  font-size:.8125rem; line-height:1.65; color:var(--ie-ink);
+  white-space:pre-wrap; word-break:break-word}
+.gotcha{margin-top:var(--s-4); display:grid; gap:10px}
+.gotcha p{margin:0; padding-left:20px; position:relative; font-size:.9375rem; color:var(--g-900)}
+.gotcha p::before{content:"–"; position:absolute; left:0; color:var(--ie-red); font-weight:700}
+.leave{margin-top:var(--s-6); padding-top:var(--s-3); border-top:2px solid var(--ie-red);
+  font-family:var(--font-display); font-size:1.0625rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.03em; color:var(--ie-navy)}
+.leave .arw{color:var(--ie-red)}
+footer{background:var(--ie-navy); color:#c9d2e6; padding:var(--s-8) 0;
+  font-size:.875rem}
+footer .wrap{display:flex; justify-content:space-between; gap:var(--s-3); flex-wrap:wrap; align-items:center}
+footer img{height:28px}
+
+/* ── narrow screens ─────────────────────────────────────────────────
+   The oversized numerals are the one thing that does not scale down on its
+   own: at 360px a 48px display figure plus its padding is wider than half the
+   grid, and the whole fact grid pushes the page sideways. */
+@media(max-width:430px){
+  :root{--fs-stat:2.5rem}
+  .fact{padding:var(--s-3) var(--s-2) var(--s-2)}
+  .fact .c{font-size:.625rem; letter-spacing:.07em}
+  .wrap{padding:0 18px}
+  .prompt pre{font-size:.75rem; padding:var(--s-2)}
+}
+.fig{max-width:100%}
+/* Nunca tuvo estilo, y `forum-sport-<team>` es un token largo que no se parte:
+   a 360px empujaba la página 12px de lado. */
+code{
+  font-family:var(--font-mono); font-size:.875em;
+  background:var(--g-100); border:1px solid var(--g-300); border-radius:var(--radius-sm);
+  padding:1px 5px; overflow-wrap:anywhere; word-break:break-word;
+}
+.tint code{background:var(--white)}
+.warn code{background:var(--white)}
+</style>
+</head>
+<body>
+
+<nav class="secnav" id="secnav" aria-label="Sections">
+  <div class="wrap">
+    <img class="navlogo" src="assets/ie-logo.svg" alt="IE Business School">
+    <a href="#overview">Overview</a>
+    <a href="#briefing">Briefing</a>
+    <a href="#week-1">W1</a><a href="#week-2">W2</a><a href="#week-3">W3</a>
+    <a href="#week-4">W4</a><a href="#week-5">W5</a><a href="#week-6">W6</a>
+    <a href="#the-tool">The tool</a>
+    <span class="mark" id="navmark" aria-hidden="true"></span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <img src="assets/ie-logo-light.svg" alt="IE Business School">
+      <span class="hero-tag">End-to-end AI Marketing Lab</span>
+    </div>
+    <p class="eyebrow rv">AI Marketing Lab · IE Business School</p>
+    <h1 class="rv">Build a pricing tool in six weeks</h1>
+    <p class="lead prose rv">Forum Sport sells 1,483 shoe models online. Seven out of ten
+      are dearer than the cheapest rival, and a shopper finds that out in four seconds.
+      In six weeks you will build and publish a working tool that reads competitor prices
+      every day and recommends what each product should cost. You will not write a line
+      of code. You will describe what you want, in plain English, to an assistant that
+      writes it for you.</p>
+    <div class="btn-row rv">
+      <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
+      <a class="btn btn-ghost" href="#week-1">Start week 01 <span class="arw">&rarr;</span></a>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:var(--s-8); padding-bottom:var(--s-8)">
+  <div class="wrap">
+    <div class="facts rv">
+      <div class="fact"><p class="n">1,483</p><p class="c">Shoe models in the catalogue</p></div>
+      <div class="fact"><p class="n">16</p><p class="c">Competitors read daily</p></div>
+      <div class="fact"><p class="n">73.3%</p><p class="c">Dearer than the cheapest rival</p></div>
+      <div class="fact"><p class="n">0</p><p class="c">Lines of code you type</p></div>
+    </div>
+    <p class="cap">Measured 13 October 2026 across 742 models that have a competitor price. Average gap +14.5%.</p>
+  </div>
+</section>
+
+<section class="tint" id="overview">
+  <div class="wrap">
+    <p class="eyebrow rv">01 — Overview</p>
+    <h2 class="rv">See what you will build</h2>
+    <p class="lead prose rv">This is the finished tool, running on real data. By week 6
+      yours does the same three things: shows the catalogue, shows what every rival
+      charges for the same shoe, and recommends a price with the reason attached.</p>
+
+    <button class="video rv" id="video" aria-label="Play the walkthrough video">
+      <img src="assets/shots/overview.webp" alt="The finished pricing tool, showing the headline figure and the positioning chart" width="1440" height="900">
+      <span class="bar">Play the walkthrough <span class="arw">&rarr;</span></span>
+    </button>
+    <p class="cap">Fig. 01 — The finished tool, end to end.</p>
+
+    <div class="grid3 rv">
+      <div>
+        <h4>Who it is for</h4>
+        <p>Marketing students. No programming background assumed, and none acquired.
+           If you can write a clear brief, you can do this.</p>
+      </div>
+      <div>
+        <h4>What you need</h4>
+        <p>A laptop, three free accounts and the assistant. Six sessions. Nothing to
+           install beyond the assistant itself.</p>
+      </div>
+      <div>
+        <h4>What you leave with</h4>
+        <p>A public web address showing 1,483 products, 16 competitors' prices, a
+           recommended price per model — and the ability to explain every number in it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="briefing">
+  <div class="wrap">
+    <p class="eyebrow rv">02 — The business problem</p>
+    <h2 class="rv">A price is compared in seconds</h2>
+    <p class="lead prose rv">Forum Sport is a Spanish sports retailer. Online, its price
+      sits one tab away from every rival selling the same shoe. The question is not
+      whether shoppers compare — it is whether Forum Sport knows what they will find.</p>
+
+    <div class="statline rv">
+      <p class="bignum">73.3%</p>
+      <p class="bigcap">of compared models are dearer than the cheapest rival</p>
+    </div>
+
+    <div class="fig rv"><svg viewBox="0 0 1110 480" role="img" aria-label="Average price gap against each competitor. We are dearer than nine of fourteen; Tradeinn is 61.8 per cent cheaper." class="figsvg">
+<style>.lb{font:600 12px var(--font-sans);fill:#2c2c2c}.vl{font:700 12px var(--font-sans);fill:#1a1a1a;font-variant-numeric:tabular-nums}.ax{font:700 10px var(--font-sans);fill:#6b6b6b;letter-spacing:.09em}.n{font:400 11px var(--font-sans);fill:#6b6b6b}</style>
+<line x1="257" y1="26" x2="257" y2="456" stroke="#d8d8d8" stroke-width="1"/>
+<text x="257" y="472" class="ax" text-anchor="middle">-60%</text>
+<line x1="443" y1="26" x2="443" y2="456" stroke="#d8d8d8" stroke-width="1"/>
+<text x="443" y="472" class="ax" text-anchor="middle">-40%</text>
+<line x1="630" y1="26" x2="630" y2="456" stroke="#d8d8d8" stroke-width="1"/>
+<text x="630" y="472" class="ax" text-anchor="middle">-20%</text>
+<line x1="1003" y1="26" x2="1003" y2="456" stroke="#d8d8d8" stroke-width="1"/>
+<text x="1003" y="472" class="ax" text-anchor="middle">+20%</text>
+<line x1="817" y1="20" x2="817" y2="456" stroke="#e3342f" stroke-width="2"/>
+<text x="817" y="14" class="ax" text-anchor="middle" fill="#e3342f">PARITY</text>
+<text x="198" y="50" class="lb" text-anchor="end">Running Emotion</text>
+<text x="198" y="50" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="38" width="205.3" height="16" fill="#2c2c2c"/>
+<text x="1030" y="50" class="vl" text-anchor="start">+22.0%</text>
+<text x="198" y="80" class="lb" text-anchor="end">Basketball Emotion</text>
+<text x="198" y="80" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="68" width="200.7" height="16" fill="#2c2c2c"/>
+<text x="1025" y="80" class="vl" text-anchor="start">+21.5%</text>
+<text x="198" y="110" class="lb" text-anchor="end">Fútbol Emotion</text>
+<text x="198" y="110" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="98" width="193.2" height="16" fill="#2c2c2c"/>
+<text x="1018" y="110" class="vl" text-anchor="start">+20.7%</text>
+<text x="198" y="140" class="lb" text-anchor="end">Nike</text>
+<text x="198" y="140" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="128" width="149.3" height="16" fill="#2c2c2c"/>
+<text x="974" y="140" class="vl" text-anchor="start">+16.0%</text>
+<text x="198" y="170" class="lb" text-anchor="end">Atmósfera Sport</text>
+<text x="198" y="170" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="158" width="136.3" height="16" fill="#2c2c2c"/>
+<text x="961" y="170" class="vl" text-anchor="start">+14.6%</text>
+<text x="198" y="200" class="lb" text-anchor="end">Top4Running</text>
+<text x="198" y="200" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="188" width="117.6" height="16" fill="#2c2c2c"/>
+<text x="942" y="200" class="vl" text-anchor="start">+12.6%</text>
+<text x="198" y="230" class="lb" text-anchor="end">Bergfreunde</text>
+<text x="198" y="230" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="218" width="100.8" height="16" fill="#2c2c2c"/>
+<text x="925" y="230" class="vl" text-anchor="start">+10.8%</text>
+<text x="198" y="260" class="lb" text-anchor="end">i-Run</text>
+<text x="198" y="260" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="248" width="66.3" height="16" fill="#2c2c2c"/>
+<text x="891" y="260" class="vl" text-anchor="start">+7.1%</text>
+<text x="198" y="290" class="lb" text-anchor="end">El Corte Inglés</text>
+<text x="198" y="290" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="816.7" y="278" width="9.3" height="16" fill="#2c2c2c"/>
+<text x="834" y="290" class="vl" text-anchor="start">+1.0%</text>
+<text x="198" y="320" class="lb" text-anchor="end">Salomon</text>
+<text x="198" y="320" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="809.2" y="308" width="7.5" height="16" fill="#9a9a9a"/>
+<text x="801" y="320" class="vl" text-anchor="end">-0.8%</text>
+<text x="198" y="350" class="lb" text-anchor="end">JD Sports</text>
+<text x="198" y="350" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="787.7" y="338" width="28.9" height="16" fill="#9a9a9a"/>
+<text x="780" y="350" class="vl" text-anchor="end">-3.1%</text>
+<text x="198" y="380" class="lb" text-anchor="end">adidas</text>
+<text x="198" y="380" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="761.6" y="368" width="55.1" height="16" fill="#9a9a9a"/>
+<text x="754" y="380" class="vl" text-anchor="end">-5.9%</text>
+<text x="198" y="410" class="lb" text-anchor="end">Décimas</text>
+<text x="198" y="410" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="750.4" y="398" width="66.3" height="16" fill="#9a9a9a"/>
+<text x="742" y="410" class="vl" text-anchor="end">-7.1%</text>
+<text x="198" y="440" class="lb" text-anchor="end">Tradeinn</text>
+<text x="198" y="440" class="n" text-anchor="end" dx="0" dy="0" opacity="0"/>
+<rect x="239.9" y="428" width="576.8" height="16" fill="#9a9a9a"/>
+<text x="232" y="440" class="vl" text-anchor="end">-61.8%</text>
+</svg></div>
+    <p class="cap">Fig. 02 — Average gap against each competitor, 13 October 2026. Positive means Forum Sport is dearer.</p>
+
+    <div class="prose rv" style="margin-top:var(--s-4)">
+      <p>Read the bottom row before anything else. Tradeinn is not 62% cheaper on the
+        same shoe in the same condition — a number that extreme is a question, not an
+        answer. It is a marketplace clearing old stock, and it is telling you that your
+        comparison is only as good as your matching. <strong>You will spend more of week 3
+        on matching products than on fetching them.</strong></p>
+      <p>And note what happens as you add rivals: every competitor added made the picture
+        worse. adidas, the one seller systematically undercut, had been flattering the
+        average all along.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint">
+  <div class="wrap">
+    <p class="eyebrow rv">03 — The client's brief</p>
+    <h2 class="rv">Explain the price, don't copy it</h2>
+
+    <blockquote class="pull rv">
+      <p>Recommendations that are coherent and explainable.</p>
+      <cite>Forum Sport, on the MVP</cite>
+    </blockquote>
+
+    <div class="tbl rv" style="margin-top:var(--s-6)">
+      <table>
+        <thead><tr><th>We are not building</th><th>We are building</th></tr></thead>
+        <tbody>
+          <tr><td>A copy of Forum Sport's real pricing model</td><td>A recommender built from the policy they gave us</td></tr>
+          <tr><td>An optimal price</td><td>A defensible price, with the reason attached</td></tr>
+          <tr><td>A machine-learning model</td><td>Rules, visible and editable on screen</td></tr>
+          <tr><td>A number you have to trust</td><td>A number with a 0–100 score on the data behind it</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 03 — What the client asked for, and what they did not.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow rv">04 — Your toolkit</p>
+    <h2 class="rv">Four tools, none of them code</h2>
+    <p class="lead prose rv">You will scroll back to this table all term. Everything else
+      on this page you read once.</p>
+
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Tool</th><th>In plain words</th><th>You use it to</th><th>From</th></tr></thead>
+        <tbody>
+          <tr><td><b>Claude Code</b></td><td>A colleague who writes the code when you describe, in normal language, what you want.</td><td>Describe, correct, ask why.</td><td>Week 1</td></tr>
+          <tr><td><b>GitHub</b></td><td>A shared folder that keeps every version, like Google Docs history.</td><td>Work as a team, undo mistakes.</td><td>Week 1</td></tr>
+          <tr><td><b>Vercel</b></td><td>Puts your project on the internet with one click.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
+          <tr><td><b>Supabase</b></td><td>An online database — a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
+          <tr><td><b>MCP server</b></td><td>A plug that lets the assistant talk to a service directly.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="fig rv" style="margin-top:var(--s-6)">
+      <svg viewBox="0 0 900 260" role="img" aria-label="The assistant in the centre, plugged into Supabase, GitHub and Vercel." class="figsvg">
+        <style>.bx{fill:#fff;stroke:#d8d8d8;stroke-width:1}.bl{font:700 12px var(--font-sans);fill:#0a1a3c;letter-spacing:.06em}
+          .sm{font:400 11px var(--font-sans);fill:#6b6b6b}.ar{stroke:#6b6b6b;stroke-width:1;fill:none}</style>
+        <rect class="bx" x="330" y="100" width="240" height="60" fill="#0a1a3c" stroke="#0a1a3c"/>
+        <text x="450" y="126" class="bl" fill="#fff" text-anchor="middle">THE ASSISTANT</text>
+        <text x="450" y="146" class="sm" fill="#c9d2e6" text-anchor="middle">you type here, in English</text>
+        <rect class="bx" x="40" y="20" width="200" height="54"/><text x="140" y="44" class="bl" text-anchor="middle">SUPABASE</text><text x="140" y="62" class="sm" text-anchor="middle">the database</text>
+        <rect class="bx" x="40" y="186" width="200" height="54"/><text x="140" y="210" class="bl" text-anchor="middle">GITHUB</text><text x="140" y="228" class="sm" text-anchor="middle">the history</text>
+        <rect class="bx" x="660" y="103" width="200" height="54"/><text x="760" y="127" class="bl" text-anchor="middle">VERCEL</text><text x="760" y="145" class="sm" text-anchor="middle">the public address</text>
+        <path class="ar" d="M240 47 H290 V118 H330"/><path class="ar" d="M240 213 H290 V142 H330"/><path class="ar" d="M570 130 H660"/>
+        <path d="M322 114 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M322 138 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M652 126 l8 4 -8 4 z" fill="#6b6b6b"/>
+        <text x="285" y="92" class="sm" text-anchor="middle">MCP</text>
+      </svg>
+    </div>
+    <p class="cap">Fig. 04 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
+
+    <div class="warn rv">
+      <h4 style="margin-top:0">Two keys. Only one of them is safe.</h4>
+      <p>Supabase gives you two. The <b>publishable</b> key may live inside a web page —
+        the database's own rules keep it to reading. The <b>service_role</b> key ignores
+        every rule. Never paste it into a chat, a page, or GitHub. If you do, rotate it
+        immediately; assume it is public forever.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint">
+  <div class="wrap">
+    <p class="eyebrow rv">05 — The roadmap</p>
+    <h2 class="rv">Six weeks, six things shipped</h2>
+    <p class="lead prose rv">Every week ends with something that works and that you can
+      show. The first three build the data foundation; the last three turn it into
+      decisions, a brand and a client presentation.</p>
+    <div class="fig rv"><svg viewBox="0 0 1120 230" role="img" aria-label="Six weeks, each ending in something that works: a live page, the catalogue, competitor prices, a recommendation, the brand, the demo." class="figsvg">
+<style>.wn{font:800 13px var(--font-display);fill:#e3342f;letter-spacing:.08em}.wt{font:700 13px var(--font-sans);fill:#0a1a3c}.wd{font:400 12px var(--font-sans);fill:#6b6b6b}.hd{font:700 10px var(--font-sans);fill:#6b6b6b;letter-spacing:.12em}</style>
+<line x1="30" y1="104" x2="1090" y2="104" stroke="#d8d8d8" stroke-width="1"/>
+<text x="30" y="156" class="hd">YOU LEAVE WITH</text>
+<rect x="26.5" y="100.5" width="7" height="7" fill="#0a1a3c"/>
+<text x="30" y="58" class="wn" text-anchor="middle">WEEK 01</text>
+<text x="30" y="78" class="wt" text-anchor="middle">Set up</text>
+<text x="30" y="92" class="wt" text-anchor="middle">and publish</text>
+<text x="30" y="178" class="wd" text-anchor="middle">A live page</text>
+<text x="30" y="194" class="wd" text-anchor="middle">with your name</text>
+<path d="M228 100 l6 4 -6 4 z" fill="#d8d8d8"/>
+<rect x="238.5" y="100.5" width="7" height="7" fill="#0a1a3c"/>
+<text x="242" y="58" class="wn" text-anchor="middle">WEEK 02</text>
+<text x="242" y="78" class="wt" text-anchor="middle">Load the</text>
+<text x="242" y="92" class="wt" text-anchor="middle">catalogue</text>
+<text x="242" y="178" class="wd" text-anchor="middle">Your catalogue,</text>
+<text x="242" y="194" class="wd" text-anchor="middle">1,483 models</text>
+<path d="M440 100 l6 4 -6 4 z" fill="#d8d8d8"/>
+<rect x="450.5" y="100.5" width="7" height="7" fill="#0a1a3c"/>
+<text x="454" y="58" class="wn" text-anchor="middle">WEEK 03</text>
+<text x="454" y="86" class="wt" text-anchor="middle">Read the rivals</text>
+<text x="454" y="178" class="wd" text-anchor="middle">Competitor prices in</text>
+<text x="454" y="194" class="wd" text-anchor="middle">your database</text>
+<path d="M652 100 l6 4 -6 4 z" fill="#d8d8d8"/>
+<rect x="662.5" y="100.5" width="7" height="7" fill="#0a1a3c"/>
+<text x="666" y="58" class="wn" text-anchor="middle">WEEK 04</text>
+<text x="666" y="78" class="wt" text-anchor="middle">Recommend a</text>
+<text x="666" y="92" class="wt" text-anchor="middle">price</text>
+<text x="666" y="178" class="wd" text-anchor="middle">A recommended price</text>
+<text x="666" y="194" class="wd" text-anchor="middle">per model</text>
+<path d="M864 100 l6 4 -6 4 z" fill="#d8d8d8"/>
+<rect x="874.5" y="100.5" width="7" height="7" fill="#0a1a3c"/>
+<text x="878" y="58" class="wn" text-anchor="middle">WEEK 05</text>
+<text x="878" y="86" class="wt" text-anchor="middle">Make it theirs</text>
+<text x="878" y="178" class="wd" text-anchor="middle">The tool in</text>
+<text x="878" y="194" class="wd" text-anchor="middle">the client's brand</text>
+<path d="M1076 100 l6 4 -6 4 z" fill="#d8d8d8"/>
+<rect x="1086.5" y="100.5" width="7" height="7" fill="#0a1a3c"/>
+<text x="1090" y="58" class="wn" text-anchor="middle">WEEK 06</text>
+<text x="1090" y="86" class="wt" text-anchor="middle">Defend it</text>
+<text x="1090" y="178" class="wd" text-anchor="middle">A live link</text>
+<text x="1090" y="194" class="wd" text-anchor="middle">and a demo</text>
+</svg></div>
+    <p class="cap">Fig. 05 — Each week's deliverable is the next week's raw material.</p>
+  </div>
+</section>
+
+<!-- ══ WEEK 1 ══════════════════════════════════════════════════════════ -->
+<section id="week-1">
+  <div class="wrap">
+    <p class="eyebrow rv">Week 01 — Kick-off</p>
+    <h2 class="rv">Publish a page today</h2>
+    <p class="wk-goal rv">By tonight there is a web address, on the real internet, with
+      your team name on it — and you got there by typing English.</p>
+
+    <h3 class="rv">Before you start</h3>
+    <ul class="chk rv">
+      <li>A GitHub account — free, use your IE email</li>
+      <li>A Vercel account — <b>sign up with GitHub</b>, not with email</li>
+      <li>A Supabase account — sign up with GitHub</li>
+      <li>Claude Code installed</li>
+      <li>A folder on your Desktop called <code>forum-sport-&lt;team&gt;</code></li>
+      <li>Nothing else. No Python, no database software</li>
+    </ul>
+
+    <h3 class="rv">What you do</h3>
+    <ol class="steps rv">
+      <li>Create the three accounts.</li>
+      <li>Open the assistant and point it at your folder.</li>
+      <li>Ask it for a one-page site that says Hello Forum Sport.</li>
+      <li>Put the folder on GitHub.</li>
+      <li>Connect GitHub to Vercel and publish.</li>
+    </ol>
+
+    <h3 class="rv">How</h3>
+    <div class="how rv">
+      <div><b>Open the assistant</b><p>It asks which folder to work in. Choose Desktop →
+        <code>forum-sport-&lt;team&gt;</code> → Open. You now have one text box at the bottom
+        of the screen. That box is the whole interface. You type sentences into it. It is
+        not a terminal, and nothing it suggests runs until you click Yes.</p></div>
+      <div><b>Put it on GitHub</b><p>Paste the second prompt below. It will ask permission
+        before each command: read the line, then click Yes. A browser window opens for
+        GitHub — click Authorize.</p></div>
+      <div><b>Publish</b><p>vercel.com → <b>Add New</b> → <b>Project</b> → import the
+        repository you just created → <b>Deploy</b>. About forty seconds. Vercel shows a
+        URL ending <code>.vercel.app</code>. Open it on your phone. That is your page, on
+        the internet.</p></div>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 1 of 2</span><button class="copy" type="button">Copy</button></div>
+      <pre>I am a marketing student and I do not write code. In this folder, create a single file called index.html: one page, no build step, no frameworks, nothing to install. It should show the team name "Team &lt;NAME&gt;" as a large heading, the line "Dynamic pricing lab — Forum Sport" under it, and today's date. White background, dark navy text, one sans-serif font, everything in a centred column no wider than 760px.
+
+Then explain to me in three sentences, with no technical words, what the file you just made actually is and how a browser turns it into what I see.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 2 of 2</span><button class="copy" type="button">Copy</button></div>
+      <pre>Publish this folder, step by step, and stop before each step to tell me what you are about to do.
+
+1) Create a private GitHub repository called forum-sport-&lt;TEAM&gt; and push this folder into it.
+2) Tell me in one sentence each what "commit" and "push" mean, as if I had never heard either word.
+3) Then tell me exactly what to click on vercel.com to connect that repository and publish it — I will do that part myself in the browser.
+
+Do not install anything that is not strictly needed, and tell me before you install anything at all.</pre>
+    </div>
+
+    <div class="gotcha rv">
+      <p>It asks permission to run a command. That is normal — it always asks before it acts.</p>
+      <p>Vercel complains about an output directory. Reply to the assistant with the exact error text, pasted whole.</p>
+    </div>
+
+    <p class="leave rv"><span class="arw">&rarr;</span> You leave with a live web address with your team name on it</p>
+  </div>
+</section>
+
+<!-- ══ WEEK 2 ══════════════════════════════════════════════════════════ -->
+<section class="tint" id="week-2">
+  <div class="wrap">
+    <p class="eyebrow rv">Week 02 — Data</p>
+    <h2 class="rv">Turn the Excel into a database</h2>
+    <p class="wk-goal rv">The client's spreadsheet — 24,109 rows — stops being a file on
+      your laptop and becomes a database your web page can ask questions of.</p>
+
+    <h3 class="rv">Before you start</h3>
+    <ul class="chk rv">
+      <li>A Supabase project, region in Europe</li>
+      <li>The database password saved somewhere you will find it again</li>
+      <li>The client's Excel saved into the folder, untouched</li>
+      <li>The Supabase MCP server connected to the assistant</li>
+      <li>You can find Project Settings → API and name the two keys</li>
+    </ul>
+
+    <h3 class="rv">What you do</h3>
+    <ol class="steps rv">
+      <li>Create the Supabase project and find its two keys.</li>
+      <li>Plug the assistant into Supabase.</li>
+      <li>Make it read the Excel and tell you what is in it — <b>before</b> loading anything.</li>
+      <li>Load the data, and check it against totals you already know.</li>
+      <li>Build a catalogue page that reads live from the database.</li>
+    </ol>
+
+    <h3 class="rv">How</h3>
+    <div class="how rv">
+      <div><b>Create the project</b><p>supabase.com → New project → name it
+        <code>forum-sport</code> → region Frankfurt → set a password → Create. Two minutes.
+        Then Project Settings → API: copy the Project URL and both keys into your notes,
+        labelled.</p></div>
+      <div><b>Plug it in</b><p>In the assistant type <code>/mcp</code> → Add server →
+        Supabase → paste your project reference and a personal access token. It reports
+        Connected. From now on you can ask "how many models are there?" and it asks the
+        database itself instead of guessing.</p></div>
+      <div><b>Read before loading</b><p>This is the week's real lesson. In the reference
+        build the two boring tabs of the workbook — a field dictionary and a pivot table —
+        turned out to be the most valuable: one explained the business grain, the other
+        became the test that proved the load was correct.</p></div>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · profile before you load</span><button class="copy" type="button">Copy</button></div>
+      <pre>Before we load anything, read the Excel file in dataset/ and profile it. For every column tell me: how many values are empty, how many distinct values there are, the type, and the three most common values.
+
+Then answer in plain language:
+1) Is one row one product, or one product-in-one-size?
+2) Which columns are identical for every row of the same model, and which change per size?
+3) Which columns are secretly yes/no questions written as words?
+4) Which columns use a word or a strange number to mean "missing"?
+
+Do not change the file and do not create any tables yet. Give me a short table plus five sentences I could read out to the client.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · load, and prove it loaded</span><button class="copy" type="button">Copy</button></div>
+      <pre>Now design the database in Supabase: three tables — models, skus, brands. One row per model in models, one row per size in skus.
+
+Before loading, write down the totals we expect: 1,483 models, 24,109 SKUs, 28 brands. After loading, run the counts and show me expected against actual, side by side. If any number disagrees, stop and tell me — do not fix it quietly.
+
+Any column that is calculated from other columns, such as the net price, must be calculated by the database, not imported, so it can never drift.
+
+Use the Supabase connection, explain each step before running it, and never write my service_role key into a file that goes to GitHub.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · the catalogue page</span><button class="copy" type="button">Copy</button></div>
+      <pre>Add a second page: the catalogue. It reads live from Supabase using the publishable key and shows one row per model — image, brand, model name, list price, sale price, discount %, stock level.
+
+Add a search box and a brand filter. 1,483 rows is too many for one screen, so paginate at 50 with a "rows per page" control, and make the column headers sortable by clicking.
+
+Keep it plain: white background, hairline grey rules, no colour except on the discount.
+
+When you are done, tell me which key you used and why it is safe for that key to be visible in a public page.</pre>
+    </div>
+
+    <div class="shot rv">
+      <img src="assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="1440" height="1200">
+    </div>
+    <p class="cap">Fig. 06 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
+
+    <div class="gotcha rv">
+      <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet — tell the assistant exactly that sentence.</p>
+      <p>Half the barcodes are 12 digits, not 13. Leave it. Week 3 explains why it decides everything.</p>
+    </div>
+
+    <p class="leave rv"><span class="arw">&rarr;</span> You leave with your own catalogue, live, 1,483 models</p>
+  </div>
+</section>
+
+<!-- ══ WEEK 3 ══════════════════════════════════════════════════════════ -->
+<section id="week-3">
+  <div class="wrap">
+    <p class="eyebrow rv">Week 03 — Competitors</p>
+    <h2 class="rv">Read your rivals' prices</h2>
+    <p class="wk-goal rv">Your database stops being about you — by the end of the session
+      it holds what other shops charge for the same shoe, today.</p>
+
+    <h3 class="rv">Before you start</h3>
+    <ul class="chk rv">
+      <li>Three competitors chosen, written down with the date</li>
+      <li>Their <code>robots.txt</code> read by you, by hand</li>
+      <li>An honest user agent agreed with your tutor</li>
+      <li>A GitHub Actions schedule you can switch on</li>
+    </ul>
+
+    <h3 class="rv">What you do</h3>
+    <ol class="steps rv">
+      <li>Read three competitors' rules and record what they say.</li>
+      <li>Fetch one product page and find the price in it, by eye.</li>
+      <li>Match their product to yours — barcode first, article code second.</li>
+      <li>Store every observation; never overwrite a price.</li>
+      <li>Set the two rhythms: discover weekly, refresh daily.</li>
+    </ol>
+
+    <h3 class="rv">How</h3>
+    <div class="how rv">
+      <div><b>Read the rules</b><p>Type the shop's address and add <code>/robots.txt</code>.
+        It is a plain text file, published to be read. <code>Disallow: /</code> means do not
+        crawl — but read <b>who</b> it applies to. Write down what you found, and the date
+        you found it.</p></div>
+      <div><b>Find the price by eye</b><p>Open any competitor product page. Right-click →
+        View page source → Ctrl+F for <code>gtin13</code>. The block inside
+        <code>&lt;script type="application/ld+json"&gt;</code> holds the price and the
+        barcode, published by the shop deliberately so Google can read it. You are not
+        breaking in; you are reading the label.</p></div>
+      <div><b>Policy is not infrastructure</b><p>What a site <i>says</i> and what its
+        servers <i>do</i> disagree in both directions. In the reference build, adidas's
+        robots.txt allows product pages while its firewall refuses them. Check the two
+        separately.</p></div>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · fetch one page, politely</span><button class="copy" type="button">Copy</button></div>
+      <pre>Pick one product page from a competitor and fetch it once: with an honest user agent that identifies us as a student project, obeying robots.txt, one request at a time, with a two-second wait. Do not use a headless browser and do not pretend to be a person.
+
+From the page extract: product name, brand, barcode (gtin13), manufacturer code (mpn), price, currency, in stock yes/no.
+
+Show me the raw block of structured data you took it from, then the clean result as a small table. Then tell me in two sentences why that data is sitting in the page at all.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · the one that decides the week</span><button class="copy" type="button">Copy</button></div>
+      <pre>Now match their products to ours, with two keys, in this order.
+
+First the barcode: our EANs are stored as a mix of 12-digit and 13-digit numbers and competitors publish 13 digits, so pad ours to 13 with a leading zero before comparing — and tell me how many of our EANs are 12 digits, because if we skip this we lose most of our matches.
+
+Second, when there is no barcode, the supplier article code, matched at model level: accept a match when their code equals ours, OR when the part of their code before the first hyphen equals ours — Nike publishes FQ7262-103 against our CD4371-style codes, Saucony publishes S29101-01 exactly as we store it.
+
+Store each observed price as a new row with a timestamp. Never update a price in place: a recommendation has to be traceable back to the observation behind it.
+
+Then report how many of our 1,483 models now have at least one competitor price, split by whether the match came from a barcode or from a code.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · two rhythms</span><button class="copy" type="button">Copy</button></div>
+      <pre>Split the crawl in two.
+
+A weekly "discover" job that walks the competitor's sitemap, keeps only URLs that could be a running or trail shoe of a brand we stock, fetches them, and records which ones matched our catalogue.
+
+A daily "refresh" job that re-fetches only the pages that already matched.
+
+Log every run: pages fetched, offers found, matches made, errors, and the smallest gap we actually left between two requests, so our politeness is provable afterwards and not merely claimed.
+
+If a fetch fails, record the failure. Never let "the request failed" and "this page had no price" end up looking like the same result.</pre>
+    </div>
+
+    <h3 class="rv">Which shops answer, and why</h3>
+    <p class="prose rv">This is the real result from the reference build, and it is the
+      most useful table on this page. The pattern is not about your code or your user
+      agent — it is about what sits in front of the shop.</p>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Competitor</th><th>In front of it</th><th>A plain, honest request</th></tr></thead>
+        <tbody>
+          <tr><td>Running Emotion</td><td>Apache</td><td>Answers</td></tr>
+          <tr><td>Fútbol Emotion</td><td>Apache</td><td>Answers</td></tr>
+          <tr><td>Basketball Emotion</td><td>Apache</td><td>Answers</td></tr>
+          <tr><td>Atmósfera Sport</td><td>Apache</td><td>Answers</td></tr>
+          <tr><td>Tradeinn</td><td>nginx</td><td>Answers</td></tr>
+          <tr><td>Salomon</td><td>Vercel</td><td>Answers</td></tr>
+          <tr><td>i-Run</td><td>Akamai</td><td>Answers</td></tr>
+          <tr><td>JD Sports</td><td>—</td><td>Answers</td></tr>
+          <tr><td>Top4Running</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
+          <tr><td>Bergfreunde</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
+          <tr><td>Décimas</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
+          <tr><td>Viladomat</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
+          <tr><td>Nencini Sport</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
+          <tr><td>The North Face</td><td><b>Akamai WAF</b></td><td>Refuses</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 07 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+
+    <div class="warn rv">
+      <h4 style="margin-top:0">Changing your user agent will not fix this</h4>
+      <p>We tested it. One Cloudflare site refuses an honest crawler <i>and</i> a
+        browser-looking one, from the same computer. Cloudflare is not reading the name you
+        send — it is reading the shape of the connection itself, which a simple program
+        cannot fake. Going further is a legal and commercial decision, not a technical one.
+        <b>It stops here.</b></p>
+    </div>
+
+    <div class="gotcha rv">
+      <p>A shop looks dead. Before you write that down: in the reference build, one site declared dead on 300 pages produced 16 matches in 10 when sampled across the sitemap instead of from the top, and six of fourteen "unscrapable" sellers turned out to be bugs in our own code. A negative result needs as much evidence as a positive one.</p>
+      <p>Your tool looks fine but the prices are a week old. Nothing on screen says so. Build the freshness display before you need it.</p>
+    </div>
+
+    <p class="leave rv"><span class="arw">&rarr;</span> You leave with competitor prices in your database</p>
+  </div>
+</section>
+
+<!-- ══ WEEK 4 ══════════════════════════════════════════════════════════ -->
+<section class="tint" id="week-4">
+  <div class="wrap">
+    <p class="eyebrow rv">Week 04 — The engine</p>
+    <h2 class="rv">Turn prices into a recommendation</h2>
+    <p class="wk-goal rv">One number per product, with a sentence explaining why, and an
+      honest score saying how much to trust it.</p>
+
+    <div class="warn rv" style="margin-top:0">
+      <h4 style="margin-top:0">Read this before you build anything</h4>
+      <p>There is no sales data. No units sold, no traffic, no conversion. Without demand
+        there is no elasticity, and without elasticity there is no optimum — anyone who
+        offers you one is selling you something. What the data does support is a
+        rule-based recommender: a target position against a reference competitor, adjusted
+        for stock, held inside a floor and a ceiling the client's own policy fixes.
+        <b>That sentence is the intellectual centre of this course.</b></p>
+    </div>
+
+    <h3 class="rv">Before you start</h3>
+    <ul class="chk rv">
+      <li>At least three competitors returning prices</li>
+      <li>The client's price-band matrix to hand</li>
+      <li>You can say what rotation classes AA, A, B, C and D mean</li>
+      <li>You accept that "optimal" is not on the table</li>
+    </ul>
+
+    <h3 class="rv">What you do</h3>
+    <ol class="steps rv">
+      <li>Pick the reference: the cheapest rival, the mean, or the median.</li>
+      <li>Set a target position per rotation class.</li>
+      <li>Adjust it for stock, outlet and old season.</li>
+      <li>Clamp it inside the client's band matrix — and decide who wins when floor and ceiling collide.</li>
+      <li>Score the data quality, separately from the price.</li>
+    </ol>
+
+    <h3 class="rv">The four rules, in words</h3>
+    <div class="how rv">
+      <div><b>Target by rotation</b><p>Bestsellers set the price perception, so they sit
+        closest to the rival. AA 100% of the reference, A 102, B 105, C 108, D 112,
+        unclassified 106. Measured today Forum Sport sits at AA 109.8 · A 106.8 · B 109.9 ·
+        C 110.5 · D 115.0 — so every target is a cut, and the deepest cut falls on the most
+        visible products.</p></div>
+      <div><b>Adjust for stock</b><p>Discounting what you barely have left is giving away
+        margin. Very high stock −4 points, high −2, medium 0, low +2, very low +4.</p></div>
+      <div><b>Adjust for context</b><p>Outlet −3 points. Previous season −3 points.</p></div>
+      <div><b>The barriers</b><p>Five price bands. Each demands a minimum margin <b>in per
+        cent and in euros — both, not whichever is convenient</b> — and sets a maximum
+        alignment against the reference. The two floors are not redundant: the euro floor is
+        the binding one on 212 models, and on 64 of the 79 in the top band. When floor and
+        ceiling contradict each other — on <b>495 of 1,483 models</b> — margin wins, and the
+        row says so out loud.</p></div>
+    </div>
+
+    <div class="shot rv">
+      <img src="assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="1118" height="210">
+    </div>
+    <p class="cap">Fig. 08 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
+      <pre>Build the pricing recommender. It is not an optimiser: we have no units sold, no traffic and no conversion, so an economic optimum is not computable, and the page must say that in plain words.
+
+1) Reference price = the cheapest observed competitor price for that model, switchable to the mean or the median of rivals.
+2) Target position as a % of that reference, by rotation class: AA 100, A 102, B 105, C 108, D 112, unclassified 106.
+3) Adjust in percentage points by stock — very high −4, high −2, medium 0, low +2, very low +4 — then outlet −3 and previous season −3.
+4) Clamp with the client's band matrix, choosing the band from the CURRENT SELLING PRICE, not the list price, with bands [0,30), [30,60), [60,100), [100,200), [200,∞): minimum margins of 30/27/24/20/18 % AND 2/8/14/20/36 €, both of which must hold, and maximum alignment against the reference of 102/101/100/99/98 %.
+5) Round to the nearest euro, and never let rounding break a barrier.
+
+When the margin floor and the alignment ceiling contradict each other, margin wins — and the row must say in words that it did. Every recommendation carries a one-line reason a buyer could read aloud.
+
+Finally, tell me how many models end up in that contradiction.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · confidence</span><button class="copy" type="button">Copy</button></div>
+      <pre>Add a confidence score from 0 to 100 to every recommendation. It measures the quality of the market data, not how sure we are about the price — put that sentence on the page where nobody can miss it.
+
+Build it from:
+- how many rivals we have a price from: 0 → 0 points, 1 → 15, 2 → 26, 3–4 → 34, 5 or more → 40
+- how we matched: exact barcode 15, supplier code 8
+- how fresh it is: today 20, within a week 14, within two weeks 8, within a month 3, older 0
+- how much the rivals disagree: spread under 5% → 15, under 15% → 10, under 30% → 5, more → 0
+- whether we know the rotation class: digital 10, store 5, neither 0
+
+Then cap it: with a single rival the score can never exceed 45, with none it can never exceed 25. One observation cannot corroborate itself.
+
+Under each score, list in plain words the reasons it lost points: "only one competitor", "matched by code, not barcode", "last seen 11 days ago", "rivals disagree by 22%".</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · make it arguable</span><button class="copy" type="button">Copy</button></div>
+      <pre>Make every parameter editable on the page — each rotation target, each stock adjustment, and the whole band matrix — and recalculate everything the instant a value changes, with no reload. Show the default next to each control and give me a Reset button.
+
+Then add a sanity panel at the top: how many models move down, how many move up, the average move in each direction, how many are already on target, and how many of the twenty largest moves rest on weak evidence — a single competitor, or confidence under 50%.
+
+If a big move rests on one observation, say so right next to it rather than in a footnote.</pre>
+    </div>
+
+    <div class="fig rv"><svg viewBox="0 0 1060 152" role="img" aria-label="The hundred confidence points: forty for how many rivals, twenty for freshness, fifteen for match type, fifteen for how much rivals agree, ten for knowing the rotation class." class="figsvg">
+<style>.s{font:700 11px var(--font-sans);fill:#fff;letter-spacing:.04em}.l{font:600 11px var(--font-sans);fill:#2c2c2c}.c{font:700 10px var(--font-sans);fill:#e3342f;letter-spacing:.09em}.t{font:800 12px var(--font-display);fill:#0a1a3c}</style>
+<rect x="20.0" y="36" width="398.0" height="40" fill="#0a1a3c"/>
+<text x="220" y="61" class="s" fill="#fff" text-anchor="middle">40</text>
+<text x="220" y="94" class="l" text-anchor="middle">How</text>
+<text x="220" y="108" class="l" text-anchor="middle">many rivals</text>
+<rect x="420.0" y="36" width="198.0" height="40" fill="#3d4f73"/>
+<text x="520" y="61" class="s" fill="#fff" text-anchor="middle">20</text>
+<text x="520" y="94" class="l" text-anchor="middle">Freshness</text>
+<rect x="620.0" y="36" width="148.0" height="40" fill="#6b7a96"/>
+<text x="695" y="61" class="s" fill="#fff" text-anchor="middle">15</text>
+<text x="695" y="94" class="l" text-anchor="middle">Match type</text>
+<rect x="770.0" y="36" width="148.0" height="40" fill="#9aa5ba"/>
+<text x="845" y="61" class="s" fill="#1a1a1a" text-anchor="middle">15</text>
+<text x="845" y="94" class="l" text-anchor="middle">Rivals agree</text>
+<rect x="920.0" y="36" width="98.0" height="40" fill="#c7cedb"/>
+<text x="970" y="61" class="s" fill="#1a1a1a" text-anchor="middle">10</text>
+<text x="970" y="94" class="l" text-anchor="middle">Rotation</text>
+<text x="970" y="108" class="l" text-anchor="middle">known</text>
+<text x="20" y="24" class="t">100 POINTS OF CONFIDENCE</text>
+<line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
+<text x="478" y="132" class="c">CEILING WITH ONE RIVAL: 45 — ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
+</svg></div>
+    <p class="cap">Fig. 09 — What the hundred points are made of. The score grades the data, never the price.</p>
+
+    <div class="shot rv">
+      <img src="assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="1440" height="560">
+    </div>
+    <p class="cap">Fig. 10 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
+
+    <div class="gotcha rv">
+      <p>Someone asks "is this the optimal price?". The answer is no — it is the defensible price. Optimal needs demand data that does not exist.</p>
+      <p>A product changes band when it goes on sale, because the band follows today's selling price, not the list price. That is deliberate. Say it before someone discovers it.</p>
+    </div>
+
+    <p class="leave rv"><span class="arw">&rarr;</span> You leave with a recommended price, and a reason, per model</p>
+  </div>
+</section>
+
+<!-- ══ WEEK 5 ══════════════════════════════════════════════════════════ -->
+<section id="week-5">
+  <div class="wrap">
+    <p class="eyebrow rv">Week 05 — Brand</p>
+    <h2 class="rv">Make it look like the client</h2>
+    <p class="wk-goal rv">Same numbers, different owner. By the end the tool looks like it
+      was made inside Forum Sport, and it works for someone reading it on a phone in a
+      stockroom.</p>
+
+    <h3 class="rv">Before you start</h3>
+    <ul class="chk rv">
+      <li>The client's site open in a browser tab</li>
+      <li>Their logo, in a vector file if you can get one</li>
+      <li>Six values written down — and only six</li>
+      <li>A phone to test on, not just a narrow window</li>
+    </ul>
+
+    <h3 class="rv">What you do</h3>
+    <ol class="steps rv">
+      <li>Harvest the brand from the client's own site.</li>
+      <li>Write it down once, as a set of named values.</li>
+      <li>Apply it everywhere at once.</li>
+      <li>Fix the two things that always break: the table on a phone, and colour used as the only signal.</li>
+      <li>Add Spanish/English and light/dark.</li>
+    </ol>
+
+    <h3 class="rv">How</h3>
+    <div class="how rv">
+      <div><b>Harvest</b><p>Open the client's site. Right-click anything → Inspect. The
+        Styles panel shows the exact colour and the font name. Write down six values and no
+        more: brand colour, text colour, hairline grey, background tint, font family, corner
+        radius. <b>Six is a design system; sixty is a mood board.</b></p></div>
+      <div><b>Name them once</b><p>Put the six at the top of the file as named values and
+        rewrite every rule to use the names. After that, changing the brand is changing six
+        lines — which is exactly what makes dark mode possible in the next step.</p></div>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · name the brand</span><button class="copy" type="button">Copy</button></div>
+      <pre>Here are six values I took from the client's own site: brand colour &lt;#&gt;, text colour &lt;#&gt;, hairline grey &lt;#&gt;, background tint &lt;#&gt;, font family &lt;name&gt;, corner radius &lt;n&gt;px.
+
+Put them at the top of the file as named variables, add a spacing scale and three type sizes, then rewrite every rule in the page to use those names — no colour written directly anywhere.
+
+When you are done, list every colour still hard-coded somewhere, because those are the ones that will go wrong later.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · the two things that always break</span><button class="copy" type="button">Copy</button></div>
+      <pre>Two fixes.
+
+First: this table has thirteen columns and is unreadable on a phone. Below 760px wide, drop the least load-bearing columns rather than squeezing them, and make sure no price is ever cut off — a price shown as "180,0…" reads as a different number. Check every cell, not just the headers.
+
+Second: we are signalling "cheaper" and "dearer" with colour alone. Add a sign (+ / −) and a word, so it still reads in greyscale and for a colour-blind buyer.
+
+Then check every text colour against its background and tell me which pairs fail WCAG AA contrast, with corrected values.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · two languages, two themes</span><button class="copy" type="button">Copy</button></div>
+      <pre>Add a Spanish/English switch. Pull every visible piece of text into a single dictionary at the top of the file, one entry per key with both languages side by side, so a non-technical person can change the wording without touching any logic.
+
+Rebuild the number and date formatters when the language changes: "1.483" and "1,483" are the same number, and the thousands separator is part of the translation, not decoration around it.
+
+Then add light/dark, following the system setting by default. Dark is not inverted light: give me a separate set of values for the same named variables and keep the same contrast ratios.
+
+Finally, list any key that exists in one language and not the other.</pre>
+    </div>
+
+    <div class="two rv">
+      <div class="shot" style="margin-top:0">
+        <img src="assets/shots/dark-es.webp" alt="The same tool in Spanish and in dark mode" loading="lazy" width="1440" height="900">
+      </div>
+      <div class="shot" style="margin-top:0">
+        <img src="assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="390" height="844">
+      </div>
+    </div>
+    <p class="cap">Fig. 11 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
+
+    <div class="gotcha rv">
+      <p>Dark mode makes the accent unreadable. Change the value, not the component — that is what naming them was for.</p>
+      <p>A missing translation fails silently and shows English. Ask for the list of missing keys, every time.</p>
+    </div>
+
+    <p class="leave rv"><span class="arw">&rarr;</span> You leave with a tool that looks like the client's</p>
+  </div>
+</section>
+
+<!-- ══ WEEK 6 ══════════════════════════════════════════════════════════ -->
+<section class="tint" id="week-6">
+  <div class="wrap">
+    <p class="eyebrow rv">Week 06 — Demo</p>
+    <h2 class="rv">Defend it in front of the client</h2>
+    <p class="wk-goal rv">Ten minutes in which the tool does something live, and you answer
+      the three questions they will actually ask.</p>
+
+    <h3 class="rv">Before you start</h3>
+    <ul class="chk rv">
+      <li>The link opened on a phone you have never used it on</li>
+      <li>A second tab already loaded, in case the wifi fails</li>
+      <li>The handover page written, in both languages</li>
+      <li>One model chosen as the worked example</li>
+    </ul>
+
+    <h3 class="rv">The ten minutes</h3>
+    <div class="how rv">
+      <div><b>0:00 — the problem</b><p>One number. 73.3% of compared models are dearer than the cheapest rival.</p></div>
+      <div><b>1:00 — the catalogue</b><p>Live, 1,483 models, their own data.</p></div>
+      <div><b>2:30 — one product</b><p>Its rivals, and how each one was matched.</p></div>
+      <div><b>4:00 — the recommendation</b><p>And the sentence behind it, read aloud.</p></div>
+      <div><b>5:30 — the confidence</b><p>Why it is 46 and not 90. This is where you earn the room.</p></div>
+      <div><b>7:00 — what we would not claim</b><p>Say the limits before they find them.</p></div>
+      <div><b>8:30 — what comes next</b><p>And what it would cost in time.</p></div>
+      <div><b>10:00 — the link</b><p>Hand it over.</p></div>
+    </div>
+
+    <h3 class="rv">The three questions they will ask</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>They ask</th><th>You answer</th><th>The number behind it</th></tr></thead>
+        <tbody>
+          <tr><td>Is this our real pricing model?</td><td>No, and it was never meant to be. It is a recommender built from the policy you gave us and prices your rivals publish openly.</td><td>5 bands, your matrix, unmodified</td></tr>
+          <tr><td>Why is this higher than the rival's?</td><td>Because band 4 requires 20% and €20 of margin, and aligning would break both. Where the floor and the ceiling collide, margin wins — and the row says so.</td><td>495 of 1,483 models</td></tr>
+          <tr><td>Can we trust it?</td><td>On the models where we have market data, yes, to the degree the score states. Below 50 we are telling you not to act yet, in the open.</td><td>742 models with a competitor price</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 12 — Rehearse these three out loud. They are the whole defence.</p>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
+      <pre>Write a one-page handover for a non-technical client. Sections: what this tool does; what it does NOT do; where the data comes from and how often it refreshes; what the confidence score means; the five things that would break it; and what the next step would cost in time.
+
+No jargon — if a word would not survive a meeting, replace it. Under 500 words, in Spanish and in English.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · make it survive the room</span><button class="copy" type="button">Copy</button></div>
+      <pre>We present this live tomorrow. Make it survive the room.
+
+1) If the database does not answer within three seconds, show a clear message instead of an empty table.
+2) Add a link that opens one specific model directly, with its filters already applied, so I can jump to it from a slide.
+3) Check it on a 390px-wide phone and fix anything that overflows or gets cut off.
+4) List every place the page could show a blank or a dash, and tell me what it will say instead.
+
+Then give me a ten-point checklist to run thirty minutes before presenting.</pre>
+    </div>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · rehearse the hostile question</span><button class="copy" type="button">Copy</button></div>
+      <pre>Act as Forum Sport's pricing manager: fifteen years in the job, sceptical of anything built by students.
+
+Read this tool and ask me the eight hardest questions you would ask in the demo — about where the cost figure comes from, about the margin floor, about how we got the competitors' prices and whether that is legal, and about what happens when a rival is out of stock and shows a stale price.
+
+For each question, tell me what a weak answer sounds like and what a strong one sounds like.</pre>
+    </div>
+
+    <div class="gotcha rv">
+      <p>Live demos fail on wifi. Have the second tab already loaded before you walk in.</p>
+      <p>Do not promise a daily crawl you have not actually scheduled. In the reference build, three competitors were returning zero pages for days and nothing on screen said so.</p>
+    </div>
+
+    <p class="leave rv"><span class="arw">&rarr;</span> You leave with a live link and a ten-minute demo</p>
+  </div>
+</section>
+
+<!-- ══ THE REFERENCE BUILD ═════════════════════════════════════════════ -->
+<section id="the-tool">
+  <div class="wrap">
+    <p class="eyebrow rv">06 — The reference build</p>
+    <h2 class="rv">See what good looks like</h2>
+    <p class="lead prose rv">This is the finished tool, running on live data. Open it, break
+      it, read its numbers. You are not copying it — you are building your own answer to the
+      same brief. But it tells you where the bar is.</p>
+
+    <div class="facts rv" style="margin-top:var(--s-6)">
+      <div class="fact"><p class="n">24,109</p><p class="c">SKUs behind 1,483 models</p></div>
+      <div class="fact"><p class="n">742</p><p class="c">Models with a competitor price</p></div>
+      <div class="fact"><p class="n">495</p><p class="c">Where margin beats alignment</p></div>
+      <div class="fact"><p class="n">4</p><p class="c">Sections: overview, explorer, pricing, scraping</p></div>
+    </div>
+
+    <div class="shot rv">
+      <img src="assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="1440" height="260">
+    </div>
+    <p class="cap">Fig. 13 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
+
+    <div class="two rv">
+      <div class="shot" style="margin-top:0">
+        <img src="assets/shots/chart.webp" alt="The online price positioning chart over time, with a parity line at 100 per cent" loading="lazy" width="1440" height="560">
+      </div>
+      <div class="shot" style="margin-top:0">
+        <img src="assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="1440" height="460">
+      </div>
+    </div>
+    <p class="cap">Fig. 14 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+
+    <div class="btn-row rv">
+      <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
+      <a class="btn" style="border-color:var(--g-300); color:var(--ie-navy)" href="https://forum-sport-pricing.vercel.app/#pricing" target="_blank" rel="noopener">Go straight to the engine <span class="arw">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="navy" style="padding:var(--s-12) 0">
+  <div class="wrap" style="text-align:center">
+    <p class="eyebrow rv">Your turn</p>
+    <h2 class="rv" style="color:#fff">Start week 01</h2>
+    <p class="lead rv" style="max-width:640px; margin:0 auto var(--s-4)">Three free accounts
+      and one folder on your Desktop. By tonight there is a web address with your team name
+      on it.</p>
+    <div class="btn-row rv" style="justify-content:center">
+      <a class="btn btn-primary" href="#week-1">Go to week 01 <span class="arw">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/ie-logo-light.svg" alt="IE Business School">
+    <span>End-to-end AI Marketing Lab · Figures measured 13 October 2026 on live data.</span>
+  </div>
+</footer>
+
+<script>
+/* ── Reveal on scroll ────────────────────────────────────────────────
+   Fade plus 8px, once, at 220ms. Content ships VISIBLE in the markup and the
+   class is only added here — a page that renders hidden and waits for
+   JavaScript to reveal it is a page that shows nothing when the script fails. */
+const rvs = document.querySelectorAll('.rv');
+if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+  rvs.forEach(el => el.classList.add('in'));
+} else {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (!e.isIntersecting) return;
+      // 60ms stagger across whatever entered together, capped so a long
+      // section never queues a visible wait.
+      setTimeout(() => e.target.classList.add('in'), Math.min(i, 3) * 60);
+      io.unobserve(e.target);           // never re-animates on the way back up
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+  rvs.forEach(el => io.observe(el));
+}
+
+/* ── Sticky section nav ──────────────────────────────────────────────── */
+const nav   = document.getElementById('secnav');
+const mark  = document.getElementById('navmark');
+const links = [...nav.querySelectorAll('a')];
+const hero  = document.querySelector('.hero');
+
+function moveMark(a) {
+  if (!a) return;
+  mark.style.width = a.offsetWidth + 'px';
+  mark.style.transform = 'translateX(' + a.offsetLeft + 'px)';
+}
+new IntersectionObserver(([e]) => nav.classList.toggle('on', !e.isIntersecting),
+  { threshold: 0 }).observe(hero);
+
+const targets = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+/* IntersectionObserver only fires on CHANGES, so a section that was already on
+   screen never emits an entry and the marker goes stale — scrolling to week 3
+   left week 2 lit. This recomputes from scratch instead: the active section is
+   the last one whose top has passed the reading line, a third of the way down. */
+let ticking = false;
+function syncNav() {
+  ticking = false;
+  const line = innerHeight / 3;
+  let active = null;
+  for (const t of targets) {
+    if (t.getBoundingClientRect().top <= line) active = t;
+  }
+  // Past the last section (the footer), keep the last one lit rather than none.
+  if (!active && scrollY > 0) active = targets[0];
+  links.forEach(a => a.removeAttribute('aria-current'));
+  if (!active) { mark.style.width = '0px'; return; }
+  const a = links.find(x => x.getAttribute('href') === '#' + active.id);
+  if (a) { a.setAttribute('aria-current', 'true'); moveMark(a); }
+}
+addEventListener('scroll', () => {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(syncNav);
+}, { passive: true });
+addEventListener('resize', syncNav, { passive: true });
+syncNav();
+
+/* ── Copy buttons ────────────────────────────────────────────────────── */
+document.querySelectorAll('.prompt').forEach(box => {
+  const btn = box.querySelector('.copy');
+  const txt = box.querySelector('pre');
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(txt.textContent.trim()); }
+    catch { /* a denied clipboard is not worth an error dialog */ }
+    btn.textContent = 'Copied';
+    btn.dataset.done = '1';
+    setTimeout(() => { btn.textContent = 'Copy'; delete btn.dataset.done; }, 1600);
+  });
+});
+
+/* ── Video facade ────────────────────────────────────────────────────
+   The poster is a real screenshot of the tool, so the section says something
+   before anyone presses play — and YouTube's own furniture stays off an IE
+   page until it is asked for. */
+document.getElementById('video').addEventListener('click', function () {
+  this.innerHTML = '<iframe src="https://www.youtube.com/embed/nhxEy5DFKs8?autoplay=1&rel=0&modestbranding=1" '
+    + 'title="End-to-end AI Marketing Lab walkthrough" allow="accelerometer; autoplay; clipboard-write; '
+    + 'encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  this.style.cursor = 'default';
+}, { once: true });
+</script>
+</body>
+</html>
