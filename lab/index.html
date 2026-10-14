@@ -501,7 +501,7 @@ code{
       In six weeks you take a real client brief from analysis through strategy, creative
       direction and delivery, and publish a working tool that reads competitor prices every
       day and recommends what each product should cost. The tool is the proof, not the
-      whole answer. You will not write a line of code — you will describe what you want, in
+      whole answer. You will not write a line of code. You will describe what you want, in
       plain English, to an assistant that writes it for you.</p>
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
@@ -534,12 +534,12 @@ code{
 
     <div class="video rv">
       <iframe src="https://www.youtube-nocookie.com/embed/nhxEy5DFKs8?rel=0&amp;modestbranding=1"
-              title="End-to-end AI Marketing Lab — walkthrough of the finished tool"
+              title="End-to-end AI Marketing Lab, walkthrough of the finished tool"
               loading="lazy" allowfullscreen
               allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
-    <p class="cap">Fig. 01 — The finished tool, end to end.</p>
+    <p class="cap">Fig. 01. The finished tool, end to end.</p>
 
     <div class="grid3 rv">
       <div>
@@ -555,7 +555,7 @@ code{
       <div>
         <h4>What you leave with</h4>
         <p>A public web address showing 1,483 products, 16 competitors' prices, a
-           recommended price per model — and the ability to explain every number in it.</p>
+           recommended price per model, and the ability to explain every number in it.</p>
       </div>
     </div>
   </div>
@@ -570,7 +570,7 @@ code{
     <h2 class="rv">Where Forum Sport's prices sit today</h2>
     <p class="lead prose rv">Forum Sport is a Spanish sports retailer. Online, its price
       sits one tab away from every rival selling the same shoe. The question is not
-      whether shoppers compare — it is whether Forum Sport knows what they will find.</p>
+      whether shoppers compare. It is whether Forum Sport knows what they will find.</p>
 
     <div class="statline rv">
       <p class="bignum">73.3%</p>
@@ -588,7 +588,7 @@ code{
 <line x1="1003" y1="26" x2="1003" y2="456" stroke="#d8d8d8" stroke-width="1"/>
 <text x="1003" y="472" class="fg-ax" text-anchor="middle">+20%</text>
 <line x1="817" y1="20" x2="817" y2="456" stroke="#e3342f" stroke-width="2"/>
-<text x="817" y="14" class="fg-ax" text-anchor="middle" fill="#e3342f">PARITY</text>
+<text x="817" y="14" class="fg-ax" text-anchor="middle" style="fill:#e3342f">PARITY</text>
 <text x="198" y="50" class="fg-lb" text-anchor="end">Running Emotion</text>
 <rect x="816.7" y="38" width="205.3" height="16" fill="#2c2c2c"/>
 <text x="1030" y="50" class="fg-vl" text-anchor="start">+22.0%</text>
@@ -632,11 +632,11 @@ code{
 <rect x="239.9" y="428" width="576.8" height="16" fill="#9a9a9a"/>
 <text x="248" y="440" class="fg-vi" text-anchor="start">-61.8%</text>
 </svg></div>
-    <p class="cap">Fig. 02 — Average gap against each competitor, 13 October 2026. Positive means Forum Sport is dearer.</p>
+    <p class="cap">Fig. 02. Average gap against each competitor, 13 October 2026. Positive means Forum Sport is dearer.</p>
 
     <div class="prose rv" style="margin-top:var(--s-4)">
       <p>Read the bottom row before anything else. Tradeinn is not 62% cheaper on the
-        same shoe in the same condition — a number that extreme is a question, not an
+        same shoe in the same condition. A number that extreme is a question, not an
         answer. It is a marketplace clearing old stock, and it is telling you that your
         comparison is only as good as your matching. <strong>You will spend more of week 3
         on matching products than on fetching them.</strong></p>
@@ -720,9 +720,9 @@ code{
     </div>
     <div class="pillars-base rv">
       <span>Supported by automation</span>
-      <b>The agents and workflows behind the campaign · Claude Code · n8n · GA4</b>
+      <b>The agents and workflows behind the campaign · Claude Code · GA4</b>
     </div>
-    <p class="cap">Fig. 03 — The four assessed areas and the automation layer that supports them.</p>
+    <p class="cap">Fig. 03. The four assessed areas and the automation layer that supports them.</p>
 
     <h3 class="rv">The assignment</h3>
     <p class="prose rv">Inside that frame, the tool itself has three jobs, in one place.</p>
@@ -731,7 +731,7 @@ code{
         running shoes, every day, and keep every observation.</li>
       <li><b>Show the picture.</b> Put Forum Sport's catalogue, with photos, next to those
         competitor prices, so a manager sees at a glance where they are cheaper or dearer.</li>
-      <li><b>Recommend a price.</b> For each product, suggest one — and explain in plain
+      <li><b>Recommend a price.</b> For each product, suggest one, and explain in plain
         words why.</li>
     </ol>
 
@@ -740,15 +740,15 @@ code{
       <table>
         <thead><tr><th>What</th><th>Detail</th><th>Catch</th></tr></thead>
         <tbody>
-          <tr><td><b>The catalogue</b></td><td>One spreadsheet. 1,483 models, 24,109 sizes, 28 brands, with list price, sale price, stock level and rotation class.</td><td>One row is one size, not one product. Collapse it wrong and you report the average price of a shoe size.</td></tr>
+          <tr><td><b>The catalogue</b></td><td><a href="https://docs.google.com/spreadsheets/d/18wylq3JY7oh4eUJnOFq-mFa6bj-PonyeWbLZZfWMHjA/edit?usp=sharing" target="_blank" rel="noopener">One spreadsheet</a>. 1,483 models, 24,109 sizes, 28 brands, with list price, sale price, stock level and rotation class.</td><td>One row is one size, not one product. Collapse it wrong and you report the average price of a shoe size.</td></tr>
           <tr><td><b>The margin policy</b></td><td>Five price bands. Each sets a minimum margin in per cent <b>and</b> in euros, plus a maximum alignment against the reference competitor.</td><td>Both margin floors must hold, not whichever is convenient. See week 4.</td></tr>
-          <tr><td><b>The catalogue dimensions</b></td><td>Season, season year, online exclusive, outlet, extended catalogue, custom label, ABCD store, ABCD digital.</td><td>The client wants all eight as filters. Two of them have no documented meaning — ask before you build a rule on one.</td></tr>
+          <tr><td><b>The catalogue dimensions</b></td><td>Season, season year, online exclusive, outlet, extended catalogue, custom label, ABCD store, ABCD digital.</td><td>The client wants all eight as filters. Two of them have no documented meaning. Ask before you build a rule on one.</td></tr>
           <tr><td><b>Competitor prices</b></td><td>Nothing. You collect these yourself, from the open web, in week 3.</td><td>Matching their product to yours is harder than fetching it.</td></tr>
           <tr><td><b>Sales data</b></td><td>None. No units, no revenue, no traffic, no conversion.</td><td>This is the constraint that shapes the whole engine. See week 4.</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 04 — The material the client supplies, and the complication attached to each.</p>
+    <p class="cap">Fig. 04. The material the client supplies, and the complication attached to each.</p>
 
     <h3 class="rv">Scope: what is included and what is not</h3>
     <div class="tbl rv">
@@ -771,7 +771,7 @@ code{
         do not, you can say which input differed.</p></div>
       <div><b>Explainable</b><p>Every recommendation carries one sentence a buyer could read
         aloud in a meeting, naming the rule that decided it.</p></div>
-      <div><b>Honest about itself</b><p>Where the data is thin, the tool says so on the row —
+      <div><b>Honest about itself</b><p>Where the data is thin, the tool says so on the row,
         not in a footnote, and not only to the person who built it.</p></div>
       <div><b>Usable weekly</b><p>A category manager opens it, filters to their brand, and
         leaves with a list. No training session required.</p></div>
@@ -804,7 +804,7 @@ code{
           <tr>
             <td><b>Brand and creative direction</b></td>
             <td class="wt">25%</td>
-            <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down — not generated and accepted.</td>
+            <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down, not generated and accepted.</td>
             <td>The brand is applied correctly but without decisions you can explain.</td>
             <td>Default styling, or a brand pasted on at the end.</td>
           </tr>
@@ -825,7 +825,7 @@ code{
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 05 — The assessment rubric: four areas at equal weight, three bands each.</p>
+    <p class="cap">Fig. 05. The assessment rubric: four areas at equal weight, three bands each.</p>
 
     <h4 class="rv" style="margin-top:var(--s-6)">Applied across every area</h4>
     <div class="tbl rv">
@@ -834,7 +834,7 @@ code{
         <tbody>
           <tr><td><b>Analysis and strategy, not only implementation</b></td><td>The brief asks for all three. A tool that runs, with no analysis behind it and no argument in front of it, is an unfinished answer however well it works.</td></tr>
           <tr><td><b>Honesty about limits</b></td><td>What the solution cannot do is stated by you, in the deliverable, before the client finds it. Claiming an optimum you cannot compute costs more than admitting the gap.</td></tr>
-          <tr><td><b>Automation that earns its place</b></td><td>The agents and workflows behind the campaign — Claude Code, n8n, GA4 — do work a person would otherwise repeat. Automation for its own sake is not credit.</td></tr>
+          <tr><td><b>Automation that earns its place</b></td><td>The agents and workflows behind the campaign, Claude Code and GA4, do work a person would otherwise repeat. Automation for its own sake is not credit.</td></tr>
           <tr><td><b>The client could run it on Monday</b></td><td>A handover someone outside the team can follow, in their language, without you in the room.</td></tr>
         </tbody>
       </table>
@@ -842,13 +842,13 @@ code{
 
     <div class="warn rv">
       <h4 style="margin-top:0">Three of the four requested changes are still open</h4>
-      <p>Forum Sport asked for four changes on the MVP, and only one — the band matrix —
+      <p>Forum Sport asked for four changes on the MVP, and only one, the band matrix,
         is fully solved in the reference build. <b>Season timing</b> is
-        not modelled at all. <b>Store context</b> is half done — outlet and old season move the
+        not modelled at all. <b>Store context</b> is half done. Outlet and old season move the
         price, extended catalogue and online exclusive do not. And the <b>reference
         competitor</b> is the hard one: the client says each product has a chosen reference,
         but <b>the rule that chooses it is not shared</b>. Without that rule you can offer a
-        selector — cheapest, mean, median — and let a human pick, but you cannot derive it.
+        selector with cheapest, mean and median, and let a human pick, but you cannot derive it.
         Say that to them rather than guessing. A pricing tool that invents the client's own
         policy is worse than one that admits the gap.</p>
     </div>
@@ -871,9 +871,8 @@ code{
           <tr><td><b>Claude Code</b></td><td>A colleague who writes the code when you describe, in normal language, what you want.</td><td>Describe, correct, ask why.</td><td>Week 1</td></tr>
           <tr><td><b>GitHub</b></td><td>A shared folder that keeps every version, like Google Docs history.</td><td>Work as a team, undo mistakes.</td><td>Week 1</td></tr>
           <tr><td><b>Vercel</b></td><td>Puts your project on the internet with one click.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
-          <tr><td><b>Supabase</b></td><td>An online database — a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
+          <tr><td><b>Supabase</b></td><td>An online database, a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
           <tr><td><b>MCP server</b></td><td>A plug that lets the assistant talk to a service directly.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
-          <tr><td><b>n8n</b></td><td>A board where you draw a workflow — when this happens, do that — instead of writing it.</td><td>Run the agents and automations behind the campaign.</td><td>Week 3</td></tr>
           <tr><td><b>GA4</b></td><td>Google Analytics. It records what people actually do on a site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
         </tbody>
       </table>
@@ -882,24 +881,25 @@ code{
     <div class="fig rv" style="margin-top:var(--s-6)">
       <svg viewBox="0 0 900 260" role="img" aria-label="The assistant in the centre, plugged into Supabase, GitHub and Vercel." class="figsvg">
         <style>.fg-bx{fill:#fff;stroke:#d8d8d8;stroke-width:1}.fg-bl{font:700 12px var(--font-sans);fill:#0a1a3c;letter-spacing:.06em}
-          .fg-sm{font:400 11px var(--font-sans);fill:#6b6b6b}.fg-ar{stroke:#6b6b6b;stroke-width:1;fill:none}</style>
-        <rect class="fg-fg-bx" x="330" y="100" width="240" height="60" fill="#0a1a3c" stroke="#0a1a3c"/>
-        <text x="450" y="126" class="fg-fg-bl" fill="#fff" text-anchor="middle">THE ASSISTANT</text>
-        <text x="450" y="146" class="fg-fg-sm" fill="#c9d2e6" text-anchor="middle">you type here, in English</text>
-        <rect class="fg-fg-bx" x="40" y="20" width="200" height="54"/><text x="140" y="44" class="fg-fg-bl" text-anchor="middle">SUPABASE</text><text x="140" y="62" class="fg-fg-sm" text-anchor="middle">the database</text>
-        <rect class="fg-fg-bx" x="40" y="186" width="200" height="54"/><text x="140" y="210" class="fg-fg-bl" text-anchor="middle">GITHUB</text><text x="140" y="228" class="fg-fg-sm" text-anchor="middle">the history</text>
-        <rect class="fg-fg-bx" x="660" y="103" width="200" height="54"/><text x="760" y="127" class="fg-fg-bl" text-anchor="middle">VERCEL</text><text x="760" y="145" class="fg-fg-sm" text-anchor="middle">the public address</text>
-        <path class="fg-fg-ar" d="M240 47 H290 V118 H330"/><path class="fg-fg-ar" d="M240 213 H290 V142 H330"/><path class="fg-fg-ar" d="M570 130 H660"/>
+          .fg-sm{font:400 11px var(--font-sans);fill:#6b6b6b}.fg-ar{stroke:#6b6b6b;stroke-width:1;fill:none}
+          .fg-bxn{fill:#0a1a3c;stroke:#0a1a3c;stroke-width:1}.fg-bln{font:700 12px var(--font-sans);fill:#fff;letter-spacing:.06em}.fg-smn{font:400 11px var(--font-sans);fill:#c9d2e6}</style>
+        <rect class="fg-bxn" x="330" y="100" width="240" height="60"/>
+        <text x="450" y="126" class="fg-bln" text-anchor="middle">THE ASSISTANT</text>
+        <text x="450" y="146" class="fg-smn" text-anchor="middle">you type here, in English</text>
+        <rect class="fg-bx" x="40" y="20" width="200" height="54"/><text x="140" y="44" class="fg-bl" text-anchor="middle">SUPABASE</text><text x="140" y="62" class="fg-sm" text-anchor="middle">the database</text>
+        <rect class="fg-bx" x="40" y="186" width="200" height="54"/><text x="140" y="210" class="fg-bl" text-anchor="middle">GITHUB</text><text x="140" y="228" class="fg-sm" text-anchor="middle">the history</text>
+        <rect class="fg-bx" x="660" y="103" width="200" height="54"/><text x="760" y="127" class="fg-bl" text-anchor="middle">VERCEL</text><text x="760" y="145" class="fg-sm" text-anchor="middle">the public address</text>
+        <path class="fg-ar" d="M240 47 H290 V118 H330"/><path class="fg-ar" d="M240 213 H290 V142 H330"/><path class="fg-ar" d="M570 130 H660"/>
         <path d="M322 114 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M322 138 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M652 126 l8 4 -8 4 z" fill="#6b6b6b"/>
-        <text x="285" y="92" class="fg-fg-sm" text-anchor="middle">MCP</text>
+        <text x="285" y="92" class="fg-sm" text-anchor="middle">MCP</text>
       </svg>
     </div>
-    <p class="cap">Fig. 06 — The MCP server lets the assistant query each service directly, instead of you copying data between them.</p>
+    <p class="cap">Fig. 06. The MCP server lets the assistant query each service directly, instead of you copying data between them.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">The two Supabase keys, and which one may be published</h4>
-      <p>Supabase gives you two. The <b>publishable</b> key may live inside a web page —
-        the database's own rules keep it to reading. The <b>service_role</b> key ignores
+      <p>Supabase gives you two. The <b>publishable</b> key may live inside a web page.
+        The database's own rules keep it to reading. The <b>service_role</b> key ignores
         every rule. Never paste it into a chat, a page, or GitHub. If you do, rotate it
         immediately; assume it is public forever.</p>
     </div>
@@ -918,50 +918,50 @@ code{
     <div class="fig rv"><svg viewBox="0 0 1180 246" role="img" aria-label="The six weeks and what each one ends with: a live page, the catalogue in a database, competitor prices, a recommendation engine, the brand and experience, and the client presentation." class="figsvg">
 <style>.fg-wn{font:800 13px var(--font-display);fill:#e3342f;letter-spacing:.08em}.fg-wt{font:700 13px var(--font-sans);fill:#0a1a3c}.fg-wd{font:400 12px var(--font-sans);fill:#6b6b6b}.fg-hd{font:700 10px var(--font-sans);fill:#6b6b6b;letter-spacing:.12em}</style>
 <line x1="86" y1="112" x2="1094" y2="112" stroke="#d8d8d8" stroke-width="1"/>
-<text x="4" y="172" class="fg-fg-hd">YOU LEAVE WITH</text>
+<text x="4" y="172" class="fg-hd">YOU LEAVE WITH</text>
 <rect x="82.5" y="108.5" width="7" height="7" fill="#0a1a3c"/>
-<text x="86" y="60" class="fg-fg-wn" text-anchor="middle">WEEK 01</text>
-<text x="86" y="80" class="fg-fg-wt" text-anchor="middle">Accounts and</text>
-<text x="86" y="95" class="fg-fg-wt" text-anchor="middle">first page</text>
-<text x="86" y="194" class="fg-fg-wd" text-anchor="middle">A live page</text>
-<text x="86" y="210" class="fg-fg-wd" text-anchor="middle">with your name</text>
+<text x="86" y="60" class="fg-wn" text-anchor="middle">WEEK 01</text>
+<text x="86" y="80" class="fg-wt" text-anchor="middle">Accounts and</text>
+<text x="86" y="95" class="fg-wt" text-anchor="middle">first page</text>
+<text x="86" y="194" class="fg-wd" text-anchor="middle">A live page</text>
+<text x="86" y="210" class="fg-wd" text-anchor="middle">with your name</text>
 <path d="M274 108 l6 4 -6 4 z" fill="#d8d8d8"/>
 <rect x="284.1" y="108.5" width="7" height="7" fill="#0a1a3c"/>
-<text x="288" y="60" class="fg-fg-wn" text-anchor="middle">WEEK 02</text>
-<text x="288" y="80" class="fg-fg-wt" text-anchor="middle">Catalogue in</text>
-<text x="288" y="95" class="fg-fg-wt" text-anchor="middle">a database</text>
-<text x="288" y="194" class="fg-fg-wd" text-anchor="middle">Your catalogue,</text>
-<text x="288" y="210" class="fg-fg-wd" text-anchor="middle">1,483 models</text>
+<text x="288" y="60" class="fg-wn" text-anchor="middle">WEEK 02</text>
+<text x="288" y="80" class="fg-wt" text-anchor="middle">Catalogue in</text>
+<text x="288" y="95" class="fg-wt" text-anchor="middle">a database</text>
+<text x="288" y="194" class="fg-wd" text-anchor="middle">Your catalogue,</text>
+<text x="288" y="210" class="fg-wd" text-anchor="middle">1,483 models</text>
 <path d="M475 108 l6 4 -6 4 z" fill="#d8d8d8"/>
 <rect x="485.7" y="108.5" width="7" height="7" fill="#0a1a3c"/>
-<text x="489" y="60" class="fg-fg-wn" text-anchor="middle">WEEK 03</text>
-<text x="489" y="80" class="fg-fg-wt" text-anchor="middle">Competitor</text>
-<text x="489" y="95" class="fg-fg-wt" text-anchor="middle">prices</text>
-<text x="489" y="194" class="fg-fg-wd" text-anchor="middle">Competitor prices in</text>
-<text x="489" y="210" class="fg-fg-wd" text-anchor="middle">your database</text>
+<text x="489" y="60" class="fg-wn" text-anchor="middle">WEEK 03</text>
+<text x="489" y="80" class="fg-wt" text-anchor="middle">Competitor</text>
+<text x="489" y="95" class="fg-wt" text-anchor="middle">prices</text>
+<text x="489" y="194" class="fg-wd" text-anchor="middle">Competitor prices in</text>
+<text x="489" y="210" class="fg-wd" text-anchor="middle">your database</text>
 <path d="M677 108 l6 4 -6 4 z" fill="#d8d8d8"/>
 <rect x="687.3" y="108.5" width="7" height="7" fill="#0a1a3c"/>
-<text x="691" y="60" class="fg-fg-wn" text-anchor="middle">WEEK 04</text>
-<text x="691" y="80" class="fg-fg-wt" text-anchor="middle">Recommendation</text>
-<text x="691" y="95" class="fg-fg-wt" text-anchor="middle">engine</text>
-<text x="691" y="194" class="fg-fg-wd" text-anchor="middle">A recommended price</text>
-<text x="691" y="210" class="fg-fg-wd" text-anchor="middle">per model</text>
+<text x="691" y="60" class="fg-wn" text-anchor="middle">WEEK 04</text>
+<text x="691" y="80" class="fg-wt" text-anchor="middle">Recommendation</text>
+<text x="691" y="95" class="fg-wt" text-anchor="middle">engine</text>
+<text x="691" y="194" class="fg-wd" text-anchor="middle">A recommended price</text>
+<text x="691" y="210" class="fg-wd" text-anchor="middle">per model</text>
 <path d="M878 108 l6 4 -6 4 z" fill="#d8d8d8"/>
 <rect x="888.9" y="108.5" width="7" height="7" fill="#0a1a3c"/>
-<text x="892" y="60" class="fg-fg-wn" text-anchor="middle">WEEK 05</text>
-<text x="892" y="80" class="fg-fg-wt" text-anchor="middle">Brand and</text>
-<text x="892" y="95" class="fg-fg-wt" text-anchor="middle">experience</text>
-<text x="892" y="194" class="fg-fg-wd" text-anchor="middle">The tool in</text>
-<text x="892" y="210" class="fg-fg-wd" text-anchor="middle">the client's brand</text>
+<text x="892" y="60" class="fg-wn" text-anchor="middle">WEEK 05</text>
+<text x="892" y="80" class="fg-wt" text-anchor="middle">Brand and</text>
+<text x="892" y="95" class="fg-wt" text-anchor="middle">experience</text>
+<text x="892" y="194" class="fg-wd" text-anchor="middle">The tool in</text>
+<text x="892" y="210" class="fg-wd" text-anchor="middle">the client's brand</text>
 <path d="M1080 108 l6 4 -6 4 z" fill="#d8d8d8"/>
 <rect x="1090.5" y="108.5" width="7" height="7" fill="#0a1a3c"/>
-<text x="1094" y="60" class="fg-fg-wn" text-anchor="middle">WEEK 06</text>
-<text x="1094" y="80" class="fg-fg-wt" text-anchor="middle">Client</text>
-<text x="1094" y="95" class="fg-fg-wt" text-anchor="middle">presentation</text>
-<text x="1094" y="194" class="fg-fg-wd" text-anchor="middle">A live link</text>
-<text x="1094" y="210" class="fg-fg-wd" text-anchor="middle">and a demo</text>
+<text x="1094" y="60" class="fg-wn" text-anchor="middle">WEEK 06</text>
+<text x="1094" y="80" class="fg-wt" text-anchor="middle">Client</text>
+<text x="1094" y="95" class="fg-wt" text-anchor="middle">presentation</text>
+<text x="1094" y="194" class="fg-wd" text-anchor="middle">A live link</text>
+<text x="1094" y="210" class="fg-wd" text-anchor="middle">and a demo</text>
 </svg></div>
-    <p class="cap">Fig. 07 — The six weeks and the deliverable each one ends with.</p>
+    <p class="cap">Fig. 07. The six weeks and the deliverable each one ends with.</p>
   </div>
 </section>
 
@@ -974,13 +974,13 @@ code{
           </div>
     <h2 class="rv">Setting up your accounts and publishing a first page</h2>
     <p class="wk-goal rv">By tonight there is a web address, on the real internet, with
-      your team name on it — and you got there by typing English.</p>
+      your team name on it, and you got there by typing English.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
-      <li>A GitHub account — free, use your IE email</li>
-      <li>A Vercel account — <b>sign up with GitHub</b>, not with email</li>
-      <li>A Supabase account — sign up with GitHub</li>
+      <li>A GitHub account, free, with your IE email</li>
+      <li>A Vercel account, <b>signed up with GitHub</b>, not with email</li>
+      <li>A Supabase account, signed up with GitHub</li>
       <li>Claude Code installed</li>
       <li>A folder on your Desktop called <code>forum-sport-&lt;team&gt;</code></li>
       <li>Nothing else. No Python, no database software</li>
@@ -1003,7 +1003,7 @@ code{
         not a terminal, and nothing it suggests runs until you click Yes.</p></div>
       <div><b>Put it on GitHub</b><p>Paste the second prompt below. It will ask permission
         before each command: read the line, then click Yes. A browser window opens for
-        GitHub — click Authorize.</p></div>
+        GitHub. Click Authorize.</p></div>
       <div><b>Publish</b><p>vercel.com → <b>Add New</b> → <b>Project</b> → import the
         repository you just created → <b>Deploy</b>. About forty seconds. Vercel shows a
         URL ending <code>.vercel.app</code>. Open it on your phone. That is your page, on
@@ -1011,25 +1011,25 @@ code{
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 1 of 2</span><button class="copy" type="button">Copy</button></div>
-      <pre>I am a marketing student and I do not write code. In this folder, create a single file called index.html: one page, no build step, no frameworks, nothing to install. It should show the team name "Team &lt;NAME&gt;" as a large heading, the line "Dynamic pricing lab — Forum Sport" under it, and today's date. White background, dark navy text, one sans-serif font, everything in a centred column no wider than 760px.
+      <div class="prompt-h"><span>Copy this prompt, 1 of 2</span><button class="copy" type="button">Copy</button></div>
+      <pre>I am a marketing student and I do not write code. In this folder, create a single file called index.html: one page, no build step, no frameworks, nothing to install. It should show the team name "Team &lt;NAME&gt;" as a large heading, the line "Dynamic pricing lab, Forum Sport" under it, and today's date. White background, dark navy text, one sans-serif font, everything in a centred column no wider than 760px.
 
 Then explain to me in three sentences, with no technical words, what the file you just made actually is and how a browser turns it into what I see.</pre>
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 2 of 2</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 2 of 2</span><button class="copy" type="button">Copy</button></div>
       <pre>Publish this folder, step by step, and stop before each step to tell me what you are about to do.
 
 1) Create a private GitHub repository called forum-sport-&lt;TEAM&gt; and push this folder into it.
 2) Tell me in one sentence each what "commit" and "push" mean, as if I had never heard either word.
-3) Then tell me exactly what to click on vercel.com to connect that repository and publish it — I will do that part myself in the browser.
+3) Then tell me exactly what to click on vercel.com to connect that repository and publish it. I will do that part myself in the browser.
 
 Do not install anything that is not strictly needed, and tell me before you install anything at all.</pre>
     </div>
 
     <div class="gotcha rv">
-      <p>It asks permission to run a command. That is normal — it always asks before it acts.</p>
+      <p>It asks permission to run a command. That is normal. It always asks before it acts.</p>
       <p>Vercel complains about an output directory. Reply to the assistant with the exact error text, pasted whole.</p>
     </div>
 
@@ -1045,23 +1045,41 @@ Do not install anything that is not strictly needed, and tell me before you inst
             <p class="sec-sub">Data</p>
           </div>
     <h2 class="rv">Loading the catalogue into a database</h2>
-    <p class="wk-goal rv">The client's spreadsheet — 24,109 rows — stops being a file on
+    <p class="wk-goal rv">The client&rsquo;s spreadsheet, 24,109 rows, stops being a file on
       your laptop and becomes a database your web page can ask questions of.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
       <li>A Supabase project, region in Europe</li>
       <li>The database password saved somewhere you will find it again</li>
-      <li>The client's Excel saved into the folder, untouched</li>
+      <li>The dataset below saved into the folder, untouched</li>
       <li>The Supabase MCP server connected to the assistant</li>
       <li>You can find Project Settings → API and name the two keys</li>
     </ul>
+
+    <a class="src rv" href="https://docs.google.com/spreadsheets/d/18wylq3JY7oh4eUJnOFq-mFa6bj-PonyeWbLZZfWMHjA/edit?usp=sharing"
+       target="_blank" rel="noopener">
+      <span class="src-tag">The dataset</span>
+      <span class="src-body">
+        <b>Forum Sport Dataset</b>
+        Three tabs. <strong>database</strong> holds the catalogue itself, 24,109 rows by
+        30 columns, one row per size. <strong>fields</strong> says what every column means
+        and whether it belongs to the model or to the size. <strong>dimension values</strong>
+        holds the pivot tables that give you the totals your load has to match: 1,483
+        models, 984 running and 499 trail.
+      </span>
+      <span class="src-arw">&rarr;</span>
+    </a>
+
+    <p class="prose rv" style="margin-top:var(--s-4)">Download it as an Excel file into a
+      <code>dataset/</code> folder inside your project, and do not edit it. Every number the
+      tool reports has to be traceable back to this file exactly as the client sent it.</p>
 
     <h3 class="rv">What you do</h3>
     <ol class="steps rv">
       <li>Create the Supabase project and find its two keys.</li>
       <li>Plug the assistant into Supabase.</li>
-      <li>Make it read the Excel and tell you what is in it — <b>before</b> loading anything.</li>
+      <li>Make it read the Excel and tell you what is in it, <b>before</b> loading anything.</li>
       <li>Load the data, and check it against totals you already know.</li>
       <li>Build a catalogue page that reads live from the database.</li>
     </ol>
@@ -1077,13 +1095,13 @@ Do not install anything that is not strictly needed, and tell me before you inst
         Connected. From now on you can ask "how many models are there?" and it asks the
         database itself instead of guessing.</p></div>
       <div><b>Read before loading</b><p>This is the week's real lesson. In the reference
-        build the two boring tabs of the workbook — a field dictionary and a pivot table —
+        build the two boring tabs of the workbook, a field dictionary and a pivot table,
         turned out to be the most valuable: one explained the business grain, the other
         became the test that proved the load was correct.</p></div>
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · profile before you load</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 1 of 3 · profile before you load</span><button class="copy" type="button">Copy</button></div>
       <pre>Before we load anything, read the Excel file in dataset/ and profile it. For every column tell me: how many values are empty, how many distinct values there are, the type, and the three most common values.
 
 Then answer in plain language:
@@ -1096,10 +1114,10 @@ Do not change the file and do not create any tables yet. Give me a short table p
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · load, and prove it loaded</span><button class="copy" type="button">Copy</button></div>
-      <pre>Now design the database in Supabase: three tables — models, skus, brands. One row per model in models, one row per size in skus.
+      <div class="prompt-h"><span>Copy this prompt, 2 of 3 · load, and prove it loaded</span><button class="copy" type="button">Copy</button></div>
+      <pre>Now design the database in Supabase: three tables: models, skus, brands. One row per model in models, one row per size in skus.
 
-Before loading, write down the totals we expect: 1,483 models, 24,109 SKUs, 28 brands. After loading, run the counts and show me expected against actual, side by side. If any number disagrees, stop and tell me — do not fix it quietly.
+Before loading, write down the totals we expect: 1,483 models, 24,109 SKUs, 28 brands. After loading, run the counts and show me expected against actual, side by side. If any number disagrees, stop and tell me. Do not fix it quietly.
 
 Any column that is calculated from other columns, such as the net price, must be calculated by the database, not imported, so it can never drift.
 
@@ -1107,8 +1125,8 @@ Use the Supabase connection, explain each step before running it, and never writ
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · the catalogue page</span><button class="copy" type="button">Copy</button></div>
-      <pre>Add a second page: the catalogue. It reads live from Supabase using the publishable key and shows one row per model — image, brand, model name, list price, sale price, discount %, stock level.
+      <div class="prompt-h"><span>Copy this prompt, 3 of 3 · the catalogue page</span><button class="copy" type="button">Copy</button></div>
+      <pre>Add a second page: the catalogue. It reads live from Supabase using the publishable key and shows one row per model: image, brand, model name, list price, sale price, discount %, stock level.
 
 Add a search box and a brand filter. 1,483 rows is too many for one screen, so paginate at 50 with a "rows per page" control, and make the column headers sortable by clicking.
 
@@ -1120,10 +1138,10 @@ When you are done, tell me which key you used and why it is safe for that key to
     <div class="shot rv">
       <img src="/lab/assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="2320" height="1240">
     </div>
-    <p class="cap">Fig. 08 — The product explorer: one row per model, with each competitor's price and the difference underneath.</p>
+    <p class="cap">Fig. 08. The product explorer: one row per model, with each competitor's price and the difference underneath.</p>
 
     <div class="gotcha rv">
-      <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet — tell the assistant exactly that sentence.</p>
+      <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet. Tell the assistant exactly that sentence.</p>
       <p>Half the barcodes are 12 digits, not 13. Leave it. Week 3 explains why it decides everything.</p>
     </div>
 
@@ -1139,7 +1157,7 @@ When you are done, tell me which key you used and why it is safe for that key to
             <p class="sec-sub">Scraping</p>
           </div>
     <h2 class="rv">Collecting competitor prices</h2>
-    <p class="wk-goal rv">Your database stops being about you — by the end of the session
+    <p class="wk-goal rv">Your database stops being about you. By the end of the session
       it holds what other shops charge for the same shoe, today.</p>
 
     <h3 class="rv">Before you start</h3>
@@ -1154,7 +1172,7 @@ When you are done, tell me which key you used and why it is safe for that key to
     <ol class="steps rv">
       <li>Read three competitors' rules and record what they say.</li>
       <li>Fetch one product page and find the price in it, by eye.</li>
-      <li>Match their product to yours — barcode first, article code second.</li>
+      <li>Match their product to yours, barcode first, article code second.</li>
       <li>Store every observation; never overwrite a price.</li>
       <li>Set the two rhythms: discover weekly, refresh daily.</li>
     </ol>
@@ -1163,7 +1181,7 @@ When you are done, tell me which key you used and why it is safe for that key to
     <div class="how rv">
       <div><b>Read the rules</b><p>Type the shop's address and add <code>/robots.txt</code>.
         It is a plain text file, published to be read. <code>Disallow: /</code> means do not
-        crawl — but read <b>who</b> it applies to. Write down what you found, and the date
+        crawl, but read <b>who</b> it applies to. Write down what you found, and the date
         you found it.</p></div>
       <div><b>Find the price by eye</b><p>Open any competitor product page. Right-click →
         View page source → Ctrl+F for <code>gtin13</code>. The block inside
@@ -1177,7 +1195,7 @@ When you are done, tell me which key you used and why it is safe for that key to
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · fetch one page, politely</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 1 of 3 · fetch one page, politely</span><button class="copy" type="button">Copy</button></div>
       <pre>Pick one product page from a competitor and fetch it once: with an honest user agent that identifies us as a student project, obeying robots.txt, one request at a time, with a two-second wait. Do not use a headless browser and do not pretend to be a person.
 
 From the page extract: product name, brand, barcode (gtin13), manufacturer code (mpn), price, currency, in stock yes/no.
@@ -1186,12 +1204,12 @@ Show me the raw block of structured data you took it from, then the clean result
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · the one that decides the week</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 2 of 3 · the one that decides the week</span><button class="copy" type="button">Copy</button></div>
       <pre>Now match their products to ours, with two keys, in this order.
 
-First the barcode: our EANs are stored as a mix of 12-digit and 13-digit numbers and competitors publish 13 digits, so pad ours to 13 with a leading zero before comparing — and tell me how many of our EANs are 12 digits, because if we skip this we lose most of our matches.
+First the barcode: our EANs are stored as a mix of 12-digit and 13-digit numbers and competitors publish 13 digits, so pad ours to 13 with a leading zero before comparing, and tell me how many of our EANs are 12 digits, because if we skip this we lose most of our matches.
 
-Second, when there is no barcode, the supplier article code, matched at model level: accept a match when their code equals ours, OR when the part of their code before the first hyphen equals ours — Nike publishes FQ7262-103 against our CD4371-style codes, Saucony publishes S29101-01 exactly as we store it.
+Second, when there is no barcode, the supplier article code, matched at model level: accept a match when their code equals ours, OR when the part of their code before the first hyphen equals ours. Nike publishes FQ7262-103 against our CD4371-style codes, Saucony publishes S29101-01 exactly as we store it.
 
 Store each observed price as a new row with a timestamp. Never update a price in place: a recommendation has to be traceable back to the observation behind it.
 
@@ -1199,7 +1217,7 @@ Then report how many of our 1,483 models now have at least one competitor price,
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · two rhythms</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 3 of 3 · two rhythms</span><button class="copy" type="button">Copy</button></div>
       <pre>Split the crawl in two.
 
 A weekly "discover" job that walks the competitor's sitemap, keeps only URLs that could be a running or trail shoe of a brand we stock, fetches them, and records which ones matched our catalogue.
@@ -1221,7 +1239,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
       <span class="src-tag">Shared sheet</span>
       <span class="src-body">
         <b>Forum Sports Competitors</b>
-        39 sellers, 389,469 records between them — 21 sports specialists, 6 running
+        39 sellers, 389,469 records between them: 21 sports specialists, 6 running
         specialists, 7 brands selling direct, 4 general retailers and 1 price comparison
         site, each with its record count and its address.
       </span>
@@ -1229,8 +1247,8 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     </a>
 
     <p class="prose rv" style="margin-top:var(--s-4)">Record count is a reasonable first
-      filter — a seller appearing 69,368 times carries more of the catalogue than one
-      appearing five times — but it is not the only one. A brand selling direct prices
+      filter. A seller appearing 69,368 times carries more of the catalogue than one
+      appearing five times, but it is not the only one. A brand selling direct prices
       differently from a marketplace, and a price comparison site is not a shop at all.
       Pick three you can defend, write down why, and move on: the second filter is the one
       below, and you cannot know it until you try.</p>
@@ -1238,7 +1256,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <h3 class="rv">Which shops answer a plain request</h3>
     <p class="prose rv">This is the real result from the reference build, and it is the
       most useful table on this page. The pattern is not about your code or your user
-      agent — it is about what sits in front of the shop.</p>
+      agent. It is about what sits in front of the shop.</p>
     <div class="tbl rv">
       <table>
         <thead><tr><th>Competitor</th><th>In front of it</th><th>A plain, honest request</th></tr></thead>
@@ -1250,7 +1268,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
           <tr><td>Tradeinn</td><td>nginx</td><td>Answers</td></tr>
           <tr><td>Salomon</td><td>Vercel</td><td>Answers</td></tr>
           <tr><td>i-Run</td><td>Akamai</td><td>Answers</td></tr>
-          <tr><td>JD Sports</td><td>—</td><td>Answers</td></tr>
+          <tr><td>JD Sports</td><td>None</td><td>Answers</td></tr>
           <tr><td>Top4Running</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
           <tr><td>Bergfreunde</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
           <tr><td>Décimas</td><td><b>Cloudflare</b></td><td>Refuses</td></tr>
@@ -1260,13 +1278,13 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 09 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+    <p class="cap">Fig. 09. Five of five Cloudflare sites refuse. None of the eight without it do.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Why changing the user agent does not help</h4>
       <p>We tested it. One Cloudflare site refuses an honest crawler <i>and</i> a
         browser-looking one, from the same computer. Cloudflare is not reading the name you
-        send — it is reading the shape of the connection itself, which a simple program
+        send. It is reading the shape of the connection itself, which a simple program
         cannot fake. Going further is a legal and commercial decision, not a technical one.
         <b>It stops here.</b></p>
     </div>
@@ -1294,7 +1312,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <div class="warn rv" style="margin-top:0">
       <h4 style="margin-top:0">Why this is a recommender and not an optimiser</h4>
       <p>There is no sales data. No units sold, no traffic, no conversion. Without demand
-        there is no elasticity, and without elasticity there is no optimum — anyone who
+        there is no elasticity, and without elasticity there is no optimum. Anyone who
         offers you one is selling you something. What the data does support is a
         rule-based recommender: a target position against a reference competitor, adjusted
         for stock, held inside a floor and a ceiling the client's own policy fixes.
@@ -1314,7 +1332,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
       <li>Pick the reference: the cheapest rival, the mean, or the median.</li>
       <li>Set a target position per rotation class.</li>
       <li>Adjust it for stock, outlet and old season.</li>
-      <li>Clamp it inside the client's band matrix — and decide who wins when floor and ceiling collide.</li>
+      <li>Clamp it inside the client&rsquo;s band matrix, and decide who wins when floor and ceiling collide.</li>
       <li>Score the data quality, separately from the price.</li>
     </ol>
 
@@ -1323,42 +1341,42 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
       <div><b>Target by rotation</b><p>Bestsellers set the price perception, so they sit
         closest to the rival. AA 100% of the reference, A 102, B 105, C 108, D 112,
         unclassified 106. Measured today Forum Sport sits at AA 109.8 · A 106.8 · B 109.9 ·
-        C 110.5 · D 115.0 — so every target is a cut, and the deepest cut falls on the most
+        C 110.5 · D 115.0, so every target is a cut, and the deepest cut falls on the most
         visible products.</p></div>
       <div><b>Adjust for stock</b><p>Discounting what you barely have left is giving away
         margin. Very high stock −4 points, high −2, medium 0, low +2, very low +4.</p></div>
       <div><b>Adjust for context</b><p>Outlet −3 points. Previous season −3 points.</p></div>
       <div><b>The barriers</b><p>Five price bands. Each demands a minimum margin <b>in per
-        cent and in euros — both, not whichever is convenient</b> — and sets a maximum
+        cent and in euros, both of them, not whichever is convenient</b>, and sets a maximum
         alignment against the reference. The two floors are not redundant: the euro floor is
         the binding one on 212 models, and on 64 of the 79 in the top band. When floor and
-        ceiling contradict each other — on <b>495 of 1,483 models</b> — margin wins, and the
+        ceiling contradict each other, on <b>495 of 1,483 models</b>, margin wins, and the
         row says so out loud.</p></div>
     </div>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
     </div>
-    <p class="cap">Fig. 10 — The client's five price bands, editable on screen. The values are the client's, not ours.</p>
+    <p class="cap">Fig. 10. The client's five price bands, editable on screen. The values are the client's, not ours.</p>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
       <pre>Build the pricing recommender. It is not an optimiser: we have no units sold, no traffic and no conversion, so an economic optimum is not computable, and the page must say that in plain words.
 
 1) Reference price = the cheapest observed competitor price for that model, switchable to the mean or the median of rivals.
 2) Target position as a % of that reference, by rotation class: AA 100, A 102, B 105, C 108, D 112, unclassified 106.
-3) Adjust in percentage points by stock — very high −4, high −2, medium 0, low +2, very low +4 — then outlet −3 and previous season −3.
+3) Adjust in percentage points by stock: very high −4, high −2, medium 0, low +2, very low +4. Then outlet −3 and previous season −3.
 4) Clamp with the client's band matrix, choosing the band from the CURRENT SELLING PRICE, not the list price, with bands [0,30), [30,60), [60,100), [100,200), [200,∞): minimum margins of 30/27/24/20/18 % AND 2/8/14/20/36 €, both of which must hold, and maximum alignment against the reference of 102/101/100/99/98 %.
 5) Round to the nearest euro, and never let rounding break a barrier.
 
-When the margin floor and the alignment ceiling contradict each other, margin wins — and the row must say in words that it did. Every recommendation carries a one-line reason a buyer could read aloud.
+When the margin floor and the alignment ceiling contradict each other, margin wins, and the row must say in words that it did. Every recommendation carries a one-line reason a buyer could read aloud.
 
 Finally, tell me how many models end up in that contradiction.</pre>
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · confidence</span><button class="copy" type="button">Copy</button></div>
-      <pre>Add a confidence score from 0 to 100 to every recommendation. It measures the quality of the market data, not how sure we are about the price — put that sentence on the page where nobody can miss it.
+      <div class="prompt-h"><span>Copy this prompt, 2 of 3 · confidence</span><button class="copy" type="button">Copy</button></div>
+      <pre>Add a confidence score from 0 to 100 to every recommendation. It measures the quality of the market data, not how sure we are about the price. Put that sentence on the page where nobody can miss it.
 
 Build it from:
 - how many rivals we have a price from: 0 → 0 points, 1 → 15, 2 → 26, 3–4 → 34, 5 or more → 40
@@ -1373,10 +1391,10 @@ Under each score, list in plain words the reasons it lost points: "only one comp
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · make it arguable</span><button class="copy" type="button">Copy</button></div>
-      <pre>Make every parameter editable on the page — each rotation target, each stock adjustment, and the whole band matrix — and recalculate everything the instant a value changes, with no reload. Show the default next to each control and give me a Reset button.
+      <div class="prompt-h"><span>Copy this prompt, 3 of 3 · make it arguable</span><button class="copy" type="button">Copy</button></div>
+      <pre>Make every parameter editable on the page, each rotation target, each stock adjustment and the whole band matrix, and recalculate everything the instant a value changes, with no reload. Show the default next to each control and give me a Reset button.
 
-Then add a sanity panel at the top: how many models move down, how many move up, the average move in each direction, how many are already on target, and how many of the twenty largest moves rest on weak evidence — a single competitor, or confidence under 50%.
+Then add a sanity panel at the top: how many models move down, how many move up, the average move in each direction, how many are already on target, and how many of the twenty largest moves rest on weak evidence: a single competitor, or confidence under 50%.
 
 If a big move rests on one observation, say so right next to it rather than in a footnote.</pre>
     </div>
@@ -1384,35 +1402,35 @@ If a big move rests on one observation, say so right next to it rather than in a
     <div class="fig rv"><svg viewBox="0 0 1060 152" role="img" aria-label="The hundred confidence points: forty for how many rivals, twenty for freshness, fifteen for match type, fifteen for how much rivals agree, ten for knowing the rotation class." class="figsvg">
 <style>.fg-s{font:700 11px var(--font-sans);fill:#fff;letter-spacing:.04em}.fg-l{font:600 11px var(--font-sans);fill:#2c2c2c}.fg-c{font:700 10px var(--font-sans);fill:#e3342f;letter-spacing:.09em}.fg-t{font:800 12px var(--font-display);fill:#0a1a3c}</style>
 <rect x="20.0" y="36" width="398.0" height="40" fill="#0a1a3c"/>
-<text x="220" y="61" class="fg-fg-s" fill="#fff" text-anchor="middle">40</text>
-<text x="220" y="94" class="fg-fg-l" text-anchor="middle">How</text>
-<text x="220" y="108" class="fg-fg-l" text-anchor="middle">many rivals</text>
+<text x="220" y="61" class="fg-s" text-anchor="middle" style="fill:#fff">40</text>
+<text x="220" y="94" class="fg-l" text-anchor="middle">How</text>
+<text x="220" y="108" class="fg-l" text-anchor="middle">many rivals</text>
 <rect x="420.0" y="36" width="198.0" height="40" fill="#3d4f73"/>
-<text x="520" y="61" class="fg-fg-s" fill="#fff" text-anchor="middle">20</text>
-<text x="520" y="94" class="fg-fg-l" text-anchor="middle">Freshness</text>
+<text x="520" y="61" class="fg-s" text-anchor="middle" style="fill:#fff">20</text>
+<text x="520" y="94" class="fg-l" text-anchor="middle">Freshness</text>
 <rect x="620.0" y="36" width="148.0" height="40" fill="#6b7a96"/>
-<text x="695" y="61" class="fg-fg-s" fill="#fff" text-anchor="middle">15</text>
-<text x="695" y="94" class="fg-fg-l" text-anchor="middle">Match type</text>
+<text x="695" y="61" class="fg-s" text-anchor="middle" style="fill:#fff">15</text>
+<text x="695" y="94" class="fg-l" text-anchor="middle">Match type</text>
 <rect x="770.0" y="36" width="148.0" height="40" fill="#9aa5ba"/>
-<text x="845" y="61" class="fg-fg-s" fill="#1a1a1a" text-anchor="middle">15</text>
-<text x="845" y="94" class="fg-fg-l" text-anchor="middle">Rivals agree</text>
+<text x="845" y="61" class="fg-s" text-anchor="middle" style="fill:#1a1a1a">15</text>
+<text x="845" y="94" class="fg-l" text-anchor="middle">Rivals agree</text>
 <rect x="920.0" y="36" width="98.0" height="40" fill="#c7cedb"/>
-<text x="970" y="61" class="fg-fg-s" fill="#1a1a1a" text-anchor="middle">10</text>
-<text x="970" y="94" class="fg-fg-l" text-anchor="middle">Rotation</text>
-<text x="970" y="108" class="fg-fg-l" text-anchor="middle">known</text>
-<text x="20" y="24" class="fg-fg-t">100 POINTS OF CONFIDENCE</text>
+<text x="970" y="61" class="fg-s" text-anchor="middle" style="fill:#1a1a1a">10</text>
+<text x="970" y="94" class="fg-l" text-anchor="middle">Rotation</text>
+<text x="970" y="108" class="fg-l" text-anchor="middle">known</text>
+<text x="20" y="24" class="fg-t">100 POINTS OF CONFIDENCE</text>
 <line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
-<text x="478" y="132" class="fg-fg-c">CEILING WITH ONE RIVAL: 45 — ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
+<text x="478" y="132" class="fg-c">CEILING WITH ONE RIVAL: 45, ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
-    <p class="cap">Fig. 11 — What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
+    <p class="cap">Fig. 11. What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="2236" height="1120">
     </div>
-    <p class="cap">Fig. 12 — Each row states the rule that decided its price, in words a buyer could read aloud.</p>
+    <p class="cap">Fig. 12. Each row states the rule that decided its price, in words a buyer could read aloud.</p>
 
     <div class="gotcha rv">
-      <p>Someone asks "is this the optimal price?". The answer is no — it is the defensible price. Optimal needs demand data that does not exist.</p>
+      <p>Someone asks "is this the optimal price?". The answer is no. It is the defensible price. Optimal needs demand data that does not exist.</p>
       <p>A product changes band when it goes on sale, because the band follows today's selling price, not the list price. That is deliberate. Say it before someone discovers it.</p>
     </div>
 
@@ -1436,7 +1454,7 @@ If a big move rests on one observation, say so right next to it rather than in a
     <ul class="chk rv">
       <li>The client's site open in a browser tab</li>
       <li>Their logo, in a vector file if you can get one</li>
-      <li>Six values written down — and only six</li>
+      <li>Six values written down, and only six</li>
       <li>A phone to test on, not just a narrow window</li>
     </ul>
 
@@ -1457,23 +1475,23 @@ If a big move rests on one observation, say so right next to it rather than in a
         radius. <b>Six is a design system; sixty is a mood board.</b></p></div>
       <div><b>Name them once</b><p>Put the six at the top of the file as named values and
         rewrite every rule to use the names. After that, changing the brand is changing six
-        lines — which is exactly what makes dark mode possible in the next step.</p></div>
+        lines, which is exactly what makes dark mode possible in the next step.</p></div>
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · name the brand</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 1 of 3 · name the brand</span><button class="copy" type="button">Copy</button></div>
       <pre>Here are six values I took from the client's own site: brand colour &lt;#&gt;, text colour &lt;#&gt;, hairline grey &lt;#&gt;, background tint &lt;#&gt;, font family &lt;name&gt;, corner radius &lt;n&gt;px.
 
-Put them at the top of the file as named variables, add a spacing scale and three type sizes, then rewrite every rule in the page to use those names — no colour written directly anywhere.
+Put them at the top of the file as named variables, add a spacing scale and three type sizes, then rewrite every rule in the page to use those names. No colour written directly anywhere.
 
 When you are done, list every colour still hard-coded somewhere, because those are the ones that will go wrong later.</pre>
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · the two things that always break</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 2 of 3 · the two things that always break</span><button class="copy" type="button">Copy</button></div>
       <pre>Two fixes.
 
-First: this table has thirteen columns and is unreadable on a phone. Below 760px wide, drop the least load-bearing columns rather than squeezing them, and make sure no price is ever cut off — a price shown as "180,0…" reads as a different number. Check every cell, not just the headers.
+First: this table has thirteen columns and is unreadable on a phone. Below 760px wide, drop the least load-bearing columns rather than squeezing them, and make sure no price is ever cut off. A price shown as "180,0…" reads as a different number. Check every cell, not just the headers.
 
 Second: we are signalling "cheaper" and "dearer" with colour alone. Add a sign (+ / −) and a word, so it still reads in greyscale and for a colour-blind buyer.
 
@@ -1481,7 +1499,7 @@ Then check every text colour against its background and tell me which pairs fail
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · two languages, two themes</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 3 of 3 · two languages, two themes</span><button class="copy" type="button">Copy</button></div>
       <pre>Add a Spanish/English switch. Pull every visible piece of text into a single dictionary at the top of the file, one entry per key with both languages side by side, so a non-technical person can change the wording without touching any logic.
 
 Rebuild the number and date formatters when the language changes: "1.483" and "1,483" are the same number, and the thousands separator is part of the translation, not decoration around it.
@@ -1499,10 +1517,10 @@ Finally, list any key that exists in one language and not the other.</pre>
         <img src="/lab/assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="1170" height="2532">
       </div>
     </div>
-    <p class="cap">Fig. 13 — The same build in Spanish and in dark mode (left), and at 390px on a phone (right).</p>
+    <p class="cap">Fig. 13. The same build in Spanish and in dark mode (left), and at 390px on a phone (right).</p>
 
     <div class="gotcha rv">
-      <p>Dark mode makes the accent unreadable. Change the value, not the component — that is what naming them was for.</p>
+      <p>Dark mode makes the accent unreadable. Change the value, not the component. That is what naming them was for.</p>
       <p>A missing translation fails silently and shows English. Ask for the list of missing keys, every time.</p>
     </div>
 
@@ -1531,14 +1549,14 @@ Finally, list any key that exists in one language and not the other.</pre>
 
     <h3 class="rv">The ten minutes</h3>
     <div class="how rv">
-      <div><b>0:00 — the problem</b><p>One number. 73.3% of compared models are dearer than the cheapest rival.</p></div>
-      <div><b>1:00 — the catalogue</b><p>Live, 1,483 models, their own data.</p></div>
-      <div><b>2:30 — one product</b><p>Its rivals, and how each one was matched.</p></div>
-      <div><b>4:00 — the recommendation</b><p>And the sentence behind it, read aloud.</p></div>
-      <div><b>5:30 — the confidence</b><p>Why it is 46 and not 90. This is where you earn the room.</p></div>
-      <div><b>7:00 — what we would not claim</b><p>Say the limits before they find them.</p></div>
-      <div><b>8:30 — what comes next</b><p>And what it would cost in time.</p></div>
-      <div><b>10:00 — the link</b><p>Hand it over.</p></div>
+      <div><b>0:00, the problem</b><p>One number. 73.3% of compared models are dearer than the cheapest rival.</p></div>
+      <div><b>1:00, the catalogue</b><p>Live, 1,483 models, their own data.</p></div>
+      <div><b>2:30, one product</b><p>Its rivals, and how each one was matched.</p></div>
+      <div><b>4:00, the recommendation</b><p>And the sentence behind it, read aloud.</p></div>
+      <div><b>5:30, the confidence</b><p>Why it is 46 and not 90. This is where you earn the room.</p></div>
+      <div><b>7:00, what we would not claim</b><p>Say the limits before they find them.</p></div>
+      <div><b>8:30, what comes next</b><p>And what it would cost in time.</p></div>
+      <div><b>10:00, the link</b><p>Hand it over.</p></div>
     </div>
 
     <h3 class="rv">The three questions the client will ask</h3>
@@ -1547,22 +1565,22 @@ Finally, list any key that exists in one language and not the other.</pre>
         <thead><tr><th>They ask</th><th>You answer</th><th>The number behind it</th></tr></thead>
         <tbody>
           <tr><td>Is this our real pricing model?</td><td>No, and it was never meant to be. It is a recommender built from the policy you gave us and prices your rivals publish openly.</td><td>5 bands, your matrix, unmodified</td></tr>
-          <tr><td>Why is this higher than the rival's?</td><td>Because band 4 requires 20% and €20 of margin, and aligning would break both. Where the floor and the ceiling collide, margin wins — and the row says so.</td><td>495 of 1,483 models</td></tr>
+          <tr><td>Why is this higher than the rival's?</td><td>Because band 4 requires 20% and €20 of margin, and aligning would break both. Where the floor and the ceiling collide, margin wins, and the row says so.</td><td>495 of 1,483 models</td></tr>
           <tr><td>Can we trust it?</td><td>On the models where we have market data, yes, to the degree the score states. Below 50 we are telling you not to act yet, in the open.</td><td>742 models with a competitor price</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 14 — The three questions the client is most likely to ask, with the answer and the figure behind each.</p>
+    <p class="cap">Fig. 14. The three questions the client is most likely to ask, with the answer and the figure behind each.</p>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
       <pre>Write a one-page handover for a non-technical client. Sections: what this tool does; what it does NOT do; where the data comes from and how often it refreshes; what the confidence score means; the five things that would break it; and what the next step would cost in time.
 
-No jargon — if a word would not survive a meeting, replace it. Under 500 words, in Spanish and in English.</pre>
+No jargon. If a word would not survive a meeting, replace it. Under 500 words, in Spanish and in English.</pre>
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 2 of 3 · make it survive the room</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 2 of 3 · make it survive the room</span><button class="copy" type="button">Copy</button></div>
       <pre>We present this live tomorrow. Make it survive the room.
 
 1) If the database does not answer within three seconds, show a clear message instead of an empty table.
@@ -1574,10 +1592,10 @@ Then give me a ten-point checklist to run thirty minutes before presenting.</pre
     </div>
 
     <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt — 3 of 3 · rehearse the hostile question</span><button class="copy" type="button">Copy</button></div>
+      <div class="prompt-h"><span>Copy this prompt, 3 of 3 · rehearse the hostile question</span><button class="copy" type="button">Copy</button></div>
       <pre>Act as Forum Sport's pricing manager: fifteen years in the job, sceptical of anything built by students.
 
-Read this tool and ask me the eight hardest questions you would ask in the demo — about where the cost figure comes from, about the margin floor, about how we got the competitors' prices and whether that is legal, and about what happens when a rival is out of stock and shows a stale price.
+Read this tool and ask me the eight hardest questions you would ask in the demo, about where the cost figure comes from, about the margin floor, about how we got the competitors' prices and whether that is legal, and about what happens when a rival is out of stock and shows a stale price.
 
 For each question, tell me what a weak answer sounds like and what a strong one sounds like.</pre>
     </div>
@@ -1600,7 +1618,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
           </div>
     <h2 class="rv">The finished tool, running on live data</h2>
     <p class="lead prose rv">This is the finished tool, running on live data. Open it, break
-      it, read its numbers. You are not copying it — you are building your own answer to the
+      it, read its numbers. You are not copying it. You are building your own answer to the
       same brief. But it tells you where the bar is.</p>
 
     <div class="facts rv" style="margin-top:var(--s-6)">
@@ -1613,7 +1631,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="2236" height="282">
     </div>
-    <p class="cap">Fig. 15 — The pricing tool headline figures, including the count of models where margin beats alignment.</p>
+    <p class="cap">Fig. 15. The pricing tool headline figures, including the count of models where margin beats alignment.</p>
 
     <div class="two rv">
       <div class="shot" style="margin-top:0">
@@ -1623,7 +1641,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
         <img src="/lab/assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="2320" height="374">
       </div>
     </div>
-    <p class="cap">Fig. 16 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+    <p class="cap">Fig. 16. Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
 
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
