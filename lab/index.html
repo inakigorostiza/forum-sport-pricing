@@ -393,7 +393,7 @@ footer img{height:36px}
   border:1px solid var(--g-300); border-radius:var(--radius) var(--radius) 0 0;
   overflow:hidden; margin-top:var(--s-4)}
 @media(min-width:720px){ .pillars{grid-template-columns:repeat(2,1fr)} }
-@media(min-width:1100px){ .pillars{grid-template-columns:repeat(4,1fr)} }
+@media(min-width:1100px){ .pillars{grid-template-columns:repeat(3,1fr)} }
 .pillars > div{background:var(--white); padding:var(--s-3)}
 .pillars .pn{
   display:block; font-family:var(--font-display); font-size:1.25rem; font-weight:800;
@@ -623,8 +623,6 @@ code{
               allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
-    <p class="cap">Fig. 01
-    <p class="cap">Fig. 02. The finished tool, end to end.</p>
 
     <div class="grid3 rv">
       <div>
@@ -709,7 +707,7 @@ code{
     <p class="lead prose rv">This is the only programme that takes the marketing process
       from start to finish. You do not just build a tool: you take a real client brief
       through analysis, strategy, creative work and delivery. A purely technical MVP does
-      not pass. Every team&rsquo;s work must address all four of these.</p>
+      not pass. Every team&rsquo;s work must address all six of these.</p>
 
     <div class="pillars rv">
       <div>
@@ -736,15 +734,26 @@ code{
       <div>
         <span class="pn">04</span>
         <h4>User experience</h4>
-        <p>Prototype an AI-powered customer journey end to end, from a real pain point to a
-          working MVP that real users can touch and test.</p>
+        <p>Design the customer journey end to end, from a real pain point, and test it
+          on someone outside the team before you call it finished.</p>
+      </div>
+      <div>
+        <span class="pn">05</span>
+        <h4>The MVP</h4>
+        <p>The tool itself, at a public address and on live data, carrying half the mark.
+          Everything else is judged on the work around it.</p>
+      </div>
+      <div>
+        <span class="pn">06</span>
+        <h4>GDPR and AI compliance</h4>
+        <p>What you collect, on what lawful basis, for how long and under whose
+          accountability, and the risk class you argue for the system under the EU AI Act.</p>
       </div>
     </div>
     <div class="pillars-base rv">
       <span>Supported by automation</span>
       <b>The agents and workflows behind the campaign · Claude Code · GA4</b>
     </div>
-    <p class="cap">Fig. 03. The four assessed areas and the automation layer that supports them.</p>
   </div>
 </section>
 
@@ -803,7 +812,6 @@ code{
 <text x="1094" y="194" class="fg-wd" text-anchor="middle">A live link</text>
 <text x="1094" y="210" class="fg-wd" text-anchor="middle">and a demo</text>
 </svg></div>
-    <p class="cap">Fig. 04. The six weeks and the deliverable each one ends with.</p>
   </div>
 </section>
 
@@ -846,7 +854,6 @@ code{
         <text x="285" y="92" class="fg-sm" text-anchor="middle">MCP</text>
       </svg>
     </div>
-    <p class="cap">Fig. 05. The MCP server lets the assistant query each service directly, instead of you copying data between them.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">The two Supabase keys, and which one may be published</h4>
@@ -874,6 +881,7 @@ code{
           <tr><td><b><a href="https://docs.google.com/spreadsheets/d/18wylq3JY7oh4eUJnOFq-mFa6bj-PonyeWbLZZfWMHjA/edit?usp=sharing" target="_blank" rel="noopener">Forum Sport Dataset</a></b></td><td>Three tabs. <code>database</code> is the catalogue, 24,109 rows by 30 columns, one row per size. <code>fields</code> says what each column means. <code>dimension values</code> holds the totals your load has to match.</td><td style="white-space:nowrap">Week 2</td></tr>
           <tr><td><b><a href="https://docs.google.com/spreadsheets/d/11MAnhxrBxhLpDxzCwylznymUuwmMgr3P4gnAVfqTvhY/edit?usp=sharing" target="_blank" rel="noopener">Forum Sports Competitors</a></b></td><td>39 sellers and 389,469 records between them, each with its record count and its address. You choose which ones to watch.</td><td style="white-space:nowrap">Week 3</td></tr>
           <tr><td><b><a href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">The reference build</a></b></td><td>A finished answer to this brief, on live data. Open it, break it, read its numbers. You are not copying it, you are building your own answer.</td><td style="white-space:nowrap">All term</td></tr>
+          <tr><td><b><a href="https://github.com/inakigorostiza/forum-sport-pricing" target="_blank" rel="noopener">The reference repository</a></b></td><td>The code behind that build, commit by commit, including the daily scraper and the database migrations. Read the commit messages: each one states what changed and why.</td><td style="white-space:nowrap">All term</td></tr>
         </tbody>
       </table>
     </div>
@@ -891,7 +899,6 @@ code{
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 06. The material the client supplies, and the complication attached to each.</p>
   </div>
 </section>
 
@@ -901,9 +908,11 @@ code{
       <p class="sec-tag">The rubric</p>
     </div>
     <h2 class="rv">How you will be marked</h2>
-    <p class="lead prose rv">The four areas carry equal weight. Within each, the
-      same question decides it: can you show it, and can you defend it? The table states
-      what a distinction requires. Both sections of the cohort are marked against it.</p>
+    <p class="lead prose rv">Half the mark is the working tool. The other half is split
+      evenly across the five areas around it, which is how a tool that runs but carries no
+      strategy, no measurement and no compliance still fails. Within each row the same
+      question decides it: can you show it, and can you defend it? The table states what a
+      distinction requires. Both sections of the cohort are marked against it.</p>
 
     <div class="tbl rv">
       <table class="t-rubric">
@@ -913,29 +922,38 @@ code{
         </tr></thead>
         <tbody>
           <tr>
+            <td><b>The MVP</b></td>
+            <td class="wt">50%</td>
+            <td>A working tool at a public address, on live data, that a category manager could open unaided: the catalogue, what each rival charges, a recommended price per model and the rule that decided it. It holds up when someone outside the team drives it.</td>
+          </tr>
+          <tr>
             <td><b>Strategy and governance</b></td>
-            <td class="wt">25%</td>
+            <td class="wt">10%</td>
             <td>A governance pack that names what the system is for, who owns it, what it must never do, and how a wrong recommendation is caught. Tied to the client's marketing strategy, not to the technology.</td>
           </tr>
           <tr>
             <td><b>Brand and creative direction</b></td>
-            <td class="wt">25%</td>
+            <td class="wt">10%</td>
             <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down, not generated and accepted.</td>
           </tr>
           <tr>
             <td><b>Data and measurement</b></td>
-            <td class="wt">25%</td>
+            <td class="wt">10%</td>
             <td>A data layer that holds up, and a measurement framework designed from the start that would show whether customer behaviour changed. Named metrics, a baseline, and what would disprove you.</td>
           </tr>
           <tr>
             <td><b>User experience</b></td>
-            <td class="wt">25%</td>
-            <td>A journey prototyped end to end from a real pain point, tested on someone who is not on your team, with what you changed after they used it.</td>
+            <td class="wt">10%</td>
+            <td>The journey is designed from a real pain point and tested on someone who is not on your team, with what you changed after watching them use it.</td>
           </tr>
-        </tbody>
+                  <tr>
+            <td><b>GDPR and AI compliance</b></td>
+            <td class="wt">10%</td>
+            <td>A register that states, for every source and every use of the assistant: what is collected, the lawful basis for holding it, what personal data you deliberately do not collect, where it is stored and for how long, and who is accountable. Analytics carries a consent path. The system&rsquo;s risk class under the EU AI Act is argued rather than asserted, and the person who applies the price is documented as the decision-maker, not named in a disclaimer.</td>
+          </tr>
+</tbody>
       </table>
     </div>
-    <p class="cap">Fig. 07. The assessment rubric: four areas at equal weight, and what a distinction requires in each.</p>
   </div>
 </section>
 
@@ -1112,7 +1130,6 @@ When you are done, tell me which key you used and why it is safe for that key to
     <div class="shot rv">
       <img src="/lab/assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="2320" height="1240">
     </div>
-    <p class="cap">Fig. 08. The product explorer: one row per model, with each competitor's price and the difference underneath.</p>
 
     <div class="gotcha rv">
       <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet. Tell the assistant exactly that sentence.</p>
@@ -1252,7 +1269,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 09. Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+    <p class="cap">Fig. 02. Five of five Cloudflare sites refuse. None of the eight without it do.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Why changing the user agent does not help</h4>
@@ -1331,7 +1348,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <div class="shot rv">
       <img src="/lab/assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
     </div>
-    <p class="cap">Fig. 10. The client's five price bands, editable on screen. The values are the client's, not ours.</p>
+    <p class="cap">Fig. 03. The client's five price bands, editable on screen. The values are the client's, not ours.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
@@ -1396,12 +1413,12 @@ If a big move rests on one observation, say so right next to it rather than in a
 <line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
 <text x="478" y="132" class="fg-c">CEILING WITH ONE RIVAL: 45, ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
-    <p class="cap">Fig. 11. What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
+    <p class="cap">Fig. 04. What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="2236" height="1120">
     </div>
-    <p class="cap">Fig. 12. Each row states the rule that decided its price, in words a buyer could read aloud.</p>
+    <p class="cap">Fig. 05. Each row states the rule that decided its price, in words a buyer could read aloud.</p>
 
     <div class="gotcha rv">
       <p>Someone asks "is this the optimal price?". The answer is no. It is the defensible price. Optimal needs demand data that does not exist.</p>
@@ -1491,7 +1508,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         <img src="/lab/assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="1170" height="2532">
       </div>
     </div>
-    <p class="cap">Fig. 13. The same build in Spanish and in dark mode (left), and at 390px on a phone (right).</p>
+    <p class="cap">Fig. 06. The same build in Spanish and in dark mode (left), and at 390px on a phone (right).</p>
 
     <div class="gotcha rv">
       <p>Dark mode makes the accent unreadable. Change the value, not the component. That is what naming them was for.</p>
@@ -1544,7 +1561,6 @@ Finally, list any key that exists in one language and not the other.</pre>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 14. The three questions the client is most likely to ask, with the answer and the figure behind each.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
@@ -1605,7 +1621,6 @@ For each question, tell me what a weak answer sounds like and what a strong one 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="2236" height="282">
     </div>
-    <p class="cap">Fig. 15. The pricing tool headline figures, including the count of models where margin beats alignment.</p>
 
     <div class="two rv">
       <div class="shot" style="margin-top:0">
@@ -1615,7 +1630,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
         <img src="/lab/assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="2320" height="374">
       </div>
     </div>
-    <p class="cap">Fig. 16. Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+    <p class="cap">Fig. 07. Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
 
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
