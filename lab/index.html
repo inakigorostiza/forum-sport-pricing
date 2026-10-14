@@ -421,13 +421,7 @@ footer img{height:36px}
   font-variant-numeric:tabular-nums}
 .t-rubric .rb{display:block; font-size:.625rem; font-weight:600; opacity:.7;
   letter-spacing:.06em; margin-top:2px}
-@media(max-width:860px){
-  /* Con cinco columnas de prosa en un móvil no se lee ninguna: se queda la
-     banda que importa, que es dónde está el listón. */
-  .t-rubric th:nth-child(4), .t-rubric td:nth-child(4),
-  .t-rubric th:nth-child(5), .t-rubric td:nth-child(5){display:none}
-  .t-rubric th:nth-child(1){width:30%}
-}
+@media(max-width:860px){ .t-rubric th:nth-child(1){width:30%} }
 
 /* Enlace a material compartido: se lee como una ficha, no como un enlace
    suelto en un párrafo, porque es algo que el alumno tiene que ir a abrir. */
@@ -936,51 +930,41 @@ code{
       <p class="sec-tag">The rubric</p>
     </div>
     <h2 class="rv">How you will be marked</h2>
-    <p class="lead prose rv">The four areas carry equal weight. Within each, the same
-      question decides the band: can you show it, and can you defend it? Both sections of
-      the cohort are marked against this table.</p>
+    <p class="lead prose rv">The four areas carry equal weight. Within each, the
+      same question decides it: can you show it, and can you defend it? The table states
+      what a distinction requires. Both sections of the cohort are marked against it.</p>
 
     <div class="tbl rv">
       <table class="t-rubric">
         <thead><tr>
           <th>Area</th><th>Weight</th>
           <th>Distinction<br><span class="rb">80–100</span></th>
-          <th>Pass<br><span class="rb">50–79</span></th>
-          <th>Fail<br><span class="rb">under 50</span></th>
         </tr></thead>
         <tbody>
           <tr>
             <td><b>Strategy and governance</b></td>
             <td class="wt">25%</td>
             <td>A governance pack that names what the system is for, who owns it, what it must never do, and how a wrong recommendation is caught. Tied to the client's marketing strategy, not to the technology.</td>
-            <td>The pack exists and the rules are stated, but ownership or the failure case is vague.</td>
-            <td>No governance pack, or a list of principles with nothing operational in it.</td>
           </tr>
           <tr>
             <td><b>Brand and creative direction</b></td>
             <td class="wt">25%</td>
             <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down, not generated and accepted.</td>
-            <td>The brand is applied correctly but without decisions you can explain.</td>
-            <td>Default styling, or a brand pasted on at the end.</td>
           </tr>
           <tr>
             <td><b>Data and measurement</b></td>
             <td class="wt">25%</td>
             <td>A data layer that holds up, and a measurement framework designed from the start that would show whether customer behaviour changed. Named metrics, a baseline, and what would disprove you.</td>
-            <td>The data works and metrics are listed, but measurement was added at the end.</td>
-            <td>No measurement framework, or metrics with no baseline to compare against.</td>
           </tr>
           <tr>
             <td><b>User experience</b></td>
             <td class="wt">25%</td>
             <td>A journey prototyped end to end from a real pain point, tested on someone who is not on your team, with what you changed after they used it.</td>
-            <td>A working MVP that real users can touch, but untested or untouched by their feedback.</td>
-            <td>A demo that only works when you drive it.</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 07. The assessment rubric: four areas at equal weight, three bands each.</p>
+    <p class="cap">Fig. 07. The assessment rubric: four areas at equal weight, and what a distinction requires in each.</p>
 
     <h4 class="rv" style="margin-top:var(--s-6)">Applied across every area</h4>
     <div class="tbl rv">
