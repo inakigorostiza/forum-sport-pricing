@@ -362,6 +362,21 @@ footer img{height:36px}
 }
 .pillars-base b{color:#fff; font-size:.875rem; font-weight:600}
 
+/* Rúbrica: cinco columnas, y las tres de banda son prosa. */
+.t-rubric th:nth-child(1){width:17%} .t-rubric th:nth-child(2){width:8%}
+.t-rubric td{font-size:.875rem; line-height:1.5}
+.t-rubric .wt{font-family:var(--font-display); font-weight:800; color:var(--ie-navy);
+  font-variant-numeric:tabular-nums}
+.t-rubric .rb{display:block; font-size:.625rem; font-weight:600; opacity:.7;
+  letter-spacing:.06em; margin-top:2px}
+@media(max-width:860px){
+  /* Con cinco columnas de prosa en un móvil no se lee ninguna: se queda la
+     banda que importa, que es dónde está el listón. */
+  .t-rubric th:nth-child(4), .t-rubric td:nth-child(4),
+  .t-rubric th:nth-child(5), .t-rubric td:nth-child(5){display:none}
+  .t-rubric th:nth-child(1){width:30%}
+}
+
 .fig{max-width:100%}
 /* Nunca tuvo estilo, y `forum-sport-<team>` es un token largo que no se parte:
    a 360px empujaba la página 12px de lado. */
@@ -716,6 +731,66 @@ code{
         strategy, no creative direction and no measurement is an unfinished answer.</p></div>
     </div>
 
+    <h3 class="rv">The rubric</h3>
+    <p class="prose rv">The four areas carry equal weight. Within each, the same question
+      decides the band: can you show it, and can you defend it? Both sections of the cohort
+      are marked against this table.</p>
+
+    <div class="tbl rv">
+      <table class="t-rubric">
+        <thead><tr>
+          <th>Area</th><th>Weight</th>
+          <th>Distinction<br><span class="rb">80–100</span></th>
+          <th>Pass<br><span class="rb">50–79</span></th>
+          <th>Fail<br><span class="rb">under 50</span></th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Strategy and governance</b></td>
+            <td class="wt">25%</td>
+            <td>A governance pack that names what the system is for, who owns it, what it must never do, and how a wrong recommendation is caught. Tied to the client's marketing strategy, not to the technology.</td>
+            <td>The pack exists and the rules are stated, but ownership or the failure case is vague.</td>
+            <td>No governance pack, or a list of principles with nothing operational in it.</td>
+          </tr>
+          <tr>
+            <td><b>Brand and creative direction</b></td>
+            <td class="wt">25%</td>
+            <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down — not generated and accepted.</td>
+            <td>The brand is applied correctly but without decisions you can explain.</td>
+            <td>Default styling, or a brand pasted on at the end.</td>
+          </tr>
+          <tr>
+            <td><b>Data and measurement</b></td>
+            <td class="wt">25%</td>
+            <td>A data layer that holds up, and a measurement framework designed from the start that would show whether customer behaviour changed. Named metrics, a baseline, and what would disprove you.</td>
+            <td>The data works and metrics are listed, but measurement was added at the end.</td>
+            <td>No measurement framework, or metrics with no baseline to compare against.</td>
+          </tr>
+          <tr>
+            <td><b>User experience</b></td>
+            <td class="wt">25%</td>
+            <td>A journey prototyped end to end from a real pain point, tested on someone who is not on your team, with what you changed after they used it.</td>
+            <td>A working MVP that real users can touch, but untested or untouched by their feedback.</td>
+            <td>A demo that only works when you drive it.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 06 — The rubric. Equal weight, four areas, one question each.</p>
+
+    <h4 class="rv" style="margin-top:var(--s-6)">Applied across every area</h4>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>What is also marked</th><th>What good looks like</th></tr></thead>
+        <tbody>
+          <tr><td><b>Analysis and strategy, not only implementation</b></td><td>The brief asks for all three. A tool that runs, with no analysis behind it and no argument in front of it, is an unfinished answer however well it works.</td></tr>
+          <tr><td><b>Honesty about limits</b></td><td>What the solution cannot do is stated by you, in the deliverable, before the client finds it. Claiming an optimum you cannot compute costs more than admitting the gap.</td></tr>
+          <tr><td><b>Automation that earns its place</b></td><td>The agents and workflows behind the campaign — Claude Code, n8n, GA4 — do work a person would otherwise repeat. Automation for its own sake is not credit.</td></tr>
+          <tr><td><b>The client could run it on Monday</b></td><td>A handover someone outside the team can follow, in their language, without you in the room.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <div class="warn rv">
       <h4 style="margin-top:0">Three of the four changes are still open</h4>
       <p>Only the band matrix is fully solved in the reference build. <b>Season timing</b> is
@@ -767,7 +842,7 @@ code{
         <text x="285" y="92" class="sm" text-anchor="middle">MCP</text>
       </svg>
     </div>
-    <p class="cap">Fig. 06 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
+    <p class="cap">Fig. 07 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Two keys. Only one of them is safe.</h4>
@@ -829,7 +904,7 @@ code{
 <text x="1090" y="178" class="wd" text-anchor="middle">A live link</text>
 <text x="1090" y="194" class="wd" text-anchor="middle">and a demo</text>
 </svg></div>
-    <p class="cap">Fig. 07 — Each week's deliverable is the next week's raw material.</p>
+    <p class="cap">Fig. 08 — Each week's deliverable is the next week's raw material.</p>
   </div>
 </section>
 
@@ -980,9 +1055,9 @@ When you are done, tell me which key you used and why it is safe for that key to
     </div>
 
     <div class="shot rv">
-      <img src="assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="1440" height="1200">
+      <img src="assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="2320" height="1240">
     </div>
-    <p class="cap">Fig. 08 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
+    <p class="cap">Fig. 09 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
 
     <div class="gotcha rv">
       <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet — tell the assistant exactly that sentence.</p>
@@ -1095,7 +1170,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 09 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+    <p class="cap">Fig. 10 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Changing your user agent will not fix this</h4>
@@ -1169,9 +1244,9 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     </div>
 
     <div class="shot rv">
-      <img src="assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="1118" height="210">
+      <img src="assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
     </div>
-    <p class="cap">Fig. 10 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
+    <p class="cap">Fig. 11 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
@@ -1236,12 +1311,12 @@ If a big move rests on one observation, say so right next to it rather than in a
 <line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
 <text x="478" y="132" class="c">CEILING WITH ONE RIVAL: 45 — ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
-    <p class="cap">Fig. 11 — What the hundred points are made of. The score grades the data, never the price.</p>
+    <p class="cap">Fig. 12 — What the hundred points are made of. The score grades the data, never the price.</p>
 
     <div class="shot rv">
-      <img src="assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="1440" height="560">
+      <img src="assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="2236" height="1120">
     </div>
-    <p class="cap">Fig. 12 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
+    <p class="cap">Fig. 13 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
 
     <div class="gotcha rv">
       <p>Someone asks "is this the optimal price?". The answer is no — it is the defensible price. Optimal needs demand data that does not exist.</p>
@@ -1322,13 +1397,13 @@ Finally, list any key that exists in one language and not the other.</pre>
 
     <div class="two rv">
       <div class="shot" style="margin-top:0">
-        <img src="assets/shots/dark-es.webp" alt="The same tool in Spanish and in dark mode" loading="lazy" width="1440" height="900">
+        <img src="assets/shots/dark-es.webp" alt="The same tool in Spanish and in dark mode" loading="lazy" width="2880" height="1800">
       </div>
       <div class="shot" style="margin-top:0">
-        <img src="assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="390" height="844">
+        <img src="assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="1170" height="2532">
       </div>
     </div>
-    <p class="cap">Fig. 13 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
+    <p class="cap">Fig. 14 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
 
     <div class="gotcha rv">
       <p>Dark mode makes the accent unreadable. Change the value, not the component — that is what naming them was for.</p>
@@ -1378,7 +1453,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 14 — Rehearse these three out loud. They are the whole defence.</p>
+    <p class="cap">Fig. 15 — Rehearse these three out loud. They are the whole defence.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
@@ -1434,19 +1509,19 @@ For each question, tell me what a weak answer sounds like and what a strong one 
     </div>
 
     <div class="shot rv">
-      <img src="assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="1440" height="260">
+      <img src="assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="2236" height="282">
     </div>
-    <p class="cap">Fig. 15 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
+    <p class="cap">Fig. 16 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
 
     <div class="two rv">
       <div class="shot" style="margin-top:0">
-        <img src="assets/shots/chart.webp" alt="The online price positioning chart over time, with a parity line at 100 per cent" loading="lazy" width="1440" height="560">
+        <img src="assets/shots/chart.webp" alt="The online price positioning chart over time, with a parity line at 100 per cent" loading="lazy" width="2320" height="1120">
       </div>
       <div class="shot" style="margin-top:0">
-        <img src="assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="1440" height="460">
+        <img src="assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="2320" height="374">
       </div>
     </div>
-    <p class="cap">Fig. 16 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+    <p class="cap">Fig. 17 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
 
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
