@@ -269,6 +269,7 @@ strong{font-weight:700; color:var(--ie-navy)}
   border:1px solid var(--g-300); border-radius:var(--radius); overflow:hidden;
   margin-top:var(--s-6)}
 @media(min-width:800px){ .grid3{grid-template-columns:repeat(3,1fr)} }
+@media(min-width:800px){ .grid3.g2{grid-template-columns:repeat(2,1fr)} }
 .grid3 > div{background:var(--white); padding:var(--s-3)}
 .tint .grid3 > div{background:var(--g-100)}
 .grid3 h4{margin-top:0}
@@ -477,8 +478,9 @@ code{
 
 <nav class="secnav" id="secnav" aria-label="Sections">
   <div class="wrap">
+    <a href="#context" class="nv-main">Context</a>
     <a href="#overview" class="nv-main">Overview</a>
-    <a href="#briefing" class="nv-main">Briefing</a>
+    <a href="#briefing" class="nv-main">The brief</a>
     <span class="nv-sep" aria-hidden="true"></span>
     <a href="#week-1"><i>01</i>Setup</a>
     <a href="#week-2"><i>02</i>Data</a>
@@ -510,7 +512,7 @@ code{
   </div>
 </header>
 
-<section style="padding-top:var(--s-8); padding-bottom:var(--s-8)">
+<section class="tint" style="padding-top:var(--s-8); padding-bottom:var(--s-8)">
   <div class="wrap">
     <div class="facts rv">
       <div class="fact"><p class="n">1,483</p><p class="c">Shoe models in the catalogue</p></div>
@@ -522,55 +524,18 @@ code{
   </div>
 </section>
 
-<section class="tint" id="overview">
+<section id="context">
   <div class="wrap">
     <div class="sec-head rv">
-            <p class="sec-tag">Overview</p>
-          </div>
-    <h2 class="rv">What you will build</h2>
-    <p class="lead prose rv">This is the finished tool, running on real data. By week 6
-      yours does the same three things: shows the catalogue, shows what every rival
-      charges for the same shoe, and recommends a price with the reason attached.</p>
-
-    <div class="video rv">
-      <iframe src="https://www.youtube-nocookie.com/embed/nhxEy5DFKs8?rel=0&amp;modestbranding=1"
-              title="End-to-end AI Marketing Lab, walkthrough of the finished tool"
-              loading="lazy" allowfullscreen
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <p class="sec-tag">Context</p>
+      <p class="sec-sub">Forum Sport</p>
     </div>
-    <p class="cap">Fig. 01. The finished tool, end to end.</p>
-
-    <div class="grid3 rv">
-      <div>
-        <h4>Who it is for</h4>
-        <p>Marketing students. No programming background assumed, and none acquired.
-           If you can write a clear brief, you can do this.</p>
-      </div>
-      <div>
-        <h4>What you need</h4>
-        <p>A laptop, three free accounts and the assistant. Six sessions. Nothing to
-           install beyond the assistant itself.</p>
-      </div>
-      <div>
-        <h4>What you leave with</h4>
-        <p>A public web address showing 1,483 products, 16 competitors' prices, a
-           recommended price per model, and the ability to explain every number in it.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="briefing">
-  <div class="wrap">
-    <div class="sec-head rv">
-            <p class="sec-tag">Briefing</p>
-            <p class="sec-sub">The business problem</p>
-          </div>
-    <h2 class="rv">Where Forum Sport's prices sit today</h2>
-    <p class="lead prose rv">Forum Sport is a Spanish sports retailer. Online, its price
-      sits one tab away from every rival selling the same shoe. The question is not
-      whether shoppers compare. It is whether Forum Sport knows what they will find.</p>
+    <h2 class="rv">Where Forum Sport&rsquo;s prices sit today</h2>
+    <p class="lead prose rv">Forum Sport is a Spanish sports retailer, online and in store.
+      The scope here is its men&rsquo;s running and trail catalogue: 1,483 shoe models.
+      Online, its price sits one tab away from every rival selling the same shoe. The
+      question is not whether shoppers compare. It is whether Forum Sport knows what they
+      will find.</p>
 
     <div class="statline rv">
       <p class="bignum">73.3%</p>
@@ -632,7 +597,7 @@ code{
 <rect x="239.9" y="428" width="576.8" height="16" fill="#9a9a9a"/>
 <text x="248" y="440" class="fg-vi" text-anchor="start">-61.8%</text>
 </svg></div>
-    <p class="cap">Fig. 02. Average gap against each competitor, 13 October 2026. Positive means Forum Sport is dearer.</p>
+    <p class="cap">Fig. 01. Average gap against each competitor, 13 October 2026. Positive means Forum Sport is dearer.</p>
 
     <div class="prose rv" style="margin-top:var(--s-4)">
       <p>Read the bottom row before anything else. Tradeinn is not 62% cheaper on the
@@ -647,12 +612,52 @@ code{
   </div>
 </section>
 
-<section class="tint" id="the-brief">
+<section class="tint" id="overview">
   <div class="wrap">
     <div class="sec-head rv">
-            <p class="sec-tag">The client&rsquo;s brief</p>
-          </div>
-    <h2 class="rv">What the client asked for</h2>
+      <p class="sec-tag">Overview</p>
+    </div>
+    <h2 class="rv">What you will build</h2>
+    <p class="lead prose rv">This is the finished tool, running on real data. By week 6
+      yours does the same three things: shows the catalogue, shows what every rival charges
+      for the same shoe, and recommends a price with the reason attached.</p>
+
+    <div class="video rv">
+      <iframe src="https://www.youtube-nocookie.com/embed/nhxEy5DFKs8?rel=0&amp;modestbranding=1"
+              title="End-to-end AI Marketing Lab, walkthrough of the finished tool"
+              loading="lazy" allowfullscreen
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+    <p class="cap">Fig. 01
+    <p class="cap">Fig. 02. The finished tool, end to end.</p>
+
+    <div class="grid3 rv">
+      <div>
+        <h4>Who it is for</h4>
+        <p>Marketing students. No programming background assumed, and none acquired.
+           If you can write a clear brief, you can do this.</p>
+      </div>
+      <div>
+        <h4>What you need</h4>
+        <p>A laptop, three free accounts and the assistant. Six sessions. Nothing to
+           install beyond the assistant itself.</p>
+      </div>
+      <div>
+        <h4>What you leave with</h4>
+        <p>A public web address showing 1,483 products, 16 competitors' prices, a
+           recommended price per model, and the ability to explain every number in it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="briefing">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="sec-tag">The client&rsquo;s needs</p>
+    </div>
+    <h2 class="rv">What Forum Sport asked for</h2>
 
     <blockquote class="pull rv">
       <p>Recommendations that are coherent and explainable.</p>
@@ -660,17 +665,22 @@ code{
     </blockquote>
 
     <p class="lead prose rv" style="margin-top:var(--s-4)">That sentence is the whole
-      engagement. Forum Sport is not asking you to reverse-engineer how they price today.
-      They are asking for a tool whose every number can be defended out loud, in a meeting,
-      by someone who did not build it.</p>
+      engagement. They are not asking you to reverse-engineer how they price today. They
+      are asking for a tool whose every number can be defended out loud, in a meeting, by
+      someone who did not build it.</p>
 
-    <h3 class="rv">The client</h3>
-    <div class="grid3 rv" style="margin-top:var(--s-2)">
-      <div>
-        <h4>Who they are</h4>
-        <p>A Spanish sports retailer selling online and in store. The scope here is the
-          men's running and trail shoe catalogue.</p>
-      </div>
+    <h3 class="rv">Three jobs, in one place</h3>
+    <ol class="steps rv">
+      <li><b>Watch the competition.</b> Collect the prices other shops charge for the same
+        running shoes, every day, and keep every observation.</li>
+      <li><b>Show the picture.</b> Put Forum Sport's catalogue, with photos, next to those
+        competitor prices, so a manager sees at a glance where they are cheaper or dearer.</li>
+      <li><b>Recommend a price.</b> For each product, suggest one, and explain in plain
+        words why.</li>
+    </ol>
+
+    <h3 class="rv">Who asks, and who uses it</h3>
+    <div class="grid3 g2 rv" style="margin-top:var(--s-2)">
       <div>
         <h4>Who asks for it</h4>
         <p>The pricing and category team. Unai, on their side, owns the commercial policy
@@ -683,11 +693,43 @@ code{
       </div>
     </div>
 
-    <h3 class="rv">The four areas assessed</h3>
-    <p class="prose rv">This is the only programme that covers the marketing process from
-      start to finish. Teams do not just build a tool: they take a real client brief through
-      analysis, strategy, creative work and delivery. A purely technical MVP does not pass.
-      Every team's work must address all four of these.</p>
+    <h3 class="rv">What &ldquo;good&rdquo; means to them</h3>
+    <div class="how rv">
+      <div><b>Coherent</b><p>Two products in the same situation get the same answer. If they
+        do not, you can say which input differed.</p></div>
+      <div><b>Explainable</b><p>Every recommendation carries one sentence a buyer could read
+        aloud in a meeting, naming the rule that decided it.</p></div>
+      <div><b>Honest about itself</b><p>Where the data is thin, the tool says so on the row,
+        not in a footnote, and not only to the person who built it.</p></div>
+      <div><b>Usable weekly</b><p>A category manager opens it, filters to their brand, and
+        leaves with a list. No training session required.</p></div>
+    </div>
+
+    <div class="warn rv">
+      <h4 style="margin-top:0">Three of the four requested changes are still open</h4>
+      <p>Forum Sport asked for four changes on the MVP, and only one, the band matrix,
+        is fully solved in the reference build. <b>Season timing</b> is
+        not modelled at all. <b>Store context</b> is half done. Outlet and old season move the
+        price, extended catalogue and online exclusive do not. And the <b>reference
+        competitor</b> is the hard one: the client says each product has a chosen reference,
+        but <b>the rule that chooses it is not shared</b>. Without that rule you can offer a
+        selector with cheapest, mean and median, and let a human pick, but you cannot derive it.
+        Say that to them rather than guessing. A pricing tool that invents the client's own
+        policy is worse than one that admits the gap.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="goal">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="sec-tag">The goal</p>
+    </div>
+    <h2 class="rv">What this lab is for</h2>
+    <p class="lead prose rv">This is the only programme that takes the marketing process
+      from start to finish. You do not just build a tool: you take a real client brief
+      through analysis, strategy, creative work and delivery. A purely technical MVP does
+      not pass. Every team&rsquo;s work must address all four of these.</p>
 
     <div class="pillars rv">
       <div>
@@ -724,33 +766,7 @@ code{
     </div>
     <p class="cap">Fig. 03. The four assessed areas and the automation layer that supports them.</p>
 
-    <h3 class="rv">The assignment</h3>
-    <p class="prose rv">Inside that frame, the tool itself has three jobs, in one place.</p>
-    <ol class="steps rv">
-      <li><b>Watch the competition.</b> Collect the prices other shops charge for the same
-        running shoes, every day, and keep every observation.</li>
-      <li><b>Show the picture.</b> Put Forum Sport's catalogue, with photos, next to those
-        competitor prices, so a manager sees at a glance where they are cheaper or dearer.</li>
-      <li><b>Recommend a price.</b> For each product, suggest one, and explain in plain
-        words why.</li>
-    </ol>
-
-    <h3 class="rv">What you are given</h3>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>What</th><th>Detail</th><th>Catch</th></tr></thead>
-        <tbody>
-          <tr><td><b>The catalogue</b></td><td><a href="https://docs.google.com/spreadsheets/d/18wylq3JY7oh4eUJnOFq-mFa6bj-PonyeWbLZZfWMHjA/edit?usp=sharing" target="_blank" rel="noopener">One spreadsheet</a>. 1,483 models, 24,109 sizes, 28 brands, with list price, sale price, stock level and rotation class.</td><td>One row is one size, not one product. Collapse it wrong and you report the average price of a shoe size.</td></tr>
-          <tr><td><b>The margin policy</b></td><td>Five price bands. Each sets a minimum margin in per cent <b>and</b> in euros, plus a maximum alignment against the reference competitor.</td><td>Both margin floors must hold, not whichever is convenient. See week 4.</td></tr>
-          <tr><td><b>The catalogue dimensions</b></td><td>Season, season year, online exclusive, outlet, extended catalogue, custom label, ABCD store, ABCD digital.</td><td>The client wants all eight as filters. Two of them have no documented meaning. Ask before you build a rule on one.</td></tr>
-          <tr><td><b>Competitor prices</b></td><td>Nothing. You collect these yourself, from the open web, in week 3.</td><td>Matching their product to yours is harder than fetching it.</td></tr>
-          <tr><td><b>Sales data</b></td><td>None. No units, no revenue, no traffic, no conversion.</td><td>This is the constraint that shapes the whole engine. See week 4.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="cap">Fig. 04. The material the client supplies, and the complication attached to each.</p>
-
-    <h3 class="rv">Scope: what is included and what is not</h3>
+    <h3 class="rv">What we build, and what we do not</h3>
     <div class="tbl rv">
       <table>
         <thead><tr><th>We are building</th><th>We are not building</th></tr></thead>
@@ -764,154 +780,15 @@ code{
         </tbody>
       </table>
     </div>
-
-    <h3 class="rv">How you will be judged</h3>
-    <div class="how rv">
-      <div><b>Coherent</b><p>Two products in the same situation get the same answer. If they
-        do not, you can say which input differed.</p></div>
-      <div><b>Explainable</b><p>Every recommendation carries one sentence a buyer could read
-        aloud in a meeting, naming the rule that decided it.</p></div>
-      <div><b>Honest about itself</b><p>Where the data is thin, the tool says so on the row,
-        not in a footnote, and not only to the person who built it.</p></div>
-      <div><b>Usable weekly</b><p>A category manager opens it, filters to their brand, and
-        leaves with a list. No training session required.</p></div>
-      <div><b>Complete</b><p>All four areas are assessed, and the same brief and the same
-        requirements go to both sections of the cohort. A tool that works but carries no
-        strategy, no creative direction and no measurement is an unfinished answer.</p></div>
-    </div>
-
-    <h3 class="rv">The rubric</h3>
-    <p class="prose rv">The four areas carry equal weight. Within each, the same question
-      decides the band: can you show it, and can you defend it? Both sections of the cohort
-      are marked against this table.</p>
-
-    <div class="tbl rv">
-      <table class="t-rubric">
-        <thead><tr>
-          <th>Area</th><th>Weight</th>
-          <th>Distinction<br><span class="rb">80–100</span></th>
-          <th>Pass<br><span class="rb">50–79</span></th>
-          <th>Fail<br><span class="rb">under 50</span></th>
-        </tr></thead>
-        <tbody>
-          <tr>
-            <td><b>Strategy and governance</b></td>
-            <td class="wt">25%</td>
-            <td>A governance pack that names what the system is for, who owns it, what it must never do, and how a wrong recommendation is caught. Tied to the client's marketing strategy, not to the technology.</td>
-            <td>The pack exists and the rules are stated, but ownership or the failure case is vague.</td>
-            <td>No governance pack, or a list of principles with nothing operational in it.</td>
-          </tr>
-          <tr>
-            <td><b>Brand and creative direction</b></td>
-            <td class="wt">25%</td>
-            <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down, not generated and accepted.</td>
-            <td>The brand is applied correctly but without decisions you can explain.</td>
-            <td>Default styling, or a brand pasted on at the end.</td>
-          </tr>
-          <tr>
-            <td><b>Data and measurement</b></td>
-            <td class="wt">25%</td>
-            <td>A data layer that holds up, and a measurement framework designed from the start that would show whether customer behaviour changed. Named metrics, a baseline, and what would disprove you.</td>
-            <td>The data works and metrics are listed, but measurement was added at the end.</td>
-            <td>No measurement framework, or metrics with no baseline to compare against.</td>
-          </tr>
-          <tr>
-            <td><b>User experience</b></td>
-            <td class="wt">25%</td>
-            <td>A journey prototyped end to end from a real pain point, tested on someone who is not on your team, with what you changed after they used it.</td>
-            <td>A working MVP that real users can touch, but untested or untouched by their feedback.</td>
-            <td>A demo that only works when you drive it.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="cap">Fig. 05. The assessment rubric: four areas at equal weight, three bands each.</p>
-
-    <h4 class="rv" style="margin-top:var(--s-6)">Applied across every area</h4>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>What is also marked</th><th>What good looks like</th></tr></thead>
-        <tbody>
-          <tr><td><b>Analysis and strategy, not only implementation</b></td><td>The brief asks for all three. A tool that runs, with no analysis behind it and no argument in front of it, is an unfinished answer however well it works.</td></tr>
-          <tr><td><b>Honesty about limits</b></td><td>What the solution cannot do is stated by you, in the deliverable, before the client finds it. Claiming an optimum you cannot compute costs more than admitting the gap.</td></tr>
-          <tr><td><b>Automation that earns its place</b></td><td>The agents and workflows behind the campaign, Claude Code and GA4, do work a person would otherwise repeat. Automation for its own sake is not credit.</td></tr>
-          <tr><td><b>The client could run it on Monday</b></td><td>A handover someone outside the team can follow, in their language, without you in the room.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="warn rv">
-      <h4 style="margin-top:0">Three of the four requested changes are still open</h4>
-      <p>Forum Sport asked for four changes on the MVP, and only one, the band matrix,
-        is fully solved in the reference build. <b>Season timing</b> is
-        not modelled at all. <b>Store context</b> is half done. Outlet and old season move the
-        price, extended catalogue and online exclusive do not. And the <b>reference
-        competitor</b> is the hard one: the client says each product has a chosen reference,
-        but <b>the rule that chooses it is not shared</b>. Without that rule you can offer a
-        selector with cheapest, mean and median, and let a human pick, but you cannot derive it.
-        Say that to them rather than guessing. A pricing tool that invents the client's own
-        policy is worse than one that admits the gap.</p>
-    </div>
   </div>
 </section>
 
-<section>
+<section id="plan">
   <div class="wrap">
     <div class="sec-head rv">
-            <p class="sec-tag">Your toolkit</p>
-          </div>
-    <h2 class="rv">The tools you will use</h2>
-    <p class="lead prose rv">You will scroll back to this table all term. Everything else
-      on this page you read once.</p>
-
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Tool</th><th>In plain words</th><th>You use it to</th><th>From</th></tr></thead>
-        <tbody>
-          <tr><td><b>Claude Code</b></td><td>A colleague who writes the code when you describe, in normal language, what you want.</td><td>Describe, correct, ask why.</td><td>Week 1</td></tr>
-          <tr><td><b>GitHub</b></td><td>A shared folder that keeps every version, like Google Docs history.</td><td>Work as a team, undo mistakes.</td><td>Week 1</td></tr>
-          <tr><td><b>Vercel</b></td><td>Puts your project on the internet with one click.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
-          <tr><td><b>Supabase</b></td><td>An online database, a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
-          <tr><td><b>MCP server</b></td><td>A plug that lets the assistant talk to a service directly.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
-          <tr><td><b>GA4</b></td><td>Google Analytics. It records what people actually do on a site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
-        </tbody>
-      </table>
+      <p class="sec-tag">The six-week plan</p>
     </div>
-
-    <div class="fig rv" style="margin-top:var(--s-6)">
-      <svg viewBox="0 0 900 260" role="img" aria-label="The assistant in the centre, plugged into Supabase, GitHub and Vercel." class="figsvg">
-        <style>.fg-bx{fill:#fff;stroke:#d8d8d8;stroke-width:1}.fg-bl{font:700 12px var(--font-sans);fill:#0a1a3c;letter-spacing:.06em}
-          .fg-sm{font:400 11px var(--font-sans);fill:#6b6b6b}.fg-ar{stroke:#6b6b6b;stroke-width:1;fill:none}
-          .fg-bxn{fill:#0a1a3c;stroke:#0a1a3c;stroke-width:1}.fg-bln{font:700 12px var(--font-sans);fill:#fff;letter-spacing:.06em}.fg-smn{font:400 11px var(--font-sans);fill:#c9d2e6}</style>
-        <rect class="fg-bxn" x="330" y="100" width="240" height="60"/>
-        <text x="450" y="126" class="fg-bln" text-anchor="middle">THE ASSISTANT</text>
-        <text x="450" y="146" class="fg-smn" text-anchor="middle">you type here, in English</text>
-        <rect class="fg-bx" x="40" y="20" width="200" height="54"/><text x="140" y="44" class="fg-bl" text-anchor="middle">SUPABASE</text><text x="140" y="62" class="fg-sm" text-anchor="middle">the database</text>
-        <rect class="fg-bx" x="40" y="186" width="200" height="54"/><text x="140" y="210" class="fg-bl" text-anchor="middle">GITHUB</text><text x="140" y="228" class="fg-sm" text-anchor="middle">the history</text>
-        <rect class="fg-bx" x="660" y="103" width="200" height="54"/><text x="760" y="127" class="fg-bl" text-anchor="middle">VERCEL</text><text x="760" y="145" class="fg-sm" text-anchor="middle">the public address</text>
-        <path class="fg-ar" d="M240 47 H290 V118 H330"/><path class="fg-ar" d="M240 213 H290 V142 H330"/><path class="fg-ar" d="M570 130 H660"/>
-        <path d="M322 114 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M322 138 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M652 126 l8 4 -8 4 z" fill="#6b6b6b"/>
-        <text x="285" y="92" class="fg-sm" text-anchor="middle">MCP</text>
-      </svg>
-    </div>
-    <p class="cap">Fig. 06. The MCP server lets the assistant query each service directly, instead of you copying data between them.</p>
-
-    <div class="warn rv">
-      <h4 style="margin-top:0">The two Supabase keys, and which one may be published</h4>
-      <p>Supabase gives you two. The <b>publishable</b> key may live inside a web page.
-        The database's own rules keep it to reading. The <b>service_role</b> key ignores
-        every rule. Never paste it into a chat, a page, or GitHub. If you do, rotate it
-        immediately; assume it is public forever.</p>
-    </div>
-  </div>
-</section>
-
-<section class="tint">
-  <div class="wrap">
-    <div class="sec-head rv">
-            <p class="sec-tag">The six-week plan</p>
-          </div>
-    <h2 class="rv">The six-week plan and its milestones</h2>
+    <h2 class="rv">Six weeks, six things shipped</h2>
     <p class="lead prose rv">Every week ends with something that works and that you can
       show. The first three build the data foundation; the last three turn it into
       decisions, a brand and a client presentation.</p>
@@ -961,7 +838,162 @@ code{
 <text x="1094" y="194" class="fg-wd" text-anchor="middle">A live link</text>
 <text x="1094" y="210" class="fg-wd" text-anchor="middle">and a demo</text>
 </svg></div>
-    <p class="cap">Fig. 07. The six weeks and the deliverable each one ends with.</p>
+    <p class="cap">Fig. 04. The six weeks and the deliverable each one ends with.</p>
+  </div>
+</section>
+
+<section class="tint" id="stack">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="sec-tag">The tech stack</p>
+    </div>
+    <h2 class="rv">Six tools, none of them code</h2>
+    <p class="lead prose rv">You will scroll back to this table all term. Everything else
+      on this page you read once.</p>
+
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Tool</th><th>In plain words</th><th>You use it to</th><th>From</th></tr></thead>
+        <tbody>
+          <tr><td><b>Claude Code</b></td><td>A colleague who writes the code when you describe, in normal language, what you want.</td><td>Describe, correct, ask why.</td><td>Week 1</td></tr>
+          <tr><td><b>GitHub</b></td><td>A shared folder that keeps every version, like Google Docs history.</td><td>Work as a team, undo mistakes.</td><td>Week 1</td></tr>
+          <tr><td><b>Vercel</b></td><td>Puts your project on the internet with one click.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
+          <tr><td><b>Supabase</b></td><td>An online database, a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
+          <tr><td><b>MCP server</b></td><td>A plug that lets the assistant talk to a service directly.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
+          <tr><td><b>GA4</b></td><td>Google Analytics. It records what people actually do on a site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="fig rv" style="margin-top:var(--s-6)">
+      <svg viewBox="0 0 900 260" role="img" aria-label="The assistant in the centre, plugged into Supabase, GitHub and Vercel." class="figsvg">
+        <style>.fg-bx{fill:#fff;stroke:#d8d8d8;stroke-width:1}.fg-bl{font:700 12px var(--font-sans);fill:#0a1a3c;letter-spacing:.06em}
+          .fg-sm{font:400 11px var(--font-sans);fill:#6b6b6b}.fg-ar{stroke:#6b6b6b;stroke-width:1;fill:none}
+          .fg-bxn{fill:#0a1a3c;stroke:#0a1a3c;stroke-width:1}.fg-bln{font:700 12px var(--font-sans);fill:#fff;letter-spacing:.06em}.fg-smn{font:400 11px var(--font-sans);fill:#c9d2e6}</style>
+        <rect class="fg-bxn" x="330" y="100" width="240" height="60"/>
+        <text x="450" y="126" class="fg-bln" text-anchor="middle">THE ASSISTANT</text>
+        <text x="450" y="146" class="fg-smn" text-anchor="middle">you type here, in English</text>
+        <rect class="fg-bx" x="40" y="20" width="200" height="54"/><text x="140" y="44" class="fg-bl" text-anchor="middle">SUPABASE</text><text x="140" y="62" class="fg-sm" text-anchor="middle">the database</text>
+        <rect class="fg-bx" x="40" y="186" width="200" height="54"/><text x="140" y="210" class="fg-bl" text-anchor="middle">GITHUB</text><text x="140" y="228" class="fg-sm" text-anchor="middle">the history</text>
+        <rect class="fg-bx" x="660" y="103" width="200" height="54"/><text x="760" y="127" class="fg-bl" text-anchor="middle">VERCEL</text><text x="760" y="145" class="fg-sm" text-anchor="middle">the public address</text>
+        <path class="fg-ar" d="M240 47 H290 V118 H330"/><path class="fg-ar" d="M240 213 H290 V142 H330"/><path class="fg-ar" d="M570 130 H660"/>
+        <path d="M322 114 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M322 138 l8 4 -8 4 z" fill="#6b6b6b"/><path d="M652 126 l8 4 -8 4 z" fill="#6b6b6b"/>
+        <text x="285" y="92" class="fg-sm" text-anchor="middle">MCP</text>
+      </svg>
+    </div>
+    <p class="cap">Fig. 05. The MCP server lets the assistant query each service directly, instead of you copying data between them.</p>
+
+    <div class="warn rv">
+      <h4 style="margin-top:0">The two Supabase keys, and which one may be published</h4>
+      <p>Supabase gives you two. The <b>publishable</b> key may live inside a web page.
+        The database's own rules keep it to reading. The <b>service_role</b> key ignores
+        every rule. Never paste it into a chat, a page, or GitHub. If you do, rotate it
+        immediately; assume it is public forever.</p>
+    </div>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="sec-tag">The resources</p>
+    </div>
+    <h2 class="rv">What you are given, and where it is</h2>
+    <p class="lead prose rv">Three links, and the catch attached to each piece of material.
+      Everything else you collect yourself.</p>
+
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Resource</th><th>What it is</th><th>Used in</th></tr></thead>
+        <tbody>
+          <tr><td><b><a href="https://docs.google.com/spreadsheets/d/18wylq3JY7oh4eUJnOFq-mFa6bj-PonyeWbLZZfWMHjA/edit?usp=sharing" target="_blank" rel="noopener">Forum Sport Dataset</a></b></td><td>Three tabs. <code>database</code> is the catalogue, 24,109 rows by 30 columns, one row per size. <code>fields</code> says what each column means. <code>dimension values</code> holds the totals your load has to match.</td><td style="white-space:nowrap">Week 2</td></tr>
+          <tr><td><b><a href="https://docs.google.com/spreadsheets/d/11MAnhxrBxhLpDxzCwylznymUuwmMgr3P4gnAVfqTvhY/edit?usp=sharing" target="_blank" rel="noopener">Forum Sports Competitors</a></b></td><td>39 sellers and 389,469 records between them, each with its record count and its address. You choose which ones to watch.</td><td style="white-space:nowrap">Week 3</td></tr>
+          <tr><td><b><a href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">The reference build</a></b></td><td>A finished answer to this brief, on live data. Open it, break it, read its numbers. You are not copying it, you are building your own answer.</td><td style="white-space:nowrap">All term</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="rv">The material, and the catch attached to each</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>What</th><th>Detail</th><th>Catch</th></tr></thead>
+        <tbody>
+          <tr><td><b>The catalogue</b></td><td><a href="https://docs.google.com/spreadsheets/d/18wylq3JY7oh4eUJnOFq-mFa6bj-PonyeWbLZZfWMHjA/edit?usp=sharing" target="_blank" rel="noopener">One spreadsheet</a>. 1,483 models, 24,109 sizes, 28 brands, with list price, sale price, stock level and rotation class.</td><td>One row is one size, not one product. Collapse it wrong and you report the average price of a shoe size.</td></tr>
+          <tr><td><b>The margin policy</b></td><td>Five price bands. Each sets a minimum margin in per cent <b>and</b> in euros, plus a maximum alignment against the reference competitor.</td><td>Both margin floors must hold, not whichever is convenient. See week 4.</td></tr>
+          <tr><td><b>The catalogue dimensions</b></td><td>Season, season year, online exclusive, outlet, extended catalogue, custom label, ABCD store, ABCD digital.</td><td>The client wants all eight as filters. Two of them have no documented meaning. Ask before you build a rule on one.</td></tr>
+          <tr><td><b>Competitor prices</b></td><td>Nothing. You collect these yourself, from the open web, in week 3.</td><td>Matching their product to yours is harder than fetching it.</td></tr>
+          <tr><td><b>Sales data</b></td><td>None. No units, no revenue, no traffic, no conversion.</td><td>This is the constraint that shapes the whole engine. See week 4.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 06. The material the client supplies, and the complication attached to each.</p>
+  </div>
+</section>
+
+<section class="tint" id="rubric">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <p class="sec-tag">The rubric</p>
+    </div>
+    <h2 class="rv">How you will be marked</h2>
+    <p class="lead prose rv">The four areas carry equal weight. Within each, the same
+      question decides the band: can you show it, and can you defend it? Both sections of
+      the cohort are marked against this table.</p>
+
+    <div class="tbl rv">
+      <table class="t-rubric">
+        <thead><tr>
+          <th>Area</th><th>Weight</th>
+          <th>Distinction<br><span class="rb">80–100</span></th>
+          <th>Pass<br><span class="rb">50–79</span></th>
+          <th>Fail<br><span class="rb">under 50</span></th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Strategy and governance</b></td>
+            <td class="wt">25%</td>
+            <td>A governance pack that names what the system is for, who owns it, what it must never do, and how a wrong recommendation is caught. Tied to the client's marketing strategy, not to the technology.</td>
+            <td>The pack exists and the rules are stated, but ownership or the failure case is vague.</td>
+            <td>No governance pack, or a list of principles with nothing operational in it.</td>
+          </tr>
+          <tr>
+            <td><b>Brand and creative direction</b></td>
+            <td class="wt">25%</td>
+            <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down, not generated and accepted.</td>
+            <td>The brand is applied correctly but without decisions you can explain.</td>
+            <td>Default styling, or a brand pasted on at the end.</td>
+          </tr>
+          <tr>
+            <td><b>Data and measurement</b></td>
+            <td class="wt">25%</td>
+            <td>A data layer that holds up, and a measurement framework designed from the start that would show whether customer behaviour changed. Named metrics, a baseline, and what would disprove you.</td>
+            <td>The data works and metrics are listed, but measurement was added at the end.</td>
+            <td>No measurement framework, or metrics with no baseline to compare against.</td>
+          </tr>
+          <tr>
+            <td><b>User experience</b></td>
+            <td class="wt">25%</td>
+            <td>A journey prototyped end to end from a real pain point, tested on someone who is not on your team, with what you changed after they used it.</td>
+            <td>A working MVP that real users can touch, but untested or untouched by their feedback.</td>
+            <td>A demo that only works when you drive it.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 07. The assessment rubric: four areas at equal weight, three bands each.</p>
+
+    <h4 class="rv" style="margin-top:var(--s-6)">Applied across every area</h4>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>What is also marked</th><th>What good looks like</th></tr></thead>
+        <tbody>
+          <tr><td><b>Analysis and strategy, not only implementation</b></td><td>The brief asks for all three. A tool that runs, with no analysis behind it and no argument in front of it, is an unfinished answer however well it works.</td></tr>
+          <tr><td><b>Honesty about limits</b></td><td>What the solution cannot do is stated by you, in the deliverable, before the client finds it. Claiming an optimum you cannot compute costs more than admitting the gap.</td></tr>
+          <tr><td><b>Automation that earns its place</b></td><td>The agents and workflows behind the campaign, Claude Code and GA4, do work a person would otherwise repeat. Automation for its own sake is not credit.</td></tr>
+          <tr><td><b>The client could run it on Monday</b></td><td>A handover someone outside the team can follow, in their language, without you in the room.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
