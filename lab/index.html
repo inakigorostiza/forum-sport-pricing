@@ -696,20 +696,6 @@ code{
       <li>Photos and prices side by side. Today their team sees only numbers and product names</li>
     </ul>
 
-    <h3 class="rv">What changes</h3>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Topic</th><th>The MVP did this</th><th>Forum Sport asks for</th></tr></thead>
-        <tbody>
-          <tr><td><b>Reference competitor</b></td><td>Always the cheapest competitor price</td><td>Each product has <b>one chosen reference competitor</b>, not always the cheapest</td></tr>
-          <tr><td><b>Profitability</b></td><td>One minimum margin for everything</td><td>A minimum margin in per cent <b>and</b> in euros, by price band</td></tr>
-          <tr><td><b>Season timing</b></td><td>Not considered</td><td>Start of season versus end of season changes the answer</td></tr>
-          <tr><td><b>Store context</b></td><td>Partly used</td><td>Outlet, extended catalogue, season and online exclusive each push the price in a known direction</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="cap">Fig. 05 — The four changes requested on the MVP. Only the second is fully solved in the reference build.</p>
-
     <h3 class="rv">In scope, and out</h3>
     <div class="tbl rv">
       <table>
@@ -785,7 +771,7 @@ code{
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 06 — The rubric. Equal weight, four areas, one question each.</p>
+    <p class="cap">Fig. 05 — The rubric. Equal weight, four areas, one question each.</p>
 
     <h4 class="rv" style="margin-top:var(--s-6)">Applied across every area</h4>
     <div class="tbl rv">
@@ -801,8 +787,9 @@ code{
     </div>
 
     <div class="warn rv">
-      <h4 style="margin-top:0">Three of the four changes are still open</h4>
-      <p>Only the band matrix is fully solved in the reference build. <b>Season timing</b> is
+      <h4 style="margin-top:0">Three of the four requested changes are still open</h4>
+      <p>Forum Sport asked for four changes on the MVP, and only one — the band matrix —
+        is fully solved in the reference build. <b>Season timing</b> is
         not modelled at all. <b>Store context</b> is half done — outlet and old season move the
         price, extended catalogue and online exclusive do not. And the <b>reference
         competitor</b> is the hard one: the client says each product has a chosen reference,
@@ -851,7 +838,7 @@ code{
         <text x="285" y="92" class="sm" text-anchor="middle">MCP</text>
       </svg>
     </div>
-    <p class="cap">Fig. 07 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
+    <p class="cap">Fig. 06 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Two keys. Only one of them is safe.</h4>
@@ -913,7 +900,7 @@ code{
 <text x="1090" y="178" class="wd" text-anchor="middle">A live link</text>
 <text x="1090" y="194" class="wd" text-anchor="middle">and a demo</text>
 </svg></div>
-    <p class="cap">Fig. 08 — Each week's deliverable is the next week's raw material.</p>
+    <p class="cap">Fig. 07 — Each week's deliverable is the next week's raw material.</p>
   </div>
 </section>
 
@@ -1066,7 +1053,7 @@ When you are done, tell me which key you used and why it is safe for that key to
     <div class="shot rv">
       <img src="/lab/assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="2320" height="1240">
     </div>
-    <p class="cap">Fig. 09 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
+    <p class="cap">Fig. 08 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
 
     <div class="gotcha rv">
       <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet — tell the assistant exactly that sentence.</p>
@@ -1179,7 +1166,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 10 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+    <p class="cap">Fig. 09 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Changing your user agent will not fix this</h4>
@@ -1255,7 +1242,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <div class="shot rv">
       <img src="/lab/assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
     </div>
-    <p class="cap">Fig. 11 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
+    <p class="cap">Fig. 10 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
@@ -1320,12 +1307,12 @@ If a big move rests on one observation, say so right next to it rather than in a
 <line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
 <text x="478" y="132" class="c">CEILING WITH ONE RIVAL: 45 — ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
-    <p class="cap">Fig. 12 — What the hundred points are made of. The score grades the data, never the price.</p>
+    <p class="cap">Fig. 11 — What the hundred points are made of. The score grades the data, never the price.</p>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="2236" height="1120">
     </div>
-    <p class="cap">Fig. 13 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
+    <p class="cap">Fig. 12 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
 
     <div class="gotcha rv">
       <p>Someone asks "is this the optimal price?". The answer is no — it is the defensible price. Optimal needs demand data that does not exist.</p>
@@ -1412,7 +1399,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         <img src="/lab/assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="1170" height="2532">
       </div>
     </div>
-    <p class="cap">Fig. 14 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
+    <p class="cap">Fig. 13 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
 
     <div class="gotcha rv">
       <p>Dark mode makes the accent unreadable. Change the value, not the component — that is what naming them was for.</p>
@@ -1462,7 +1449,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 15 — Rehearse these three out loud. They are the whole defence.</p>
+    <p class="cap">Fig. 14 — Rehearse these three out loud. They are the whole defence.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
@@ -1520,7 +1507,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="2236" height="282">
     </div>
-    <p class="cap">Fig. 16 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
+    <p class="cap">Fig. 15 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
 
     <div class="two rv">
       <div class="shot" style="margin-top:0">
@@ -1530,7 +1517,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
         <img src="/lab/assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="2320" height="374">
       </div>
     </div>
-    <p class="cap">Fig. 17 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+    <p class="cap">Fig. 16 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
 
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
