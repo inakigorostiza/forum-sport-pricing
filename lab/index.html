@@ -416,6 +416,7 @@ footer img{height:36px}
 /* Rúbrica: cinco columnas, y las tres de banda son prosa. */
 .t-rubric th:nth-child(1){width:17%} .t-rubric th:nth-child(2){width:8%}
 .t-rubric td{font-size:.875rem; line-height:1.5}
+#stack table td:last-child, #stack table th:last-child{white-space:nowrap}
 .t-rubric .wt{font-family:var(--font-display); font-weight:800; color:var(--ie-navy);
   font-variant-numeric:tabular-nums}
 .t-rubric .rb{display:block; font-size:.625rem; font-weight:600; opacity:.7;
@@ -496,8 +497,8 @@ code{
       In six weeks you take a real client brief from analysis through strategy, creative
       direction and delivery, and publish a working tool that reads competitor prices every
       day and recommends what each product should cost. The tool is the proof, not the
-      whole answer. You will not write a line of code. You will describe what you want, in
-      plain English, to an assistant that writes it for you.</p>
+      whole answer. You will not write the code yourself. You specify what it has to do,
+      and you review what the assistant builds.</p>
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
       <a class="btn btn-ghost" href="#week-1">Start week 01 <span class="arw">&rarr;</span></a>
@@ -511,7 +512,7 @@ code{
       <div class="fact"><p class="n">1,483</p><p class="c">Shoe models in the catalogue</p></div>
       <div class="fact"><p class="n">16</p><p class="c">Competitors read daily</p></div>
       <div class="fact"><p class="n">73.3%</p><p class="c">Dearer than the cheapest rival</p></div>
-      <div class="fact"><p class="n">0</p><p class="c">Lines of code you type</p></div>
+      <div class="fact"><p class="n">0</p><p class="c">Lines of code written by hand</p></div>
     </div>
     <p class="cap">Measured 13 October 2026 across 742 models that have a competitor price. Average gap +14.5%.</p>
   </div>
@@ -629,7 +630,7 @@ code{
       <div>
         <h4>Who it is for</h4>
         <p>Marketing students. No programming background assumed, and none acquired.
-           If you can write a clear brief, you can do this.</p>
+           What is assessed is how you specify and direct the work.</p>
       </div>
       <div>
         <h4>What you need</h4>
@@ -811,20 +812,20 @@ code{
     <div class="sec-head rv">
       <p class="sec-tag">The tech stack</p>
     </div>
-    <h2 class="rv">Six tools, none of them code</h2>
+    <h2 class="rv">Six tools, and what each one does</h2>
     <p class="lead prose rv">You will scroll back to this table all term. Everything else
       on this page you read once.</p>
 
     <div class="tbl rv">
       <table>
-        <thead><tr><th>Tool</th><th>In plain words</th><th>You use it to</th><th>From</th></tr></thead>
+        <thead><tr><th>Tool</th><th>What it is</th><th>You use it to</th><th>From</th></tr></thead>
         <tbody>
-          <tr><td><b>Claude Code</b></td><td>A colleague who writes the code when you describe, in normal language, what you want.</td><td>Describe, correct, ask why.</td><td>Week 1</td></tr>
-          <tr><td><b>GitHub</b></td><td>A shared folder that keeps every version, like Google Docs history.</td><td>Work as a team, undo mistakes.</td><td>Week 1</td></tr>
-          <tr><td><b>Vercel</b></td><td>Puts your project on the internet with one click.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
-          <tr><td><b>Supabase</b></td><td>An online database, a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
-          <tr><td><b>MCP server</b></td><td>A plug that lets the assistant talk to a service directly.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
-          <tr><td><b>GA4</b></td><td>Google Analytics. It records what people actually do on a site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
+          <tr><td><b>Claude Code</b></td><td>Writes and edits the project&rsquo;s code from a written specification.</td><td>Specify, correct, ask why.</td><td>Week 1</td></tr>
+          <tr><td><b>GitHub</b></td><td>Version control. Every change is recorded, with who made it and when, and any version can be restored.</td><td>Work as a team, undo mistakes.</td><td>Week 1</td></tr>
+          <tr><td><b>Vercel</b></td><td>Hosting. Serves the project at a public address and republishes it on every change.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
+          <tr><td><b>Supabase</b></td><td>A hosted PostgreSQL database the page queries directly.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
+          <tr><td><b>MCP server</b></td><td>A connector that lets the assistant query a service itself.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
+          <tr><td><b>GA4</b></td><td>Google Analytics 4. Records what visitors do on the site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
         </tbody>
       </table>
     </div>
@@ -836,7 +837,7 @@ code{
           .fg-bxn{fill:#0a1a3c;stroke:#0a1a3c;stroke-width:1}.fg-bln{font:700 12px var(--font-sans);fill:#fff;letter-spacing:.06em}.fg-smn{font:400 11px var(--font-sans);fill:#c9d2e6}</style>
         <rect class="fg-bxn" x="330" y="100" width="240" height="60"/>
         <text x="450" y="126" class="fg-bln" text-anchor="middle">THE ASSISTANT</text>
-        <text x="450" y="146" class="fg-smn" text-anchor="middle">you type here, in English</text>
+        <text x="450" y="146" class="fg-smn" text-anchor="middle">you describe what it must do</text>
         <rect class="fg-bx" x="40" y="20" width="200" height="54"/><text x="140" y="44" class="fg-bl" text-anchor="middle">SUPABASE</text><text x="140" y="62" class="fg-sm" text-anchor="middle">the database</text>
         <rect class="fg-bx" x="40" y="186" width="200" height="54"/><text x="140" y="210" class="fg-bl" text-anchor="middle">GITHUB</text><text x="140" y="228" class="fg-sm" text-anchor="middle">the history</text>
         <rect class="fg-bx" x="660" y="103" width="200" height="54"/><text x="760" y="127" class="fg-bl" text-anchor="middle">VERCEL</text><text x="760" y="145" class="fg-sm" text-anchor="middle">the public address</text>
@@ -946,8 +947,8 @@ code{
             <p class="sec-sub">Setup</p>
           </div>
     <h2 class="rv">Setting up your accounts and publishing a first page</h2>
-    <p class="wk-goal rv">By tonight there is a web address, on the real internet, with
-      your team name on it, and you got there by typing English.</p>
+    <p class="wk-goal rv">By the end of the session the team has a public web address,
+      published from its own repository.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
@@ -972,15 +973,15 @@ code{
     <div class="how rv">
       <div><b>Open the assistant</b><p>It asks which folder to work in. Choose Desktop →
         <code>forum-sport-&lt;team&gt;</code> → Open. You now have one text box at the bottom
-        of the screen. That box is the whole interface. You type sentences into it. It is
-        not a terminal, and nothing it suggests runs until you click Yes.</p></div>
+        of the screen. That box is the whole interface: you write your instructions into
+        it. It is not a terminal, and nothing it proposes runs until you approve it.</p></div>
       <div><b>Put it on GitHub</b><p>Paste the second prompt below. It will ask permission
-        before each command: read the line, then click Yes. A browser window opens for
+        before each command: read the line, then approve it. A browser window opens for
         GitHub. Click Authorize.</p></div>
       <div><b>Publish</b><p>vercel.com → <b>Add New</b> → <b>Project</b> → import the
         repository you just created → <b>Deploy</b>. About forty seconds. Vercel shows a
-        URL ending <code>.vercel.app</code>. Open it on your phone. That is your page, on
-        the internet.</p></div>
+        URL ending <code>.vercel.app</code>. Open it on your phone. That is the published
+        page.</p></div>
     </div>
 
     <div class="prompt rv">
@@ -1002,7 +1003,7 @@ Do not install anything that is not strictly needed, and tell me before you inst
     </div>
 
     <div class="gotcha rv">
-      <p>It asks permission to run a command. That is normal. It always asks before it acts.</p>
+      <p>It asks permission before every command it runs.</p>
       <p>Vercel complains about an output directory. Reply to the assistant with the exact error text, pasted whole.</p>
     </div>
 
@@ -1068,7 +1069,7 @@ Do not install anything that is not strictly needed, and tell me before you inst
         Connected. From now on you can ask "how many models are there?" and it asks the
         database itself instead of guessing.</p></div>
       <div><b>Read before loading</b><p>This is the week's real lesson. In the reference
-        build the two boring tabs of the workbook, a field dictionary and a pivot table,
+        build the field dictionary and the pivot tabs
         turned out to be the most valuable: one explained the business grain, the other
         became the test that proved the load was correct.</p></div>
     </div>
