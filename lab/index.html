@@ -120,16 +120,20 @@ strong{font-weight:700; color:var(--ie-navy)}
 
 /* ── sticky section nav ─────────────────────────────────────────────── */
 .secnav{
-  position:sticky; top:0; z-index:60; height:var(--nav-h);
+  position:fixed; top:0; left:0; right:0; z-index:60; height:var(--nav-h);
   background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
   border-bottom:1px solid var(--g-300);
   opacity:0; pointer-events:none;
   transition:opacity var(--t) var(--ease), transform var(--t) var(--ease);
-  transform:translateY(-8px);
+  transform:translateY(-100%);
 }
 .secnav.on{opacity:1; pointer-events:auto; transform:none}
+/* position:relative a propósito: hace de bloque contenedor del marcador, para
+   que su translateX se mida desde el borde del contenido y no desde su posición
+   estática dentro del flex —que arrastraba un desfase de 144px— y para que
+   acompañe a los enlaces cuando la barra se desplaza en pantalla estrecha. */
 .secnav .wrap{display:flex; align-items:center; gap:2px; height:100%; overflow-x:auto;
-  scrollbar-width:none}
+  scrollbar-width:none; position:relative}
 .secnav .wrap::-webkit-scrollbar{display:none}
 .secnav a{
   position:relative; flex:none; color:var(--g-600);
@@ -140,22 +144,41 @@ strong{font-weight:700; color:var(--ie-navy)}
 .secnav a:hover{color:var(--ie-navy)}
 .secnav a[aria-current="true"]{color:var(--ie-navy)}
 .secnav .mark{
-  position:absolute; bottom:0; height:2px; background:var(--ie-red);
+  position:absolute; left:0; bottom:0; width:0; height:2px; background:var(--ie-red);
   transition:transform var(--t) var(--ease), width var(--t) var(--ease);
 }
 .navlogo{flex:none; height:30px; margin-right:18px}
+.secnav{position:fixed}
+@media(max-width:620px){
+  .navlogo{display:none}
+  .secnav a{padding:0 10px}
+  /* El menú se desplaza; sin esto nadie sabe que hay más detrás del borde. */
+  .secnav::after{
+    content:""; position:absolute; top:0; right:0; bottom:1px; width:44px;
+    pointer-events:none;
+    background:linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.96) 70%);
+  }
+}
 
 /* ── hero ───────────────────────────────────────────────────────────── */
+/* El lockup institucional es tinta oscura sobre transparente y no existe en
+   versión clara, así que abre la página en una banda blanca propia en vez de
+   ir sobre el navy con una placa detrás, que se vería como una pegatina.
+   Lleva dentro el logo de IE, de modo que el héroe ya no repite la marca. */
+.masthead{background:var(--white); border-bottom:1px solid var(--g-300)}
+.masthead .wrap{display:flex; align-items:center; justify-content:space-between;
+  gap:var(--s-3); flex-wrap:wrap; padding-top:16px; padding-bottom:16px}
+.masthead img{height:56px; width:auto}
+.masthead .mh-tag{font-size:var(--fs-eyebrow); font-weight:700;
+  text-transform:uppercase; letter-spacing:var(--track-eyebrow); color:var(--g-600)}
+@media(max-width:560px){ .masthead img{height:40px} .masthead .mh-tag{display:none} }
+
 .hero{
   background:linear-gradient(180deg,var(--ie-navy-700) 0%,var(--ie-navy) 100%);
   padding:var(--s-8) 0 var(--s-12);
 }
 .hero .btn-ghost{color:#fff}
-.hero-top{display:flex; align-items:center; justify-content:space-between;
-  gap:var(--s-3); margin-bottom:var(--s-12); flex-wrap:wrap}
-.hero-top img{height:46px}
-.hero-tag{font-size:var(--fs-eyebrow); font-weight:700; text-transform:uppercase;
-  letter-spacing:var(--track-eyebrow); color:#8fa3cc}
+.hero{padding-top:var(--s-12)}
 
 /* ── key facts ──────────────────────────────────────────────────────── */
 .facts{
@@ -313,6 +336,32 @@ footer img{height:36px}
   .wrap{padding:0 18px}
   .prompt pre{font-size:.75rem; padding:var(--s-2)}
 }
+/* Las cuatro áreas: rejilla de filetes con el numeral en rojo, y debajo una
+   banda navy con la capa de automatización que las sostiene. */
+.pillars{display:grid; gap:1px; background:var(--g-300);
+  border:1px solid var(--g-300); border-radius:var(--radius) var(--radius) 0 0;
+  overflow:hidden; margin-top:var(--s-4)}
+@media(min-width:720px){ .pillars{grid-template-columns:repeat(2,1fr)} }
+@media(min-width:1100px){ .pillars{grid-template-columns:repeat(4,1fr)} }
+.pillars > div{background:var(--white); padding:var(--s-3)}
+.pillars .pn{
+  display:block; font-family:var(--font-display); font-size:1.25rem; font-weight:800;
+  color:var(--ie-red); letter-spacing:.04em; margin-bottom:var(--s-1);
+  font-variant-numeric:tabular-nums;
+}
+.pillars h4{margin:0 0 6px; color:var(--ie-navy); font-size:.8125rem}
+.pillars p{margin:0; font-size:.875rem; line-height:1.55}
+.pillars-base{
+  background:var(--ie-navy); color:#c9d2e6; padding:var(--s-2) var(--s-3);
+  border-radius:0 0 var(--radius) var(--radius);
+  display:flex; align-items:baseline; gap:var(--s-2); flex-wrap:wrap;
+}
+.pillars-base span{
+  font-size:.625rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.12em; color:#8fa3cc; flex:none;
+}
+.pillars-base b{color:#fff; font-size:.875rem; font-weight:600}
+
 .fig{max-width:100%}
 /* Nunca tuvo estilo, y `forum-sport-<team>` es un token largo que no se parte:
    a 360px empujaba la página 12px de lado. */
@@ -326,6 +375,14 @@ code{
 </style>
 </head>
 <body>
+
+<div class="masthead">
+  <div class="wrap">
+    <img src="assets/next-best-you.webp" alt="IE Business School · Igniting the next best you"
+         width="860" height="342">
+    <span class="mh-tag">End-to-end AI Marketing Lab</span>
+  </div>
+</div>
 
 <nav class="secnav" id="secnav" aria-label="Sections">
   <div class="wrap">
@@ -341,18 +398,15 @@ code{
 
 <header class="hero">
   <div class="wrap">
-    <div class="hero-top">
-      <img src="assets/ie-logo-light.svg" alt="IE Business School">
-      <span class="hero-tag">End-to-end AI Marketing Lab</span>
-    </div>
     <p class="eyebrow rv">AI Marketing Lab · IE Business School</p>
     <h1 class="rv">Build a pricing tool in six weeks</h1>
     <p class="lead prose rv">Forum Sport sells 1,483 shoe models online. Seven out of ten
       are dearer than the cheapest rival, and a shopper finds that out in four seconds.
-      In six weeks you will build and publish a working tool that reads competitor prices
-      every day and recommends what each product should cost. You will not write a line
-      of code. You will describe what you want, in plain English, to an assistant that
-      writes it for you.</p>
+      In six weeks you take a real client brief from analysis through strategy, creative
+      direction and delivery, and publish a working tool that reads competitor prices every
+      day and recommends what each product should cost. The tool is the proof, not the
+      whole answer. You will not write a line of code — you will describe what you want, in
+      plain English, to an assistant that writes it for you.</p>
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
       <a class="btn btn-ghost" href="#week-1">Start week 01 <span class="arw">&rarr;</span></a>
@@ -506,7 +560,7 @@ code{
   </div>
 </section>
 
-<section class="tint">
+<section class="tint" id="the-brief">
   <div class="wrap">
     <p class="eyebrow rv">03 — The client's brief</p>
     <h2 class="rv">Explain the price, don't copy it</h2>
@@ -516,18 +570,163 @@ code{
       <cite>Forum Sport, on the MVP</cite>
     </blockquote>
 
-    <div class="tbl rv" style="margin-top:var(--s-6)">
+    <p class="lead prose rv" style="margin-top:var(--s-4)">That sentence is the whole
+      engagement. Forum Sport is not asking you to reverse-engineer how they price today.
+      They are asking for a tool whose every number can be defended out loud, in a meeting,
+      by someone who did not build it.</p>
+
+    <h3 class="rv">The client</h3>
+    <div class="grid3 rv" style="margin-top:var(--s-2)">
+      <div>
+        <h4>Who they are</h4>
+        <p>A Spanish sports retailer selling online and in store. The scope here is the
+          men's running and trail shoe catalogue.</p>
+      </div>
+      <div>
+        <h4>Who asks for it</h4>
+        <p>The pricing and category team. Unai, on their side, owns the commercial policy
+          and supplies the margin rules the engine must respect.</p>
+      </div>
+      <div>
+        <h4>Who uses it</h4>
+        <p>A category manager, weekly. Not an analyst and not a developer. If a number
+          needs a footnote to be understood, it has failed.</p>
+      </div>
+    </div>
+
+    <h3 class="rv">Four areas, not one deliverable</h3>
+    <p class="prose rv">This is the only programme that covers the marketing process from
+      start to finish. Teams do not just build a tool: they take a real client brief through
+      analysis, strategy, creative work and delivery. A purely technical MVP does not pass.
+      Every team's work must address all four of these.</p>
+
+    <div class="pillars rv">
+      <div>
+        <span class="pn">01</span>
+        <h4>Strategy and governance</h4>
+        <p>Design, manage and govern an AI system. Define what it is for, how it supports the
+          client's marketing strategy, and what rules and controls keep it reliable and
+          responsible. Captured in the <b>governance pack</b>.</p>
+      </div>
+      <div>
+        <span class="pn">02</span>
+        <h4>Brand and creative direction</h4>
+        <p>Learn to direct AI, not just prompt it. Shape how the solution looks, sounds and
+          tells its story, and produce front-end and back-end creative work that reflects the
+          client's brand.</p>
+      </div>
+      <div>
+        <span class="pn">03</span>
+        <h4>Data and measurement</h4>
+        <p>Build the data layer and the measurement framework that show whether the solution
+          actually changes customer behaviour. Measurement is not an add-on: it is designed
+          from the start and carries the impact story.</p>
+      </div>
+      <div>
+        <span class="pn">04</span>
+        <h4>User experience</h4>
+        <p>Prototype an AI-powered customer journey end to end, from a real pain point to a
+          working MVP that real users can touch and test.</p>
+      </div>
+    </div>
+    <div class="pillars-base rv">
+      <span>Supported by automation</span>
+      <b>The agents and workflows behind the campaign · Claude Code · n8n · GA4</b>
+    </div>
+    <p class="cap">Fig. 03 — Four areas, one automation layer underneath. All four are assessed.</p>
+
+    <h3 class="rv">The assignment</h3>
+    <p class="prose rv">Inside that frame, the tool itself has three jobs, in one place.</p>
+    <ol class="steps rv">
+      <li><b>Watch the competition.</b> Collect the prices other shops charge for the same
+        running shoes, every day, and keep every observation.</li>
+      <li><b>Show the picture.</b> Put Forum Sport's catalogue, with photos, next to those
+        competitor prices, so a manager sees at a glance where they are cheaper or dearer.</li>
+      <li><b>Recommend a price.</b> For each product, suggest one — and explain in plain
+        words why.</li>
+    </ol>
+
+    <h3 class="rv">What you are given</h3>
+    <div class="tbl rv">
       <table>
-        <thead><tr><th>We are not building</th><th>We are building</th></tr></thead>
+        <thead><tr><th>What</th><th>Detail</th><th>Catch</th></tr></thead>
         <tbody>
-          <tr><td>A copy of Forum Sport's real pricing model</td><td>A recommender built from the policy they gave us</td></tr>
-          <tr><td>An optimal price</td><td>A defensible price, with the reason attached</td></tr>
-          <tr><td>A machine-learning model</td><td>Rules, visible and editable on screen</td></tr>
-          <tr><td>A number you have to trust</td><td>A number with a 0–100 score on the data behind it</td></tr>
+          <tr><td><b>The catalogue</b></td><td>One spreadsheet. 1,483 models, 24,109 sizes, 28 brands, with list price, sale price, stock level and rotation class.</td><td>One row is one size, not one product. Collapse it wrong and you report the average price of a shoe size.</td></tr>
+          <tr><td><b>The margin policy</b></td><td>Five price bands. Each sets a minimum margin in per cent <b>and</b> in euros, plus a maximum alignment against the reference competitor.</td><td>Both margin floors must hold, not whichever is convenient. See week 4.</td></tr>
+          <tr><td><b>The catalogue dimensions</b></td><td>Season, season year, online exclusive, outlet, extended catalogue, custom label, ABCD store, ABCD digital.</td><td>The client wants all eight as filters. Two of them have no documented meaning — ask before you build a rule on one.</td></tr>
+          <tr><td><b>Competitor prices</b></td><td>Nothing. You collect these yourself, from the open web, in week 3.</td><td>Matching their product to yours is harder than fetching it.</td></tr>
+          <tr><td><b>Sales data</b></td><td>None. No units, no revenue, no traffic, no conversion.</td><td>This is the constraint that shapes the whole engine. See week 4.</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 03 — What the client asked for, and what they did not.</p>
+    <p class="cap">Fig. 04 — What the client hands over, and what each thing costs you.</p>
+
+    <h3 class="rv">What they liked about the first version</h3>
+    <p class="prose rv">Forum Sport reviewed an MVP before this brief was written. Keep what
+      earned its place:</p>
+    <ul class="chk rv" style="margin-top:var(--s-2)">
+      <li>One tool covering all three steps, not three disconnected ones</li>
+      <li>Simple, accessible charts with enough filters to compare Forum against the competition</li>
+      <li>A recommendation engine that is visible and interactive — the manager changes the rules and simulates alternatives</li>
+      <li>Each recommended price showing the reasons behind it, so the manager understands the logic</li>
+      <li>Photos and prices side by side. Today their team sees only numbers and product names</li>
+    </ul>
+
+    <h3 class="rv">What changes</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Topic</th><th>The MVP did this</th><th>Forum Sport asks for</th></tr></thead>
+        <tbody>
+          <tr><td><b>Reference competitor</b></td><td>Always the cheapest competitor price</td><td>Each product has <b>one chosen reference competitor</b>, not always the cheapest</td></tr>
+          <tr><td><b>Profitability</b></td><td>One minimum margin for everything</td><td>A minimum margin in per cent <b>and</b> in euros, by price band</td></tr>
+          <tr><td><b>Season timing</b></td><td>Not considered</td><td>Start of season versus end of season changes the answer</td></tr>
+          <tr><td><b>Store context</b></td><td>Partly used</td><td>Outlet, extended catalogue, season and online exclusive each push the price in a known direction</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Fig. 05 — The four changes requested on the MVP. Only the second is fully solved in the reference build.</p>
+
+    <h3 class="rv">In scope, and out</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>We are building</th><th>We are not building</th></tr></thead>
+        <tbody>
+          <tr><td>A recommender built from the policy they gave us</td><td>A copy of Forum Sport's real pricing model</td></tr>
+          <tr><td>A defensible price, with the reason attached</td><td>An optimal price</td></tr>
+          <tr><td>Rules, visible and editable on screen</td><td>A machine-learning model</td></tr>
+          <tr><td>A number with a 0–100 score on the data behind it</td><td>A number you have to trust</td></tr>
+          <tr><td>A recommendation a human then applies</td><td>Anything that changes a live price by itself</td></tr>
+          <tr><td>Analysis, strategy and creative work, delivered alongside it</td><td>Implementation on its own, however well it runs</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="rv">How you will be judged</h3>
+    <div class="how rv">
+      <div><b>Coherent</b><p>Two products in the same situation get the same answer. If they
+        do not, you can say which input differed.</p></div>
+      <div><b>Explainable</b><p>Every recommendation carries one sentence a buyer could read
+        aloud in a meeting, naming the rule that decided it.</p></div>
+      <div><b>Honest about itself</b><p>Where the data is thin, the tool says so on the row —
+        not in a footnote, and not only to the person who built it.</p></div>
+      <div><b>Usable weekly</b><p>A category manager opens it, filters to their brand, and
+        leaves with a list. No training session required.</p></div>
+      <div><b>Complete</b><p>All four areas are assessed, and the same brief and the same
+        requirements go to both sections of the cohort. A tool that works but carries no
+        strategy, no creative direction and no measurement is an unfinished answer.</p></div>
+    </div>
+
+    <div class="warn rv">
+      <h4 style="margin-top:0">Three of the four changes are still open</h4>
+      <p>Only the band matrix is fully solved in the reference build. <b>Season timing</b> is
+        not modelled at all. <b>Store context</b> is half done — outlet and old season move the
+        price, extended catalogue and online exclusive do not. And the <b>reference
+        competitor</b> is the hard one: the client says each product has a chosen reference,
+        but <b>the rule that chooses it is not shared</b>. Without that rule you can offer a
+        selector — cheapest, mean, median — and let a human pick, but you cannot derive it.
+        Say that to them rather than guessing. A pricing tool that invents the client's own
+        policy is worse than one that admits the gap.</p>
+    </div>
   </div>
 </section>
 
@@ -547,6 +746,8 @@ code{
           <tr><td><b>Vercel</b></td><td>Puts your project on the internet with one click.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
           <tr><td><b>Supabase</b></td><td>An online database — a very powerful spreadsheet that apps can read.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
           <tr><td><b>MCP server</b></td><td>A plug that lets the assistant talk to a service directly.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
+          <tr><td><b>n8n</b></td><td>A board where you draw a workflow — when this happens, do that — instead of writing it.</td><td>Run the agents and automations behind the campaign.</td><td>Week 3</td></tr>
+          <tr><td><b>GA4</b></td><td>Google Analytics. It records what people actually do on a site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
         </tbody>
       </table>
     </div>
@@ -566,7 +767,7 @@ code{
         <text x="285" y="92" class="sm" text-anchor="middle">MCP</text>
       </svg>
     </div>
-    <p class="cap">Fig. 04 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
+    <p class="cap">Fig. 06 — Without the plug, you are the plug: you copy, you paste, you make mistakes.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Two keys. Only one of them is safe.</h4>
@@ -628,7 +829,7 @@ code{
 <text x="1090" y="178" class="wd" text-anchor="middle">A live link</text>
 <text x="1090" y="194" class="wd" text-anchor="middle">and a demo</text>
 </svg></div>
-    <p class="cap">Fig. 05 — Each week's deliverable is the next week's raw material.</p>
+    <p class="cap">Fig. 07 — Each week's deliverable is the next week's raw material.</p>
   </div>
 </section>
 
@@ -781,7 +982,7 @@ When you are done, tell me which key you used and why it is safe for that key to
     <div class="shot rv">
       <img src="assets/shots/explorer.webp" alt="The product explorer in the finished tool: one row per model, each competitor's price underneath, with the difference in euros and per cent" loading="lazy" width="1440" height="1200">
     </div>
-    <p class="cap">Fig. 06 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
+    <p class="cap">Fig. 08 — The catalogue, grown up. By week 3 each product carries its rivals underneath.</p>
 
     <div class="gotcha rv">
       <p>The page loads but the table is empty. The database's security rules are on and nothing is allowed to read yet — tell the assistant exactly that sentence.</p>
@@ -894,7 +1095,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 07 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+    <p class="cap">Fig. 09 — Five of five Cloudflare sites refuse. None of the eight without it do.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Changing your user agent will not fix this</h4>
@@ -970,7 +1171,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <div class="shot rv">
       <img src="assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="1118" height="210">
     </div>
-    <p class="cap">Fig. 08 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
+    <p class="cap">Fig. 10 — The client's band matrix, editable on screen. Every value here is theirs, not ours.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
@@ -1035,12 +1236,12 @@ If a big move rests on one observation, say so right next to it rather than in a
 <line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
 <text x="478" y="132" class="c">CEILING WITH ONE RIVAL: 45 — ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
-    <p class="cap">Fig. 09 — What the hundred points are made of. The score grades the data, never the price.</p>
+    <p class="cap">Fig. 11 — What the hundred points are made of. The score grades the data, never the price.</p>
 
     <div class="shot rv">
       <img src="assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="1440" height="560">
     </div>
-    <p class="cap">Fig. 10 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
+    <p class="cap">Fig. 12 — Every row carries its reason. "Band 4's minimum margin leaves no room to align with the reference."</p>
 
     <div class="gotcha rv">
       <p>Someone asks "is this the optimal price?". The answer is no — it is the defensible price. Optimal needs demand data that does not exist.</p>
@@ -1127,7 +1328,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         <img src="assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="390" height="844">
       </div>
     </div>
-    <p class="cap">Fig. 11 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
+    <p class="cap">Fig. 13 — The same build in Spanish and dark (left) and on a 390px phone (right). Same values, renamed.</p>
 
     <div class="gotcha rv">
       <p>Dark mode makes the accent unreadable. Change the value, not the component — that is what naming them was for.</p>
@@ -1177,7 +1378,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 12 — Rehearse these three out loud. They are the whole defence.</p>
+    <p class="cap">Fig. 14 — Rehearse these three out loud. They are the whole defence.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt — 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
@@ -1235,7 +1436,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
     <div class="shot rv">
       <img src="assets/shots/pricing-kpis.webp" alt="The pricing tool headline figures: models, down, up, unchanged, not alignable, current position and recommended position" loading="lazy" width="1440" height="260">
     </div>
-    <p class="cap">Fig. 13 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
+    <p class="cap">Fig. 15 — The pricing tool's own headline. "Not alignable" is the number the client argues about.</p>
 
     <div class="two rv">
       <div class="shot" style="margin-top:0">
@@ -1245,7 +1446,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
         <img src="assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="1440" height="460">
       </div>
     </div>
-    <p class="cap">Fig. 14 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+    <p class="cap">Fig. 16 — Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
 
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
@@ -1299,7 +1500,7 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObs
 const nav   = document.getElementById('secnav');
 const mark  = document.getElementById('navmark');
 const links = [...nav.querySelectorAll('a')];
-const hero  = document.querySelector('.hero');
+const hero  = document.querySelector('.masthead');
 
 function moveMark(a) {
   if (!a) return;
