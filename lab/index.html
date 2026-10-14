@@ -61,14 +61,23 @@ section{padding:var(--s-12) 0}
 .navy,.hero{background:var(--ie-navy); color:var(--white)}
 .navy .lead,.navy p,.hero .lead,.hero p{color:#c9d2e6}
 .navy h2,.navy h1,.hero h1,.hero h2{color:var(--white)}
-.navy .eyebrow,.hero .eyebrow{color:#8fa3cc}
 
 /* ── type ───────────────────────────────────────────────────────────── */
+/* El eyebrow del manual son 12px. Aquí es el rótulo que ordena una página de
+   treinta mil píxeles, así que sube de tamaño y el numeral toma el rojo de
+   marca —que el sistema reserva justamente para numerales, botones y enlaces—
+   para ganar peso sin inventarse un color nuevo. */
 .eyebrow{
-  font-size:var(--fs-eyebrow); font-weight:700; text-transform:uppercase;
-  letter-spacing:var(--track-eyebrow); color:var(--g-600);
-  margin:0 0 var(--s-2);
+  font-size:clamp(.875rem,1.4vw,1.0625rem); font-weight:700; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--ie-navy);
+  margin:0 0 var(--s-3); display:flex; align-items:baseline; gap:.5em; flex-wrap:wrap;
 }
+.eyebrow .eb-n{color:var(--ie-red); font-family:var(--font-display); font-weight:800;
+  font-variant-numeric:tabular-nums; letter-spacing:.06em}
+.eyebrow .eb-s{color:var(--g-300); font-weight:400}
+.navy .eyebrow,.hero .eyebrow{color:#c9d2e6}
+.navy .eyebrow .eb-n,.hero .eyebrow .eb-n{color:#fff}
+.navy .eyebrow .eb-s,.hero .eyebrow .eb-s{color:#4a5c84}
 .navy .eyebrow{color:#8fa3cc}
 h1,h2,h3{overflow-wrap:break-word}
 h1{
@@ -443,7 +452,7 @@ code{
 
 <section class="tint" id="overview">
   <div class="wrap">
-    <p class="eyebrow rv">01 — Overview</p>
+    <p class="eyebrow rv"><span class="eb-n">01</span><span class="eb-s">—</span>Overview</p>
     <h2 class="rv">See what you will build</h2>
     <p class="lead prose rv">This is the finished tool, running on real data. By week 6
       yours does the same three things: shows the catalogue, shows what every rival
@@ -480,7 +489,7 @@ code{
 
 <section id="briefing">
   <div class="wrap">
-    <p class="eyebrow rv">02 — The business problem</p>
+    <p class="eyebrow rv"><span class="eb-n">02</span><span class="eb-s">—</span>The business problem</p>
     <h2 class="rv">A price is compared in seconds</h2>
     <p class="lead prose rv">Forum Sport is a Spanish sports retailer. Online, its price
       sits one tab away from every rival selling the same shoe. The question is not
@@ -577,7 +586,7 @@ code{
 
 <section class="tint" id="the-brief">
   <div class="wrap">
-    <p class="eyebrow rv">03 — The client's brief</p>
+    <p class="eyebrow rv"><span class="eb-n">03</span><span class="eb-s">—</span>The client's brief</p>
     <h2 class="rv">Explain the price, don't copy it</h2>
 
     <blockquote class="pull rv">
@@ -807,7 +816,7 @@ code{
 
 <section>
   <div class="wrap">
-    <p class="eyebrow rv">04 — Your toolkit</p>
+    <p class="eyebrow rv"><span class="eb-n">04</span><span class="eb-s">—</span>Your toolkit</p>
     <h2 class="rv">Four tools, none of them code</h2>
     <p class="lead prose rv">You will scroll back to this table all term. Everything else
       on this page you read once.</p>
@@ -856,7 +865,7 @@ code{
 
 <section class="tint">
   <div class="wrap">
-    <p class="eyebrow rv">05 — The roadmap</p>
+    <p class="eyebrow rv"><span class="eb-n">05</span><span class="eb-s">—</span>The roadmap</p>
     <h2 class="rv">Six weeks, six things shipped</h2>
     <p class="lead prose rv">Every week ends with something that works and that you can
       show. The first three build the data foundation; the last three turn it into
@@ -911,7 +920,7 @@ code{
 <!-- ══ WEEK 1 ══════════════════════════════════════════════════════════ -->
 <section id="week-1">
   <div class="wrap">
-    <p class="eyebrow rv">Week 01 — Kick-off</p>
+    <p class="eyebrow rv"><span class="eb-n">Week 01</span><span class="eb-s">—</span>Kick-off</p>
     <h2 class="rv">Publish a page today</h2>
     <p class="wk-goal rv">By tonight there is a web address, on the real internet, with
       your team name on it — and you got there by typing English.</p>
@@ -980,7 +989,7 @@ Do not install anything that is not strictly needed, and tell me before you inst
 <!-- ══ WEEK 2 ══════════════════════════════════════════════════════════ -->
 <section class="tint" id="week-2">
   <div class="wrap">
-    <p class="eyebrow rv">Week 02 — Data</p>
+    <p class="eyebrow rv"><span class="eb-n">Week 02</span><span class="eb-s">—</span>Data</p>
     <h2 class="rv">Turn the Excel into a database</h2>
     <p class="wk-goal rv">The client's spreadsheet — 24,109 rows — stops being a file on
       your laptop and becomes a database your web page can ask questions of.</p>
@@ -1071,7 +1080,7 @@ When you are done, tell me which key you used and why it is safe for that key to
 <!-- ══ WEEK 3 ══════════════════════════════════════════════════════════ -->
 <section id="week-3">
   <div class="wrap">
-    <p class="eyebrow rv">Week 03 — Competitors</p>
+    <p class="eyebrow rv"><span class="eb-n">Week 03</span><span class="eb-s">—</span>Competitors</p>
     <h2 class="rv">Read your rivals' prices</h2>
     <p class="wk-goal rv">Your database stops being about you — by the end of the session
       it holds what other shops charge for the same shoe, today.</p>
@@ -1193,7 +1202,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
 <!-- ══ WEEK 4 ══════════════════════════════════════════════════════════ -->
 <section class="tint" id="week-4">
   <div class="wrap">
-    <p class="eyebrow rv">Week 04 — The engine</p>
+    <p class="eyebrow rv"><span class="eb-n">Week 04</span><span class="eb-s">—</span>The engine</p>
     <h2 class="rv">Turn prices into a recommendation</h2>
     <p class="wk-goal rv">One number per product, with a sentence explaining why, and an
       honest score saying how much to trust it.</p>
@@ -1330,7 +1339,7 @@ If a big move rests on one observation, say so right next to it rather than in a
 <!-- ══ WEEK 5 ══════════════════════════════════════════════════════════ -->
 <section id="week-5">
   <div class="wrap">
-    <p class="eyebrow rv">Week 05 — Brand</p>
+    <p class="eyebrow rv"><span class="eb-n">Week 05</span><span class="eb-s">—</span>Brand</p>
     <h2 class="rv">Make it look like the client</h2>
     <p class="wk-goal rv">Same numbers, different owner. By the end the tool looks like it
       was made inside Forum Sport, and it works for someone reading it on a phone in a
@@ -1417,7 +1426,7 @@ Finally, list any key that exists in one language and not the other.</pre>
 <!-- ══ WEEK 6 ══════════════════════════════════════════════════════════ -->
 <section class="tint" id="week-6">
   <div class="wrap">
-    <p class="eyebrow rv">Week 06 — Demo</p>
+    <p class="eyebrow rv"><span class="eb-n">Week 06</span><span class="eb-s">—</span>Demo</p>
     <h2 class="rv">Defend it in front of the client</h2>
     <p class="wk-goal rv">Ten minutes in which the tool does something live, and you answer
       the three questions they will actually ask.</p>
@@ -1495,7 +1504,7 @@ For each question, tell me what a weak answer sounds like and what a strong one 
 <!-- ══ THE REFERENCE BUILD ═════════════════════════════════════════════ -->
 <section id="the-tool">
   <div class="wrap">
-    <p class="eyebrow rv">06 — The reference build</p>
+    <p class="eyebrow rv"><span class="eb-n">06</span><span class="eb-s">—</span>The reference build</p>
     <h2 class="rv">See what good looks like</h2>
     <p class="lead prose rv">This is the finished tool, running on live data. Open it, break
       it, read its numbers. You are not copying it — you are building your own answer to the
