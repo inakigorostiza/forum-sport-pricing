@@ -428,6 +428,31 @@ footer img{height:36px}
   .t-rubric th:nth-child(1){width:30%}
 }
 
+/* Enlace a material compartido: se lee como una ficha, no como un enlace
+   suelto en un párrafo, porque es algo que el alumno tiene que ir a abrir. */
+.src{
+  display:flex; align-items:flex-start; gap:var(--s-2);
+  border:1px solid var(--g-300); border-left:3px solid var(--ie-red);
+  border-radius:var(--radius); background:var(--white);
+  padding:var(--s-3); margin-top:var(--s-3); color:var(--ie-ink);
+  transition:border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+  max-width:var(--container-text);
+}
+.tint .src{background:var(--white)}
+.src:hover{border-color:var(--g-600); box-shadow:var(--shadow-card); color:var(--ie-ink)}
+.src:hover .src-arw{transform:translateX(3px)}
+.src-tag{
+  flex:none; font-size:.625rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.1em; color:#fff; background:var(--ie-navy);
+  padding:4px 8px; border-radius:var(--radius-sm); margin-top:2px;
+}
+.src-body{flex:1 1 auto; font-size:.9375rem; line-height:1.55; min-width:0}
+.src-body b{display:block; font-family:var(--font-display); font-size:1rem;
+  color:var(--ie-navy); margin-bottom:2px}
+.src-arw{flex:none; color:var(--ie-red); font-weight:700;
+  transition:transform var(--t) var(--ease)}
+@media(max-width:560px){ .src{flex-wrap:wrap} .src-arw{display:none} }
+
 .fig{max-width:100%}
 /* Nunca tuvo estilo, y `forum-sport-<team>` es un token largo que no se parte:
    a 360px empujaba la página 12px de lado. */
@@ -1188,6 +1213,30 @@ Log every run: pages fetched, offers found, matches made, errors, and the smalle
 
 If a fetch fails, record the failure. Never let "the request failed" and "this page had no price" end up looking like the same result.</pre>
     </div>
+
+    <h3 class="rv">Choosing which shops to watch</h3>
+    <p class="prose rv">You do not pick them at random. The starting list is here, with
+      every seller that already appears as a price source for this catalogue, how many
+      times each one appears, and what kind of shop it is.</p>
+
+    <a class="src rv" href="https://docs.google.com/spreadsheets/d/11MAnhxrBxhLpDxzCwylznymUuwmMgr3P4gnAVfqTvhY/edit?usp=sharing"
+       target="_blank" rel="noopener">
+      <span class="src-tag">Shared sheet</span>
+      <span class="src-body">
+        <b>Forum Sports Competitors</b>
+        39 sellers, 389,469 records between them — 21 sports specialists, 6 running
+        specialists, 7 brands selling direct, 4 general retailers and 1 price comparison
+        site, each with its record count and its address.
+      </span>
+      <span class="src-arw">&rarr;</span>
+    </a>
+
+    <p class="prose rv" style="margin-top:var(--s-4)">Record count is a reasonable first
+      filter — a seller appearing 69,368 times carries more of the catalogue than one
+      appearing five times — but it is not the only one. A brand selling direct prices
+      differently from a marketplace, and a price comparison site is not a shop at all.
+      Pick three you can defend, write down why, and move on: the second filter is the one
+      below, and you cannot know it until you try.</p>
 
     <h3 class="rv">Which shops answer a plain request</h3>
     <p class="prose rv">This is the real result from the reference build, and it is the
