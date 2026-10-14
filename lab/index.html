@@ -36,7 +36,7 @@
   --radius:4px; --radius-sm:2px;
   --shadow-card:0 8px 28px rgba(10,26,60,.10);
   --ease:cubic-bezier(.2,.7,.2,1); --t:220ms;
-  --nav-h:58px;
+  --nav-h:64px;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 24px)}
@@ -128,15 +128,16 @@ strong{font-weight:700; color:var(--ie-navy)}
 .btn-row{display:flex; gap:var(--s-2); flex-wrap:wrap; margin-top:var(--s-4)}
 
 /* ── sticky section nav ─────────────────────────────────────────────── */
+/* Visible siempre, no sólo al bajar: los alumnos lo usan como guía durante la
+   clase, así que tiene que estar ahí desde que abren la página. Pegajoso y no
+   fijo, para que reserve su sitio y ningún contenido quede debajo. */
 .secnav{
-  position:fixed; top:0; left:0; right:0; z-index:60; height:var(--nav-h);
-  background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:60; height:var(--nav-h);
+  background:rgba(255,255,255,.97); backdrop-filter:blur(10px);
   border-bottom:1px solid var(--g-300);
-  opacity:0; pointer-events:none;
-  transition:opacity var(--t) var(--ease), transform var(--t) var(--ease);
-  transform:translateY(-100%);
+  transition:box-shadow var(--t) var(--ease);
 }
-.secnav.on{opacity:1; pointer-events:auto; transform:none}
+.secnav.on{box-shadow:0 2px 12px rgba(10,26,60,.07)}
 /* position:relative a propósito: hace de bloque contenedor del marcador, para
    que su translateX se mida desde el borde del contenido y no desde su posición
    estática dentro del flex —que arrastraba un desfase de 144px— y para que
@@ -145,22 +146,33 @@ strong{font-weight:700; color:var(--ie-navy)}
   scrollbar-width:none; position:relative}
 .secnav .wrap::-webkit-scrollbar{display:none}
 .secnav a{
-  position:relative; flex:none; color:var(--g-600);
-  font-size:.6875rem; font-weight:700; text-transform:uppercase;
-  letter-spacing:.08em; padding:0 12px; line-height:var(--nav-h);
-  transition:color var(--t) var(--ease);
+  position:relative; flex:none; display:inline-flex; align-items:center; gap:7px;
+  color:var(--g-600); font-size:.8125rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.07em; padding:0 15px; height:100%;
+  transition:color var(--t) var(--ease), background var(--t) var(--ease);
 }
-.secnav a:hover{color:var(--ie-navy)}
-.secnav a[aria-current="true"]{color:var(--ie-navy)}
+/* El numeral de la semana lleva el rojo de marca, igual que los rótulos de
+   sección: el profesor dice "semana 3" y el ojo lo encuentra. */
+.secnav a i{
+  font-style:normal; font-family:var(--font-display); font-weight:800;
+  font-size:.75rem; color:var(--ie-red); letter-spacing:.04em;
+  font-variant-numeric:tabular-nums; opacity:.7;
+  transition:opacity var(--t) var(--ease);
+}
+.secnav a:hover{color:var(--ie-navy); background:var(--g-100)}
+.secnav a[aria-current="true"]{color:var(--ie-navy); background:var(--g-100)}
+.secnav a[aria-current="true"] i{opacity:1}
+/* Overview, Briefing y The tool son las paradas grandes; las seis semanas van
+   entre separadores para leerse como un bloque y no como nueve enlaces sueltos. */
+.secnav .nv-main{color:var(--ie-navy)}
+.secnav .nv-sep{flex:none; width:1px; height:20px; background:var(--g-300); margin:0 8px}
 .secnav .mark{
-  position:absolute; left:0; bottom:0; width:0; height:2px; background:var(--ie-red);
+  position:absolute; left:0; bottom:0; width:0; height:3px; background:var(--ie-red);
   transition:transform var(--t) var(--ease), width var(--t) var(--ease);
 }
-.navlogo{flex:none; height:30px; margin-right:18px}
-.secnav{position:fixed}
 @media(max-width:620px){
-  .navlogo{display:none}
-  .secnav a{padding:0 10px}
+  .secnav a{padding:0 11px; font-size:.75rem}
+  .secnav .nv-sep{margin:0 4px}
   /* El menú se desplaza; sin esto nadie sabe que hay más detrás del borde. */
   .secnav::after{
     content:""; position:absolute; top:0; right:0; bottom:1px; width:44px;
@@ -410,12 +422,17 @@ code{
 
 <nav class="secnav" id="secnav" aria-label="Sections">
   <div class="wrap">
-    <img class="navlogo" src="/lab/assets/ie-logo.svg" alt="IE Business School">
-    <a href="#overview">Overview</a>
-    <a href="#briefing">Briefing</a>
-    <a href="#week-1">W1</a><a href="#week-2">W2</a><a href="#week-3">W3</a>
-    <a href="#week-4">W4</a><a href="#week-5">W5</a><a href="#week-6">W6</a>
-    <a href="#the-tool">The tool</a>
+    <a href="#overview" class="nv-main">Overview</a>
+    <a href="#briefing" class="nv-main">Briefing</a>
+    <span class="nv-sep" aria-hidden="true"></span>
+    <a href="#week-1"><i>01</i>Setup</a>
+    <a href="#week-2"><i>02</i>Data</a>
+    <a href="#week-3"><i>03</i>Scraping</a>
+    <a href="#week-4"><i>04</i>Engine</a>
+    <a href="#week-5"><i>05</i>Brand</a>
+    <a href="#week-6"><i>06</i>Demo</a>
+    <span class="nv-sep" aria-hidden="true"></span>
+    <a href="#the-tool" class="nv-main">The tool</a>
     <span class="mark" id="navmark" aria-hidden="true"></span>
   </div>
 </nav>
@@ -1581,6 +1598,8 @@ function moveMark(a) {
   mark.style.width = a.offsetWidth + 'px';
   mark.style.transform = 'translateX(' + a.offsetLeft + 'px)';
 }
+// `.on` ya no decide si se ve el menú —se ve siempre— sino si está pegado al
+// borde, que es cuando necesita una sombra para despegarse del contenido.
 new IntersectionObserver(([e]) => nav.classList.toggle('on', !e.isIntersecting),
   { threshold: 0 }).observe(hero);
 
@@ -1603,7 +1622,18 @@ function syncNav() {
   links.forEach(a => a.removeAttribute('aria-current'));
   if (!active) { mark.style.width = '0px'; return; }
   const a = links.find(x => x.getAttribute('href') === '#' + active.id);
-  if (a) { a.setAttribute('aria-current', 'true'); moveMark(a); }
+  if (!a) return;
+  a.setAttribute('aria-current', 'true');
+  moveMark(a);
+  // En una pantalla estrecha el menú se desplaza, y el elemento activo puede
+  // quedar fuera del borde: sin esto el alumno no ve en qué semana está.
+  const wrap = nav.querySelector('.wrap');
+  if (wrap.scrollWidth > wrap.clientWidth + 1) {
+    const l = a.offsetLeft, r = l + a.offsetWidth;
+    if (l < wrap.scrollLeft + 12) wrap.scrollTo({ left: l - 12, behavior: 'smooth' });
+    else if (r > wrap.scrollLeft + wrap.clientWidth - 12)
+      wrap.scrollTo({ left: r - wrap.clientWidth + 12, behavior: 'smooth' });
+  }
 }
 addEventListener('scroll', () => {
   if (ticking) return;
