@@ -305,7 +305,7 @@ strong{font-weight:700; color:var(--ie-navy)}
 .tint .fig{background:var(--white)}
 .figsvg{width:100%; height:auto; min-width:560px}
 .tbl{border:1px solid var(--g-300); border-radius:var(--radius);
-  overflow:hidden; background:var(--white)}
+  overflow-x:auto; background:var(--white)}
 .tbl table{width:100%; border-collapse:collapse; font-size:.9375rem}
 .tbl th{
   background:var(--ie-navy); color:#fff; text-align:left; vertical-align:bottom;
@@ -335,6 +335,12 @@ strong{font-weight:700; color:var(--ie-navy)}
 /* ── week blocks ────────────────────────────────────────────────────── */
 .wk-goal{font-size:var(--fs-lead); line-height:1.5; color:var(--ie-navy);
   font-weight:600; max-width:var(--container-text); margin:0 0 var(--s-6)}
+.measure{max-width:var(--container-text); margin:calc(-1 * var(--s-4)) 0 var(--s-6);
+  padding:12px 16px; border-left:3px solid var(--accent); background:var(--g-100);
+  font-size:.9375rem; line-height:1.55}
+.tint .measure{background:var(--white)}
+.measure b{font-size:.6875rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.09em; color:var(--ie-navy); margin-right:8px}
 .chk{list-style:none; padding:0; margin:0; display:grid; gap:10px}
 .chk li{position:relative; padding-left:30px; font-size:.9375rem}
 .chk li::before{content:""; position:absolute; left:0; top:3px; width:16px; height:16px;
@@ -353,6 +359,8 @@ strong{font-weight:700; color:var(--ie-navy)}
 .how b{font-size:.6875rem; font-weight:700; text-transform:uppercase;
   letter-spacing:.09em; color:var(--g-600)}
 .how p{margin:0; font-size:.9375rem}
+/* La negrita dentro de la prosa es énfasis, no otro rótulo. */
+.how p b{font-size:inherit; text-transform:none; letter-spacing:0; color:var(--ie-navy)}
 
 /* ── the prompts: the most distinct object on the page ──────────────── */
 .prompt{border:1px solid var(--ie-navy); border-radius:var(--radius);
@@ -702,6 +710,9 @@ code{
         selector with cheapest, mean and median, and let a human pick, but you cannot derive it.
         Say that to them rather than guessing. A pricing tool that invents the client's own
         policy is worse than one that admits the gap.</p>
+      <p style="margin-top:var(--s-2)"><a href="#week-4">Week 04</a> turns all four into
+        configurator rules: season and store context get default values, and the reference
+        becomes a rival the manager fixes per product, or the median when none is fixed.</p>
     </div>
   </div>
 </section>
@@ -735,9 +746,10 @@ code{
       <div>
         <span class="pn">03</span>
         <h4>Data and measurement</h4>
-        <p>Build the data layer and the measurement framework that show whether the solution
-          actually changes customer behaviour. Measurement is not an add-on: it is designed
-          from the start and carries the impact story.</p>
+        <p>Build the data layer and measure at three levels, from a baseline: business
+          (price index, margin, discount depth), adoption (prices accepted and overridden) and
+          system quality (coherence, thin data, freshness). One measurement milestone every
+          week, not an add-on at the end.</p>
       </div>
       <div>
         <span class="pn">04</span>
@@ -820,6 +832,46 @@ code{
 <text x="1094" y="194" class="fg-wd" text-anchor="middle">A live link</text>
 <text x="1094" y="210" class="fg-wd" text-anchor="middle">and a demo</text>
 </svg></div>
+
+    <h3 class="rv">Measured every week, not at the end</h3>
+    <p class="lead prose rv">Every session closes with one measurement milestone, checked
+      at the next session. By week 6 the team has a supervision panel built from six weeks of
+      evidence, not one weekend.</p>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Week</th><th>Measurement milestone</th></tr></thead>
+        <tbody>
+          <tr><td><b>01</b></td><td>A hypothesis and one primary KPI</td></tr>
+          <tr><td><b>02</b></td><td>Catalogue baselines: margin and discount depth</td></tr>
+          <tr><td><b>03</b></td><td>Market baselines: price index, coverage and freshness</td></tr>
+          <tr><td><b>04</b></td><td>Engine quality tests, simulated impact and the override log</td></tr>
+          <tr><td><b>05</b></td><td>Adoption: an outside user, accepted prices and overrides</td></tr>
+          <tr><td><b>06</b></td><td>The supervision panel: baseline, now, and what would prove you wrong</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="rv">Three levels of KPI</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Level</th><th>KPIs</th><th>The question</th><th>Starting point in the reference build</th></tr></thead>
+        <tbody>
+          <tr><td><b>Business</b></td><td>Price index against the reference &middot; average margin &middot; discount depth</td><td>Would following the tool put Forum Sport where it wants to be?</td><td>+14.5% against the cheapest rival &middot; 27.6% margin &middot; 55.6% of models discounted, by 27.4% on average</td></tr>
+          <tr><td><b>Adoption</b></td><td>Recommendations accepted &middot; overrides, with their reason</td><td>Do the managers trust it?</td><td>Zero. It starts counting in week 5</td></tr>
+          <tr><td><b>System quality</b></td><td>Coherence &middot; rows with too little data &middot; price freshness</td><td>Can the numbers be trusted?</td><td>742 of 1,483 models have a rival price</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warn rv">
+      <h4 style="margin-top:0">Why the business KPIs are hypotheses</h4>
+      <p>There are no sales data, so nobody can measure what the prices did to demand. What
+        you can measure is what the recommended prices would do to the index, the margin and
+        the discount depth, against a baseline, and state in advance the result that would
+        prove you wrong. The <b>override log</b> records who accepted or changed each price,
+        from what, to what and why. It is the adoption KPI, the governance record and the
+        evidence that a person, not the tool, decides, as the EU AI Act expects.</p>
+    </div>
   </div>
 </section>
 
@@ -841,7 +893,7 @@ code{
           <tr><td><b>Vercel</b></td><td>Hosting. Serves the project at a public address and republishes it on every change.</td><td>Publish, and re-publish on every change.</td><td>Week 1</td></tr>
           <tr><td><b>Supabase</b></td><td>A hosted PostgreSQL database the page queries directly.</td><td>Hold 24,109 rows and answer questions about them.</td><td>Week 2</td></tr>
           <tr><td><b>MCP server</b></td><td>A connector that lets the assistant query a service itself.</td><td>Let the assistant query the database itself instead of you copying things across.</td><td>Week 2</td></tr>
-          <tr><td><b>GA4</b></td><td>Google Analytics 4. Records what visitors do on the site.</td><td>Measure whether the solution changes customer behaviour.</td><td>Week 5</td></tr>
+          <tr><td><b>GA4</b></td><td>Google Analytics 4. Records what people do on the site.</td><td>Optional. Count how managers use the tool, filters opened and prices accepted, next to the override log, with consent.</td><td>Week 5</td></tr>
         </tbody>
       </table>
     </div>
@@ -932,7 +984,7 @@ code{
           <tr>
             <td><b>Data and measurement</b></td>
             <td class="wt">10%</td>
-            <td>A data layer that holds up, and a measurement framework designed from the start that would show whether customer behaviour changed. Named metrics, a baseline, and what would disprove you.</td>
+            <td>A data layer that holds up, and KPIs at three levels, business, adoption and system quality, each with a baseline and the result that would disprove the hypothesis. An override log that records every accepted or changed price and why. Built milestone by milestone, one per week, and shown on a supervision panel.</td>
           </tr>
           <tr>
             <td><b>User experience</b></td>
@@ -960,6 +1012,7 @@ code{
     <h2 class="rv">Setting up your accounts and publishing a first page</h2>
     <p class="wk-goal rv">By the end of the session the team has a public web address,
       published from its own repository.</p>
+    <p class="measure rv"><b>Measure</b>Write the team's pricing hypothesis and choose one primary KPI. For example: following the recommendations brings Forum Sport within 5% of the market without average margin falling below 25%.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
@@ -1032,6 +1085,7 @@ Do not install anything that is not strictly needed, and tell me before you inst
     <h2 class="rv">Loading the catalogue into a database</h2>
     <p class="wk-goal rv">The client&rsquo;s spreadsheet, 24,109 rows, stops being a file on
       your laptop and becomes a database your web page can ask questions of.</p>
+    <p class="measure rv"><b>Measure</b>Record the catalogue baselines from the database: average margin, share of models on discount, and average discount depth.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
@@ -1143,6 +1197,7 @@ When you are done, tell me which key you used and why it is safe for that key to
     <h2 class="rv">Collecting competitor prices</h2>
     <p class="wk-goal rv">Your database stops being about you. By the end of the session
       it holds what other shops charge for the same shoe, today.</p>
+    <p class="measure rv"><b>Measure</b>Record the market baselines: the price index against the reference, coverage (models with at least one rival price) and how fresh each price is.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
@@ -1292,6 +1347,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <h2 class="rv">Building the recommendation engine</h2>
     <p class="wk-goal rv">One number per product, with a sentence explaining why, and an
       honest score saying how much to trust it.</p>
+    <p class="measure rv"><b>Measure</b>Test the engine: two products in the same situation get the same price, and the share of rows with too little data is on screen. Show the simulated effect on the three business KPIs, and create the override log.</p>
 
     <div class="warn rv" style="margin-top:0">
       <h4 style="margin-top:0">Why this is a recommender and not an optimiser</h4>
@@ -1313,45 +1369,113 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
 
     <h3 class="rv">What you do</h3>
     <ol class="steps rv">
-      <li>Pick the reference: the cheapest rival, the mean, or the median.</li>
-      <li>Set a target position per rotation class.</li>
-      <li>Adjust it for stock, outlet and old season.</li>
+      <li>Pick the reference: the rival fixed for that product, otherwise the median of rivals.</li>
+      <li>Read the target position from the demand &times; stock grid.</li>
+      <li>Add the context adjustments: outlet, season, end of season, extended catalogue.</li>
       <li>Clamp it inside the client&rsquo;s band matrix, and decide who wins when floor and ceiling collide.</li>
       <li>Score the data quality, separately from the price.</li>
     </ol>
 
-    <h3 class="rv">How the four rules work</h3>
+    <h3 class="rv">The rules, one step at a time</h3>
+    <p class="prose rv">Every number below is a default in the configurator, editable on screen.
+      The band matrix is the client&rsquo;s, unmodified. The client gave the direction of the
+      other rules in words; the figures that translate them are ours, and your team may argue
+      for different ones in its pricing policy.</p>
+
     <div class="how rv">
-      <div><b>Target by rotation</b><p>Bestsellers set the price perception, so they sit
-        closest to the rival. AA 100% of the reference, A 102, B 105, C 108, D 112,
-        unclassified 106. Measured today Forum Sport sits at AA 109.8 · A 106.8 · B 109.9 ·
-        C 110.5 · D 115.0, so every target is a cut, and the deepest cut falls on the most
-        visible products.</p></div>
-      <div><b>Adjust for stock</b><p>Discounting what you barely have left is giving away
-        margin. Very high stock −4 points, high −2, medium 0, low +2, very low +4.</p></div>
-      <div><b>Adjust for context</b><p>Outlet −3 points. Previous season −3 points.</p></div>
-      <div><b>The barriers</b><p>Five price bands. Each demands a minimum margin <b>in per
-        cent and in euros, both of them, not whichever is convenient</b>, and sets a maximum
-        alignment against the reference. The two floors are not redundant: the euro floor is
-        the binding one on 212 models, and on 64 of the 79 in the top band. When floor and
-        ceiling contradict each other, on <b>495 of 1,483 models</b>, margin wins, and the
-        row says so out loud.</p></div>
+      <div><b>1 · Reference</b><p>Forum Sport picks one reference rival per product but has
+        not shared how. If the manager fixes a rival for a product, that rival is the
+        reference. Otherwise it is the <b>median</b> of the rivals selected in the filters,
+        switchable to the cheapest or the mean. The median stops one odd price dragging the
+        recommendation, and the client said its reference is not always the cheapest.</p></div>
+      <div><b>2 · Demand &times; stock</b><p>Demand from the online ABCD class: high is AA and
+        A, medium is B and unclassified, low is C and D. Stock: low is very low and low, high
+        is high and very high. The grid below gives the target as a percentage of the
+        reference. The four corners are the client&rsquo;s four rules.</p></div>
+      <div><b>3 · Context</b><p>Points are added to the target. The sum is capped between
+        &minus;8 and +2, so no stack of labels runs away with the price.</p></div>
+      <div><b>4 · Barriers</b><p>The band is set by today&rsquo;s selling price. The floor is
+        the higher of cost &divide; (1 &minus; min. margin %) and cost + min. margin &euro;,
+        <b>both of them, not whichever is convenient</b>. The ceiling is the reference
+        &times; the band&rsquo;s maximum alignment, plus 3 points for an online exclusive.
+        Never above list price, and an outlet price never goes up. When floor and ceiling
+        collide, margin wins, and the row says so out loud.</p></div>
+      <div><b>5 · Close</b><p>No rival at all: the price can only go down, never up. One
+        rival: recommend, but flag the row as weak evidence. Round to the euro without
+        breaking a barrier. Every row carries one sentence naming the rule that decided it,
+        and a person, not the tool, applies the price.</p></div>
+    </div>
+
+    <h3 class="rv">Target position by demand and stock</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Demand \ Stock</th><th>Low</th><th>Medium</th><th>High</th></tr></thead>
+        <tbody>
+          <tr><td><b>High</b> &middot; AA, A</td><td><b>102%</b> &middot; defend price and margin</td><td>100%</td><td><b>99%</b> &middot; hold, or a moderate cut</td></tr>
+          <tr><td><b>Medium</b> &middot; B, unclassified</td><td>101%</td><td>99%</td><td>97%</td></tr>
+          <tr><td><b>Low</b> &middot; C, D</td><td><b>100%</b> &middot; little need to cut</td><td>98%</td><td><b>95%</b> &middot; first candidate for a cut</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="rv">Context adjustments</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Variable</th><th>What the client said</th><th>Default</th></tr></thead>
+        <tbody>
+          <tr><td><b>Outlet</b></td><td>More willing to cut the price</td><td>&minus;3 points, and never raised</td></tr>
+          <tr><td><b>Previous season</b></td><td>More promotional pressure</td><td>&minus;3 points</td></tr>
+          <tr><td><b>Current season</b></td><td>Not untouchable either, given the other factors</td><td>0, moved only by demand, stock and timing</td></tr>
+          <tr><td><b>End of season</b></td><td>Start versus end of season matters</td><td>&minus;2 points on everything, one switch for the whole catalogue</td></tr>
+          <tr><td><b>Extended catalogue</b></td><td>Less pressure to clear: it is not Forum&rsquo;s own stock</td><td>+2 points</td></tr>
+          <tr><td><b>Own stock</b></td><td>Prioritise selling through own inventory</td><td>0, high stock already pushes the price down</td></tr>
+          <tr><td><b>Online exclusive</b></td><td>More freedom to adapt the price</td><td>+3 points on the alignment ceiling</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="rv">The client&rsquo;s band matrix</h3>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Band</th><th>Selling price today</th><th>Min. margin %</th><th>Min. margin &euro;</th><th>Max. alignment vs reference</th></tr></thead>
+        <tbody>
+          <tr><td><b>1</b></td><td>0&ndash;30 &euro;</td><td>30%</td><td>2 &euro;</td><td>102%</td></tr>
+          <tr><td><b>2</b></td><td>30&ndash;60 &euro;</td><td>27%</td><td>8 &euro;</td><td>101%</td></tr>
+          <tr><td><b>3</b></td><td>60&ndash;100 &euro;</td><td>24%</td><td>14 &euro;</td><td>100%</td></tr>
+          <tr><td><b>4</b></td><td>100&ndash;200 &euro;</td><td>20%</td><td>20 &euro;</td><td>99%</td></tr>
+          <tr><td><b>5</b></td><td>200 &euro; and over</td><td>18%</td><td>36 &euro;</td><td>98%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">The two floors are not redundant: the euro floor binds on 212 models, and on 64 of the 79 in the top band.</p>
+
+    <h3 class="rv">One shoe, start to finish</h3>
+    <div class="how rv">
+      <div><b>The shoe</b><p>Illustrative figures: selling at 120 &euro;, list price 140 &euro;, cost 80 &euro;, demand B, high stock, previous season, own stock, not outlet, start of season. Rivals at 105, 110 and 118 &euro;.</p></div>
+      <div><b>1 &middot; Reference</b><p>Median of 105, 110 and 118 &euro; = <b>110 &euro;</b>.</p></div>
+      <div><b>2 &middot; Grid</b><p>Medium demand, high stock = <b>97%</b>.</p></div>
+      <div><b>3 &middot; Context</b><p>Previous season &minus;3 points = 94%, so 103.40 &euro;.</p></div>
+      <div><b>4 &middot; Barriers</b><p>Band 4. Floor: the higher of 80 &divide; 0.80 and 80 + 20 = 100 &euro;. Ceiling: 110 &times; 99% = 108.90 &euro;. 103.40 &euro; sits inside.</p></div>
+      <div><b>5 &middot; Close</b><p><b>103 &euro;</b>, down 17 &euro;, at a 22% margin. Make it outlet and end of season too: the adjustments hit the &minus;8 cap, the target falls to 97.90 &euro;, below the floor, so margin wins at <b>100 &euro;</b> and the row says the band&rsquo;s minimum margin stopped the cut.</p></div>
     </div>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
     </div>
-    <p class="cap">Fig. 03. The client's five price bands, editable on screen. The values are the client's, not ours.</p>
+    <p class="cap">Fig. 03. The band matrix as the configurator shows it, editable on screen. The values are the client&rsquo;s, not ours.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
       <pre>Build the pricing recommender. It is not an optimiser: we have no units sold, no traffic and no conversion, so an economic optimum is not computable, and the page must say that in plain words.
 
-1) Reference price = the cheapest observed competitor price for that model, switchable to the mean or the median of rivals.
-2) Target position as a % of that reference, by rotation class: AA 100, A 102, B 105, C 108, D 112, unclassified 106.
-3) Adjust in percentage points by stock: very high −4, high −2, medium 0, low +2, very low +4. Then outlet −3 and previous season −3.
-4) Clamp with the client's band matrix, choosing the band from the CURRENT SELLING PRICE, not the list price, with bands [0,30), [30,60), [60,100), [100,200), [200,∞): minimum margins of 30/27/24/20/18 % AND 2/8/14/20/36 €, both of which must hold, and maximum alignment against the reference of 102/101/100/99/98 %.
-5) Round to the nearest euro, and never let rounding break a barrier.
+1) Reference price: if the manager has fixed a reference competitor for the model, use its price. Otherwise use the median of the competitors selected in the filters, switchable to the cheapest or the mean.
+2) Target position as a % of the reference, from a demand × stock grid. Demand from the online ABCD class: high = AA and A, medium = B and unclassified, low = C and D. Stock: low = very low and low, medium = medium, high = high and very high.
+   High demand: low stock 102, medium 100, high 99.
+   Medium demand: low 101, medium 99, high 97.
+   Low demand: low 100, medium 98, high 95.
+3) Context adjustments in percentage points: outlet −3, previous season −3, extended catalogue +2, and a single "end of season" switch for the whole catalogue worth −2. Cap the sum of adjustments between −8 and +2.
+4) Clamp with the client's band matrix, choosing the band from the CURRENT SELLING PRICE, not the list price, with bands [0,30), [30,60), [60,100), [100,200), [200,∞): minimum margins of 30/27/24/20/18 % AND 2/8/14/20/36 €, both of which must hold, and maximum alignment against the reference of 102/101/100/99/98 %, plus 3 points for an online exclusive. Never go above the list price, and never raise the price of an outlet product.
+5) With no competitor price at all, never raise the price: apply only the adjustments that lower it, to today's price. Round to the nearest euro, and never let rounding break a barrier.
 
 When the margin floor and the alignment ceiling contradict each other, margin wins, and the row must say in words that it did. Every recommendation carries a one-line reason a buyer could read aloud.
 
@@ -1376,7 +1500,7 @@ Under each score, list in plain words the reasons it lost points: "only one comp
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt, 3 of 3 · make it arguable</span><button class="copy" type="button">Copy</button></div>
-      <pre>Make every parameter editable on the page, each rotation target, each stock adjustment and the whole band matrix, and recalculate everything the instant a value changes, with no reload. Show the default next to each control and give me a Reset button.
+      <pre>Make every parameter editable on the page, each cell of the demand × stock grid, each context adjustment, the cap and the whole band matrix, and recalculate everything the instant a value changes, with no reload. Show the default next to each control and give me a Reset button.
 
 Then add a sanity panel at the top: how many models move down, how many move up, the average move in each direction, how many are already on target, and how many of the twenty largest moves rest on weak evidence: a single competitor, or confidence under 50%.
 
@@ -1433,6 +1557,7 @@ If a big move rests on one observation, say so right next to it rather than in a
     <p class="wk-goal rv">Same numbers, different owner. By the end the tool looks like it
       was made inside Forum Sport, and it works for someone reading it on a phone in a
       stockroom.</p>
+    <p class="measure rv"><b>Measure</b>Put the tool in front of someone outside the team. Count the recommendations they accept and the ones they override, with the reason, all written to the override log.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
@@ -1522,6 +1647,7 @@ Finally, list any key that exists in one language and not the other.</pre>
     <h2 class="rv">Presenting the MVP to the client</h2>
     <p class="wk-goal rv">Ten minutes in which the tool does something live, and you answer
       the three questions they will actually ask.</p>
+    <p class="measure rv"><b>Measure</b>One supervision panel with the three levels: baseline next to now for each KPI, and the result that would prove your hypothesis wrong.</p>
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
