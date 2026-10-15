@@ -711,9 +711,9 @@ code{
       <p class="sec-tag">The brief</p>
       <p class="sec-sub">The client&rsquo;s needs</p>
     </div>
-    <h2 class="rv">What Forum Sport asked for</h2>
-    <p class="lead prose rv">Forum Sport reviewed the first version of this tool and told us
-      what they need next. Their answer, written up as the brief your team works to.</p>
+    <h2 class="rv">What Forum Sport is asking for</h2>
+    <p class="lead prose rv">This is the client&rsquo;s brief. Everything your team builds over
+      the six weeks answers it, so read it twice.</p>
 
     <div class="brief rv">
       <article class="letter">
@@ -729,13 +729,13 @@ code{
           reviews those prices largely by hand, looking at figures and product names, never
           at the products themselves.</p>
 
-        <p>We have seen the first version of the tool, and three things convinced us. It puts
-          the whole job in one place: reading competitor prices, seeing where we stand, and
-          recommending a price. Its charts are simple, with filters that let a manager
-          compare us with any group of rivals. And above all, the recommendation engine is in
-          the open. A manager can change its parameters, simulate alternatives and read the
-          reasons behind every price. Seeing our catalogue with images, next to our rivals,
-          is already a step forward for us.</p>
+        <p>What we need is one tool for the whole job: reading competitor prices, seeing
+          where we stand, and recommending a price. It should be simple to read, with filters
+          that let a manager compare us with any group of rivals. Above all, the
+          recommendation engine must be in the open. A manager should be able to change its
+          parameters, simulate alternatives and read the reasons behind every price. Seeing
+          our catalogue with images, next to our rivals, would already be a step forward
+          for us.</p>
 
         <blockquote class="letter-pull">
           <p>We are not asking you to reproduce our pricing model. We are asking for
@@ -795,17 +795,6 @@ code{
           </ol>
         </div>
       </aside>
-    </div>
-    <p class="cap rv">Written up from Forum Sport&rsquo;s feedback on the MVP. The figures in the dataset are illustrative.</p>
-
-    <div class="warn rv">
-      <h4 style="margin-top:0">Where the reference build stands</h4>
-      <p>Of the four things the brief asks the engine to handle, the reference build solves
-        one fully, the band matrix. Season timing is not modelled, store context only in
-        part, and the reference competitor cannot be derived because its rule is not shared.
-        <a href="#week-4">Week 04</a> gives each of them a configurator rule. For the
-        reference rival, propose yours and defend it. A tool that invents the client&rsquo;s
-        policy is worse than one that admits the gap.</p>
     </div>
   </div>
 </section>
@@ -1480,7 +1469,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         not shared how. If the manager fixes a rival for a product, that rival is the
         reference. Otherwise it is the <b>median</b> of the rivals selected in the filters,
         switchable to the cheapest or the mean. The median stops one odd price dragging the
-        recommendation, and the client said its reference is not always the cheapest.</p></div>
+        recommendation, and the brief says the client&rsquo;s reference is not always the cheapest.</p></div>
       <div><b>2 · Demand &times; stock</b><p>Demand from the online ABCD class: high is AA and
         A, medium is B and unclassified, low is C and D. Stock: low is very low and low, high
         is high and very high. The grid below gives the target as a percentage of the
@@ -1514,7 +1503,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <h3 class="rv">Context adjustments</h3>
     <div class="tbl rv">
       <table>
-        <thead><tr><th>Variable</th><th>What the client said</th><th>Default</th></tr></thead>
+        <thead><tr><th>Variable</th><th>What the brief says</th><th>Default</th></tr></thead>
         <tbody>
           <tr><td><b>Outlet</b></td><td>More willing to cut the price</td><td>&minus;3 points, and never raised</td></tr>
           <tr><td><b>Previous season</b></td><td>More promotional pressure</td><td>&minus;3 points</td></tr>
@@ -1772,34 +1761,6 @@ Finally, list any key that exists in one language and not the other.</pre>
           <tr><td>Can we trust it?</td><td>On the models where we have market data, yes, to the degree the score states. Below 50 we are telling you not to act yet, in the open.</td><td>742 models with a competitor price</td></tr>
         </tbody>
       </table>
-    </div>
-
-    <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the handover</span><button class="copy" type="button">Copy</button></div>
-      <pre>Write a one-page handover for a non-technical client. Sections: what this tool does; what it does NOT do; where the data comes from and how often it refreshes; what the confidence score means; the five things that would break it; and what the next step would cost in time.
-
-No jargon. If a word would not survive a meeting, replace it. Under 500 words, in Spanish and in English.</pre>
-    </div>
-
-    <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt, 2 of 3 · make it survive the room</span><button class="copy" type="button">Copy</button></div>
-      <pre>We present this live tomorrow. Make it survive the room.
-
-1) If the database does not answer within three seconds, show a clear message instead of an empty table.
-2) Add a link that opens one specific model directly, with its filters already applied, so I can jump to it from a slide.
-3) Check it on a 390px-wide phone and fix anything that overflows or gets cut off.
-4) List every place the page could show a blank or a dash, and tell me what it will say instead.
-
-Then give me a ten-point checklist to run thirty minutes before presenting.</pre>
-    </div>
-
-    <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt, 3 of 3 · rehearse the hostile question</span><button class="copy" type="button">Copy</button></div>
-      <pre>Act as Forum Sport's pricing manager: fifteen years in the job, sceptical of anything built by students.
-
-Read this tool and ask me the eight hardest questions you would ask in the demo, about where the cost figure comes from, about the margin floor, about how we got the competitors' prices and whether that is legal, and about what happens when a rival is out of stock and shows a stale price.
-
-For each question, tell me what a weak answer sounds like and what a strong one sounds like.</pre>
     </div>
 
     <div class="gotcha rv">
