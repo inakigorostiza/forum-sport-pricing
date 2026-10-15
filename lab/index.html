@@ -13,11 +13,18 @@
 /* ── IE Business School tokens ──────────────────────────────────────────
    Copied from `IE Design System/tokens/`. Inlined on purpose: this page has
    to stand on its own, so the kit itself can stay out of the deployment.
-   Navy carries the brand, red is the only accent and never a background
-   field, grayscale on white does everything else. */
+   Navy carries the brand, the IE blues are the only accent, grayscale on
+   white does everything else. The accent lives in two tokens, so changing
+   it is a two-line edit:
+   --accent         #0097dc, the emblem blue. 3.25:1 on white and 2.96:1 on
+                    the tint, so it never carries text: rules, bars, borders.
+   --accent-strong  #2f6fed. 4.55:1 on white, 4.13:1 on the tint: numerals
+                    and large type (AA large, 3:1), white text on it (AA).
+   Small text and links stay navy; links get an --accent underline. */
 :root{
-  --ie-navy:#0a1a3c; --ie-navy-700:#16264f; --ie-blue:#0097dc;
-  --ie-ink:#1a1a1a; --ie-red:#e3342f; --ie-red-700:#c02622;
+  --ie-navy:#0a1a3c; --ie-navy-700:#16264f; --ie-blue:#0097dc; --ie-blue-data:#2f6fed;
+  --ie-ink:#1a1a1a;
+  --accent:var(--ie-blue); --accent-strong:var(--ie-blue-data);
   --g-900:#2c2c2c; --g-600:#6b6b6b; --g-300:#d8d8d8; --g-100:#f4f4f4; --white:#fff;
 
   --font-sans:"Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
@@ -46,9 +53,11 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 img,svg{display:block; max-width:100%}
-a{color:var(--ie-red); text-decoration:none}
-a:hover{color:var(--ie-red-700)}
-:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(227,52,47,.40); border-radius:var(--radius-sm)}
+a{color:var(--ie-navy); text-decoration:underline; text-decoration-color:var(--accent);
+  text-decoration-thickness:2px; text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ie-navy)}
+.btn,.secnav a,.src{text-decoration:none}
+:focus-visible{outline:none; box-shadow:0 0 0 3px var(--accent-strong); border-radius:var(--radius-sm)}
 
 /* ── layout ─────────────────────────────────────────────────────────── */
 .wrap{max-width:var(--container); margin:0 auto; padding:0 24px}
@@ -64,9 +73,8 @@ section{padding:var(--s-12) 0}
 
 /* ── type ───────────────────────────────────────────────────────────── */
 /* El eyebrow del manual son 12px. Aquí es el rótulo que ordena una página de
-   treinta mil píxeles, así que sube de tamaño y el numeral toma el rojo de
-   marca —que el sistema reserva justamente para numerales, botones y enlaces—
-   para ganar peso sin inventarse un color nuevo. */
+   treinta mil píxeles, así que sube de tamaño y el numeral toma el azul de
+   acento para ganar peso sin inventarse un color nuevo. */
 .eyebrow{
   font-size:clamp(.875rem,1.4vw,1.0625rem); font-weight:700; text-transform:uppercase;
   letter-spacing:.1em; color:var(--ie-navy);
@@ -76,12 +84,12 @@ section{padding:var(--s-12) 0}
 /* ── El rótulo que abre cada sección ──────────────────────────────────
    Lleva el mismo nombre que su parada en el menú, para que el alumno case
    "semana 3, scraping" de la barra con lo que tiene delante sin leer nada
-   más. La regla roja encima marca dónde empieza una sección en una página
+   más. La regla azul encima marca dónde empieza una sección en una página
    de treinta mil píxeles. */
 .sec-head{
   display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;
   margin:0 0 var(--s-2); padding-top:var(--s-2);
-  border-top:3px solid var(--ie-red); border-image:none;
+  border-top:3px solid var(--accent); border-image:none;
   position:relative;
 }
 .sec-head::before{
@@ -93,7 +101,7 @@ section{padding:var(--s-12) 0}
   font-weight:800; line-height:1; letter-spacing:-.015em; text-transform:uppercase;
   color:var(--ie-navy); margin:0; display:inline-flex; align-items:baseline; gap:.22em;
 }
-.sec-tag .n{color:var(--ie-red); font-size:1em; font-weight:inherit;
+.sec-tag .n{color:var(--accent-strong); font-size:1em; font-weight:inherit;
   font-family:inherit; font-variant-numeric:tabular-nums}
 .sec-sub{
   font-size:clamp(.8125rem,1.3vw,1rem); font-weight:700; text-transform:uppercase;
@@ -102,7 +110,7 @@ section{padding:var(--s-12) 0}
 .navy .sec-tag,.hero .sec-tag{color:#fff}
 .navy .sec-sub,.hero .sec-sub{color:#8fa3cc}
 .navy .sec-head::before,.hero .sec-head::before{background:#2b3c63}
-.eyebrow .eb-n{color:var(--ie-red); font-family:var(--font-display); font-weight:800;
+.eyebrow .eb-n{color:var(--accent-strong); font-family:var(--font-display); font-weight:800;
   font-variant-numeric:tabular-nums; letter-spacing:.06em}
 .eyebrow .eb-s{color:var(--g-300); font-weight:400}
 .navy .eyebrow,.hero .eyebrow{color:#c9d2e6}
@@ -144,12 +152,11 @@ strong{font-weight:700; color:var(--ie-navy)}
   cursor:pointer; transition:background var(--t) var(--ease),
     color var(--t) var(--ease), border-color var(--t) var(--ease), transform var(--t) var(--ease);
 }
-/* El rojo de marca puro con texto blanco da 4,38:1 — por debajo de AA. El
-   rojo oscuro es token de marca igualmente y da 6,0:1, así que el botón lo usa
-   y el rojo puro queda para las marcas que no llevan texto encima: el
-   subrayado del índice, los filetes y los numerales. */
-.btn-primary{background:var(--ie-red-700); color:#fff}
-.btn-primary:hover{background:#a81e1b; color:#fff}
+/* El azul del emblema con texto blanco da 3,25:1, por debajo de AA, así que el
+   botón usa --accent-strong (4,55:1) y el azul del emblema queda para lo que no
+   lleva texto encima: el subrayado del índice y los filetes. */
+.btn-primary{background:var(--accent-strong); color:#fff}
+.btn-primary:hover{background:#fff; color:var(--ie-navy)}
 .btn-primary:active{transform:translateY(1px)}
 .btn-ghost{background:transparent; color:#fff; border-color:rgba(255,255,255,.45)}
 .btn-ghost:hover{background:#fff; color:var(--ie-navy); border-color:#fff}
@@ -181,12 +188,12 @@ strong{font-weight:700; color:var(--ie-navy)}
   letter-spacing:.07em; padding:0 15px; height:100%;
   transition:color var(--t) var(--ease), background var(--t) var(--ease);
 }
-/* El numeral de la semana lleva el rojo de marca, igual que los rótulos de
+/* El numeral de la semana lleva el azul de acento, igual que los rótulos de
    sección: el profesor dice "semana 3" y el ojo lo encuentra. */
 .secnav a i{
   font-style:normal; font-family:var(--font-display); font-weight:800;
-  font-size:.75rem; color:var(--ie-red); letter-spacing:.04em;
-  font-variant-numeric:tabular-nums; opacity:.7;
+  font-size:.75rem; color:var(--accent-strong); letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
   transition:opacity var(--t) var(--ease);
 }
 .secnav a:hover{color:var(--ie-navy); background:var(--g-100)}
@@ -197,7 +204,7 @@ strong{font-weight:700; color:var(--ie-navy)}
 .secnav .nv-main{color:var(--ie-navy)}
 .secnav .nv-sep{flex:none; width:1px; height:20px; background:var(--g-300); margin:0 8px}
 .secnav .mark{
-  position:absolute; left:0; bottom:0; width:0; height:3px; background:var(--ie-red);
+  position:absolute; left:0; bottom:0; width:0; height:3px; background:var(--accent);
   transition:transform var(--t) var(--ease), width var(--t) var(--ease);
 }
 @media(max-width:620px){
@@ -308,14 +315,14 @@ strong{font-weight:700; color:var(--ie-navy)}
 .tbl td{padding:14px 16px; border-top:1px solid var(--g-300); vertical-align:top}
 .tbl tbody tr:nth-child(odd) td{background:#fcfcfc}
 .pull{margin:var(--s-6) 0 0; padding:0 0 0 var(--s-3);
-  border-left:2px solid var(--ie-red); max-width:var(--container-text)}
+  border-left:2px solid var(--accent); max-width:var(--container-text)}
 .pull p{font-family:var(--font-display); font-size:var(--fs-h3); font-weight:700;
   line-height:var(--lh-snug); color:var(--ie-navy); margin:0}
 .pull cite{display:block; margin-top:var(--s-1); font-style:normal;
   font-size:.6875rem; font-weight:700; text-transform:uppercase;
   letter-spacing:.09em; color:var(--g-600)}
 .warn{margin-top:var(--s-6); padding:var(--s-3) var(--s-3) var(--s-3) var(--s-4);
-  border-left:2px solid var(--ie-red); background:var(--g-100);
+  border-left:2px solid var(--accent); background:var(--g-100);
   border-radius:0 var(--radius) var(--radius) 0; max-width:var(--container-text)}
 .tint .warn{background:var(--white)}
 .warn p{margin:0; font-size:.9375rem}
@@ -336,7 +343,7 @@ strong{font-weight:700; color:var(--ie-navy)}
 .steps li{counter-increment:st; position:relative; padding-left:48px; font-size:1rem}
 .steps li::before{content:counter(st,decimal-leading-zero);
   position:absolute; left:0; top:-2px; font-family:var(--font-display);
-  font-size:1.125rem; font-weight:800; color:var(--ie-red);
+  font-size:1.1875rem; font-weight:800; color:var(--accent-strong);
   font-variant-numeric:tabular-nums}
 .how{display:grid; gap:1px; background:var(--g-300); border:1px solid var(--g-300);
   border-radius:var(--radius); overflow:hidden; margin-top:var(--s-2)}
@@ -360,17 +367,17 @@ strong{font-weight:700; color:var(--ie-navy)}
   background:#fff; border:0; border-radius:var(--radius-sm);
   padding:6px 12px; cursor:pointer; transition:background var(--t) var(--ease), color var(--t) var(--ease)}
 .copy:hover{background:var(--g-100)}
-.copy[data-done]{background:var(--ie-red); color:#fff}
+.copy[data-done]{background:var(--accent-strong); color:#fff}
 .prompt pre{margin:0; padding:var(--s-3); font-family:var(--font-mono);
   font-size:.8125rem; line-height:1.65; color:var(--ie-ink);
   white-space:pre-wrap; word-break:break-word}
 .gotcha{margin-top:var(--s-4); display:grid; gap:10px}
 .gotcha p{margin:0; padding-left:20px; position:relative; font-size:.9375rem; color:var(--g-900)}
-.gotcha p::before{content:"–"; position:absolute; left:0; color:var(--ie-red); font-weight:700}
-.leave{margin-top:var(--s-6); padding-top:var(--s-3); border-top:2px solid var(--ie-red);
+.gotcha p::before{content:"–"; position:absolute; left:0; color:var(--accent); font-weight:700}
+.leave{margin-top:var(--s-6); padding-top:var(--s-3); border-top:2px solid var(--accent);
   font-family:var(--font-display); font-size:1.0625rem; font-weight:700;
   text-transform:uppercase; letter-spacing:.03em; color:var(--ie-navy)}
-.leave .arw{color:var(--ie-red)}
+.leave .arw{color:var(--accent-strong)}
 footer{background:var(--ie-navy); color:#c9d2e6; padding:var(--s-8) 0;
   font-size:.875rem}
 footer .wrap{display:flex; justify-content:space-between; gap:var(--s-3); flex-wrap:wrap; align-items:center}
@@ -387,7 +394,7 @@ footer img{height:36px}
   .wrap{padding:0 18px}
   .prompt pre{font-size:.75rem; padding:var(--s-2)}
 }
-/* Las cuatro áreas: rejilla de filetes con el numeral en rojo, y debajo una
+/* Las cuatro áreas: rejilla de filetes con el numeral en azul, y debajo una
    banda navy con la capa de automatización que las sostiene. */
 .pillars{display:grid; gap:1px; background:var(--g-300);
   border:1px solid var(--g-300); border-radius:var(--radius) var(--radius) 0 0;
@@ -397,7 +404,7 @@ footer img{height:36px}
 .pillars > div{background:var(--white); padding:var(--s-3)}
 .pillars .pn{
   display:block; font-family:var(--font-display); font-size:1.25rem; font-weight:800;
-  color:var(--ie-red); letter-spacing:.04em; margin-bottom:var(--s-1);
+  color:var(--accent-strong); letter-spacing:.04em; margin-bottom:var(--s-1);
   font-variant-numeric:tabular-nums;
 }
 .pillars h4{margin:0 0 6px; color:var(--ie-navy); font-size:.8125rem}
@@ -427,7 +434,7 @@ footer img{height:36px}
    suelto en un párrafo, porque es algo que el alumno tiene que ir a abrir. */
 .src{
   display:flex; align-items:flex-start; gap:var(--s-2);
-  border:1px solid var(--g-300); border-left:3px solid var(--ie-red);
+  border:1px solid var(--g-300); border-left:3px solid var(--accent);
   border-radius:var(--radius); background:var(--white);
   padding:var(--s-3); margin-top:var(--s-3); color:var(--ie-ink);
   transition:border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
@@ -444,7 +451,7 @@ footer img{height:36px}
 .src-body{flex:1 1 auto; font-size:.9375rem; line-height:1.55; min-width:0}
 .src-body b{display:block; font-family:var(--font-display); font-size:1rem;
   color:var(--ie-navy); margin-bottom:2px}
-.src-arw{flex:none; color:var(--ie-red); font-weight:700;
+.src-arw{flex:none; color:var(--accent-strong); font-weight:700;
   transition:transform var(--t) var(--ease)}
 @media(max-width:560px){ .src{flex-wrap:wrap} .src-arw{display:none} }
 
@@ -546,8 +553,8 @@ code{
 <text x="630" y="472" class="fg-ax" text-anchor="middle">-20%</text>
 <line x1="1003" y1="26" x2="1003" y2="456" stroke="#d8d8d8" stroke-width="1"/>
 <text x="1003" y="472" class="fg-ax" text-anchor="middle">+20%</text>
-<line x1="817" y1="20" x2="817" y2="456" stroke="#e3342f" stroke-width="2"/>
-<text x="817" y="14" class="fg-ax" text-anchor="middle" style="fill:#e3342f">PARITY</text>
+<line x1="817" y1="20" x2="817" y2="456" stroke="var(--accent)" stroke-width="2"/>
+<text x="817" y="14" class="fg-ax" text-anchor="middle" style="fill:var(--accent-strong)">PARITY</text>
 <text x="198" y="50" class="fg-lb" text-anchor="end">Running Emotion</text>
 <rect x="816.7" y="38" width="205.3" height="16" fill="#2c2c2c"/>
 <text x="1030" y="50" class="fg-vl" text-anchor="start">+22.0%</text>
@@ -768,7 +775,7 @@ code{
       show. The first three build the data foundation; the last three turn it into
       decisions, a brand and a client presentation.</p>
     <div class="fig rv"><svg viewBox="0 0 1180 246" role="img" aria-label="The six weeks and what each one ends with: a live page, the catalogue in a database, competitor prices, a recommendation engine, the brand and experience, and the client presentation." class="figsvg">
-<style>.fg-wn{font:800 13px var(--font-display);fill:#e3342f;letter-spacing:.08em}.fg-wt{font:700 13px var(--font-sans);fill:#0a1a3c}.fg-wd{font:400 12px var(--font-sans);fill:#6b6b6b}.fg-hd{font:700 10px var(--font-sans);fill:#6b6b6b;letter-spacing:.12em}</style>
+<style>.fg-wn{font:800 13px var(--font-display);fill:var(--accent-strong);letter-spacing:.08em}.fg-wt{font:700 13px var(--font-sans);fill:#0a1a3c}.fg-wd{font:400 12px var(--font-sans);fill:#6b6b6b}.fg-hd{font:700 10px var(--font-sans);fill:#6b6b6b;letter-spacing:.12em}</style>
 <line x1="86" y1="112" x2="1094" y2="112" stroke="#d8d8d8" stroke-width="1"/>
 <text x="4" y="172" class="fg-hd">YOU LEAVE WITH</text>
 <rect x="82.5" y="108.5" width="7" height="7" fill="#0a1a3c"/>
@@ -1377,7 +1384,7 @@ If a big move rests on one observation, say so right next to it rather than in a
     </div>
 
     <div class="fig rv"><svg viewBox="0 0 1060 152" role="img" aria-label="The hundred confidence points: forty for how many rivals, twenty for freshness, fifteen for match type, fifteen for how much rivals agree, ten for knowing the rotation class." class="figsvg">
-<style>.fg-s{font:700 11px var(--font-sans);fill:#fff;letter-spacing:.04em}.fg-l{font:600 11px var(--font-sans);fill:#2c2c2c}.fg-c{font:700 10px var(--font-sans);fill:#e3342f;letter-spacing:.09em}.fg-t{font:800 12px var(--font-display);fill:#0a1a3c}</style>
+<style>.fg-s{font:700 11px var(--font-sans);fill:#fff;letter-spacing:.04em}.fg-l{font:600 11px var(--font-sans);fill:#2c2c2c}.fg-c{font:700 10px var(--font-sans);fill:var(--accent-strong);letter-spacing:.09em}.fg-t{font:800 12px var(--font-display);fill:#0a1a3c}</style>
 <rect x="20.0" y="36" width="398.0" height="40" fill="#0a1a3c"/>
 <text x="220" y="61" class="fg-s" text-anchor="middle" style="fill:#fff">40</text>
 <text x="220" y="94" class="fg-l" text-anchor="middle">How</text>
@@ -1396,7 +1403,7 @@ If a big move rests on one observation, say so right next to it rather than in a
 <text x="970" y="94" class="fg-l" text-anchor="middle">Rotation</text>
 <text x="970" y="108" class="fg-l" text-anchor="middle">known</text>
 <text x="20" y="24" class="fg-t">100 POINTS OF CONFIDENCE</text>
-<line x1="470" y1="28" x2="470" y2="84" stroke="#e3342f" stroke-width="2"/>
+<line x1="470" y1="28" x2="470" y2="84" stroke="var(--accent)" stroke-width="2"/>
 <text x="478" y="132" class="fg-c">CEILING WITH ONE RIVAL: 45, ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
     <p class="cap">Fig. 04. What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
