@@ -473,6 +473,52 @@ code{
 }
 .tint code{background:var(--white)}
 .warn code{background:var(--white)}
+
+/* ── El brief como carta del cliente ─────────────────────────────────
+   Se lee como un documento que el cliente entrega, no como una ficha:
+   cabecera de memorándum, párrafos, firma. Al lado, lo que se consulta de
+   un vistazo. */
+.brief{display:grid; gap:var(--s-4); margin-top:var(--s-6); align-items:start}
+@media(min-width:960px){ .brief{grid-template-columns:minmax(0,1fr) 300px; gap:var(--s-6)} }
+.letter{background:var(--white); border:1px solid var(--g-300); border-top:4px solid var(--accent);
+  border-radius:var(--radius); box-shadow:var(--shadow-card);
+  padding:var(--s-4) var(--s-3) var(--s-4); max-width:var(--container-text)}
+@media(min-width:700px){ .letter{padding:var(--s-6) var(--s-6) var(--s-4)} }
+.memo{margin:0 0 var(--s-4); padding-bottom:var(--s-3); border-bottom:1px solid var(--g-300);
+  display:grid; gap:6px}
+.memo div{display:grid; grid-template-columns:80px 1fr; gap:var(--s-2)}
+.memo dt{font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
+  color:var(--g-600); padding-top:2px}
+.memo dd{margin:0; font-size:.9375rem; color:var(--ie-navy); font-weight:600}
+.letter p{font-size:1.0625rem; line-height:1.7; color:var(--ie-ink); margin:0 0 var(--s-3)}
+.letter .opening{font-size:var(--fs-lead); line-height:1.55; color:var(--ie-navy)}
+.letter h3{font-size:.8125rem; letter-spacing:.1em; margin:var(--s-6) 0 var(--s-2); color:var(--accent-strong)}
+.letter b{color:var(--ie-navy)}
+.letter-pull{margin:var(--s-4) 0; padding:var(--s-3) 0 var(--s-3) var(--s-3);
+  border-left:3px solid var(--accent)}
+.letter-pull p{font-family:var(--font-display); font-size:clamp(1.125rem,2.4vw,1.375rem);
+  font-weight:700; line-height:1.35; color:var(--ie-navy); margin:0}
+.signoff{margin:var(--s-6) 0 0!important; padding-top:var(--s-3); border-top:1px solid var(--g-300);
+  font-family:var(--font-display); font-weight:800; font-size:1.125rem!important; color:var(--ie-navy)!important}
+.signoff span{display:block; font-family:var(--font-sans); font-weight:400; font-size:.875rem;
+  color:var(--g-600); margin-top:2px}
+.brief-side{display:grid; gap:var(--s-3)}
+@media(min-width:960px){ .brief-side{position:sticky; top:calc(var(--nav-h) + var(--s-3))} }
+.side-block{background:var(--ie-navy); color:#c9d2e6; border-radius:var(--radius); padding:var(--s-3)}
+.side-block + .side-block{background:var(--white); color:var(--ie-ink); border:1px solid var(--g-300)}
+.side-h{font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em;
+  color:#8fa3cc; margin:0 0 var(--s-2)}
+.side-block + .side-block .side-h{color:var(--g-600)}
+.side-facts{margin:0; display:grid; gap:var(--s-2)}
+.side-facts div{display:grid; grid-template-columns:72px 1fr; gap:var(--s-2); align-items:baseline}
+.side-facts dt{font-family:var(--font-display); font-weight:800; font-size:1.5rem; color:#fff;
+  font-variant-numeric:tabular-nums}
+.side-facts dd{margin:0; font-size:.875rem; line-height:1.4}
+.side-tests{list-style:none; counter-reset:t; margin:0; padding:0; display:grid; gap:var(--s-2)}
+.side-tests li{counter-increment:t; position:relative; padding-left:34px; font-size:.875rem; line-height:1.5}
+.side-tests li::before{content:counter(t,decimal-leading-zero); position:absolute; left:0; top:0;
+  font-family:var(--font-display); font-weight:800; color:var(--accent-strong)}
+.side-tests b{color:var(--ie-navy)}
 </style>
 </head>
 <body>
@@ -666,53 +712,100 @@ code{
       <p class="sec-sub">The client&rsquo;s needs</p>
     </div>
     <h2 class="rv">What Forum Sport asked for</h2>
+    <p class="lead prose rv">Forum Sport reviewed the first version of this tool and told us
+      what they need next. Their answer, written up as the brief your team works to.</p>
 
-    <blockquote class="pull rv">
-      <p>Recommendations that are coherent and explainable.</p>
-      <cite>Forum Sport, on the MVP</cite>
-    </blockquote>
+    <div class="brief rv">
+      <article class="letter">
+        <dl class="memo">
+          <div><dt>From</dt><dd>Forum Sport, pricing and e-commerce</dd></div>
+          <div><dt>To</dt><dd>The teams of the End-to-End AI Marketing Lab</dd></div>
+          <div><dt>Subject</dt><dd>Dynamic pricing for our running and trail catalogue</dd></div>
+        </dl>
 
-    <p class="lead prose rv" style="margin-top:var(--s-4)">That sentence is the whole
-      engagement. They are not asking you to reverse-engineer how they price today. They
-      are asking for a tool whose every number can be defended out loud, in a meeting, by
-      someone who did not build it.</p>
+        <p class="opening">We sell sport in our own stores and online. Running and trail is one
+          of our biggest online categories, and it is where pricing hurts most: our customers
+          can compare what we charge with a dozen shops in a few seconds. Today our team
+          reviews those prices largely by hand, looking at figures and product names, never
+          at the products themselves.</p>
 
-    <h3 class="rv">Three jobs, in one place</h3>
-    <ol class="steps rv">
-      <li><b>Watch the competition.</b> Collect the prices other shops charge for the same
-        running shoes, every day, and keep every observation.</li>
-      <li><b>Show the picture.</b> Put Forum Sport's catalogue, with photos, next to those
-        competitor prices, so a manager sees at a glance where they are cheaper or dearer.</li>
-      <li><b>Recommend a price.</b> For each product, suggest one, and explain in plain
-        words why.</li>
-    </ol>
+        <p>We have seen the first version of the tool, and three things convinced us. It puts
+          the whole job in one place: reading competitor prices, seeing where we stand, and
+          recommending a price. Its charts are simple, with filters that let a manager
+          compare us with any group of rivals. And above all, the recommendation engine is in
+          the open. A manager can change its parameters, simulate alternatives and read the
+          reasons behind every price. Seeing our catalogue with images, next to our rivals,
+          is already a step forward for us.</p>
 
-    <h3 class="rv">What &ldquo;good&rdquo; means to them</h3>
-    <div class="how rv">
-      <div><b>Coherent</b><p>Two products in the same situation get the same answer. If they
-        do not, you can say which input differed.</p></div>
-      <div><b>Explainable</b><p>Every recommendation carries one sentence a buyer could read
-        aloud in a meeting, naming the rule that decided it.</p></div>
-      <div><b>Honest about itself</b><p>Where the data is thin, the tool says so on the row,
-        not in a footnote, and not only to the person who built it.</p></div>
-      <div><b>Usable weekly</b><p>A category manager opens it, filters to their brand, and
-        leaves with a list. No training session required.</p></div>
+        <blockquote class="letter-pull">
+          <p>We are not asking you to reproduce our pricing model. We are asking for
+            recommendations that are coherent and explainable.</p>
+        </blockquote>
+
+        <h3>How we build a price</h3>
+        <p><b>Profitability comes first.</b> Every price must keep a minimum margin, both as a
+          percentage and in euros, and both depend on the price band. We have shared the
+          matrix we use as a guide.</p>
+        <p><b>Then stock and online demand.</b> A product that sells well and is running out
+          should defend its price and margin. One that sells well with plenty of stock can
+          hold, or move a little. A slow seller with little stock has no real need to drop.
+          A slow seller with a lot of stock is the first candidate for a cut. Where we are in
+          the season, start or end, matters too.</p>
+        <p><b>Then context.</b> Outlet products are more open to a lower price. Products from
+          our extended catalogue, which we do not hold ourselves, are under less pressure to
+          clear than our own stock, which we need to sell through. Older seasons carry more
+          promotional pressure, though the current one is not untouchable either. Online
+          exclusives give us more freedom to adapt.</p>
+        <p><b>And one thing we cannot give you yet.</b> For every product we compare against
+          one chosen competitor, not necessarily the cheapest. We are not able to share how
+          that competitor is chosen. Propose a rule, and tell us why it is reasonable.</p>
+
+        <h3>About the data</h3>
+        <p>The dataset has fewer variables than our business uses, and its figures are not our
+          real ones. Sales and stock are not live: stock, margin and the A to D sales
+          classification are a single snapshot. Build something that works with what is
+          there, and tell us plainly where it falls short.</p>
+
+        <h3>What can wait</h3>
+        <p>To use this for real we would need more variables and a regular data feed, a way to
+          export the competitor prices and the recommendations into our own systems, and a
+          chart comparing our price curve with that of the competitors chosen in the filters.
+          None of that is for these six weeks. Show us that the idea holds first.</p>
+
+        <p class="signoff">Forum Sport<span>Pricing and e-commerce team</span></p>
+      </article>
+
+      <aside class="brief-side">
+        <div class="side-block">
+          <p class="side-h">The category</p>
+          <dl class="side-facts">
+            <div><dt>1,483</dt><dd>running and trail models</dd></div>
+            <div><dt>28</dt><dd>brands</dd></div>
+            <div><dt>39</dt><dd>competitors on the client&rsquo;s list</dd></div>
+            <div><dt>5</dt><dd>price bands, each with its own margin floor</dd></div>
+          </dl>
+        </div>
+        <div class="side-block">
+          <p class="side-h">What &ldquo;good&rdquo; means to them</p>
+          <ol class="side-tests">
+            <li><b>Coherent.</b> Two products in the same situation get the same answer.</li>
+            <li><b>Explainable.</b> Every price carries one sentence a buyer could read aloud.</li>
+            <li><b>Honest.</b> Where the data is thin, the row says so.</li>
+            <li><b>Usable weekly.</b> A manager filters to a brand and leaves with a list.</li>
+          </ol>
+        </div>
+      </aside>
     </div>
+    <p class="cap rv">Written up from Forum Sport&rsquo;s feedback on the MVP. The figures in the dataset are illustrative.</p>
 
     <div class="warn rv">
-      <h4 style="margin-top:0">Three of the four requested changes are still open</h4>
-      <p>Forum Sport asked for four changes on the MVP, and only one, the band matrix,
-        is fully solved in the reference build. <b>Season timing</b> is
-        not modelled at all. <b>Store context</b> is half done. Outlet and old season move the
-        price, extended catalogue and online exclusive do not. And the <b>reference
-        competitor</b> is the hard one: the client says each product has a chosen reference,
-        but <b>the rule that chooses it is not shared</b>. Without that rule you can offer a
-        selector with cheapest, mean and median, and let a human pick, but you cannot derive it.
-        Say that to them rather than guessing. A pricing tool that invents the client's own
+      <h4 style="margin-top:0">Where the reference build stands</h4>
+      <p>Of the four things the brief asks the engine to handle, the reference build solves
+        one fully, the band matrix. Season timing is not modelled, store context only in
+        part, and the reference competitor cannot be derived because its rule is not shared.
+        <a href="#week-4">Week 04</a> gives each of them a configurator rule. For the
+        reference rival, propose yours and defend it. A tool that invents the client&rsquo;s
         policy is worse than one that admits the gap.</p>
-      <p style="margin-top:var(--s-2)"><a href="#week-4">Week 04</a> turns all four into
-        configurator rules: season and store context get default values, and the reference
-        becomes a rival the manager fixes per product, or the median when none is fixed.</p>
     </div>
   </div>
 </section>
