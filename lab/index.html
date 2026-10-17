@@ -725,6 +725,20 @@ kbd{font-family:var(--font-mono); font-size:.8125em; padding:1px 6px; border:1px
 
 .secnav .nv-lbl{flex:none; font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em;
   color:var(--ie-navy); padding:3px 8px; margin-right:2px; border-radius:var(--radius-sm); background:var(--g-100)}
+
+/* Semana 1: la decisión de equipo. */
+.team{display:grid; gap:var(--s-3); margin-top:var(--s-3); max-width:var(--container-text)}
+@media(min-width:760px){ .team{grid-template-columns:1fr 1fr} }
+.team-opt{border:1px solid var(--g-300); border-top:4px solid var(--ie-navy); border-radius:var(--radius);
+  padding:var(--s-3); background:var(--white)}
+.team-opt h4{margin:4px 0 var(--s-1); font-size:1rem; text-transform:none; letter-spacing:0; color:var(--ie-navy)}
+.team-opt p{font-size:.9375rem; margin:0 0 var(--s-1)}
+.team-opt ul{margin:0; padding-left:18px; font-size:.875rem; display:grid; gap:4px}
+.team-tag{margin:0; font-size:.6875rem!important; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-strong)}
+.team-q{margin-top:var(--s-3); max-width:var(--container-text); padding:var(--s-3); border-radius:var(--radius);
+  background:var(--ie-navy); color:#c9d2e6}
+.team-q .team-tag{color:#8fa3cc}
+.team-q ol{margin:var(--s-1) 0 0; padding-left:20px; display:grid; gap:4px; font-size:.9375rem; color:#fff}
 </style>
 </head>
 <body>
@@ -1343,6 +1357,42 @@ kbd{font-family:var(--font-mono); font-size:.8125em; padding:1px 6px; border:1px
       <li>Your IE email, for every account</li>
       <li>Nothing else: no Python, no database software</li>
     </ul>
+
+    <h3 class="rv">Decide first: how your team will work</h3>
+    <p class="prose rv">At the end the team presents <b>one</b> deliverable: one link, one
+      repository, one demo. How you get there is up to you. Talk it through before anyone
+      installs anything, because it changes how you set things up today.</p>
+    <div class="team rv">
+      <div class="team-opt">
+        <p class="team-tag">Option A</p>
+        <h4>One shared project from day one</h4>
+        <p>One person creates the repository and invites the others as collaborators on
+          GitHub. One Vercel project, one Supabase project, one link from week 1.</p>
+        <ul>
+          <li><b>Good for:</b> moving fast, no merging at the end.</li>
+          <li><b>Watch out:</b> two people changing the same file at once. Agree who works on what each week.</li>
+        </ul>
+      </div>
+      <div class="team-opt">
+        <p class="team-tag">Option B</p>
+        <h4>Everyone builds their own, then you choose</h4>
+        <p>Each student sets up their own repository, Vercel and Supabase, and builds the
+          tool alone. You compare, keep the best parts, and bring them into one project.</p>
+        <ul>
+          <li><b>Good for:</b> everyone learns every step, and you can compare approaches.</li>
+          <li><b>Watch out:</b> the merge takes time. Pick the final project by week 5 at the latest.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="team-q rv">
+      <p class="team-tag">Before you leave today, write down</p>
+      <ol>
+        <li>Option A or B, and why.</li>
+        <li>Who owns the repository that becomes the final deliverable.</li>
+        <li>Who leads each week: data, scraping, engine, brand, demo.</li>
+        <li>When you check in with each other between sessions.</li>
+      </ol>
+    </div>
 
     <h3 class="rv">Three ideas before you install anything</h3>
     <div class="idea rv">
