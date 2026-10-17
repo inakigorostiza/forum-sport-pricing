@@ -868,6 +868,8 @@ const T = {
 "cr.g.clearance":{es:"Liquidación", en:"Clearance"},
 "cr.g.launch":   {es:"Lanzamiento", en:"Launch"},
 "cr.estimar":    {es:"Ver coste", en:"Check cost"},
+"cr.sinSaldo":   {es:"La cuenta de la API de Higgsfield no tiene saldo. Recárgala en console.higgsfield.ai y vuelve a intentarlo: no se ha cobrado nada.", en:"The Higgsfield API account has no balance. Top it up at console.higgsfield.ai and try again: nothing was charged."},
+"cr.porUso":     {es:"según uso, unos céntimos", en:"billed by usage, a few cents"},
 "cr.generar":    {es:"Generar", en:"Generate"},
 "cr.cerrar":     {es:"Cerrar", en:"Close"},
 "cr.coste":      {es:"Coste estimado: {c}", en:"Estimated cost: {c}"},
@@ -3859,10 +3861,12 @@ function crPanel(row){
       crFallo = null; const fm = CR_FORMATS[crForm.fmt];
       try{
         const r = await crApi({action:"estimate", modelo:row.modelo, kind:crForm.kind, channel:fm.ch, format:fm.f, goal:crForm.goal, price_rec:row.precio_rec});
-        const pick = o => o ? (o.credits ?? o.credit ?? o.cost_credits ?? null) : null;
-        const usd  = o => o ? (o.usd ?? o.cost_usd ?? o.price_usd ?? null) : null;
-        const cr_ = (pick(r.image)||0) + (pick(r.video)||0), us = (usd(r.image)||0) + (usd(r.video)||0);
-        crCost = [cr_ ? `${cr_} credits` : "", us ? `$${us.toFixed(2)}` : ""].filter(Boolean).join(" · ") || JSON.stringify(r);
+        /* Higgsfield returns a fixed estimate for video ({credits, usd} as strings)
+           and only a pricing description for token-billed images. */
+        const part = (o, label) => !o ? "" : o.type === "estimate"
+          ? `${label}: ${Number(o.credits).toFixed(2)} cr ($${Number(o.usd).toFixed(2)})`
+          : `${label}: ${t("cr.porUso")}`;
+        crCost = [part(r.image, t("cr.imagen")), part(r.video, t("cr.video"))].filter(Boolean).join(" · ");
       }catch(e){ crFallo = e; }
       render();
     };
@@ -3879,7 +3883,9 @@ function crPanel(row){
   if(crJob){
     const p = document.createElement("p"); p.className = "cr-status" + (crJob.stage === "failed" ? " warn" : "");
     p.setAttribute("role","status");
-    p.textContent = crJob.stage === "failed" ? t("cr.st.failed", {d: crFallo ? crFallo.message : (crJob.detail || "")}) : t("cr.st."+crJob.stage);
+    const why = crFallo ? crFallo.message : (crJob.detail || "");
+    p.textContent = crJob.stage !== "failed" ? t("cr.st."+crJob.stage)
+      : /not_enough_credits/.test(why) ? t("cr.sinSaldo") : t("cr.st.failed", {d: why});
     box.append(p);
   }
   if(crFallo && !crJob) crSetupNote(box, crFallo);
