@@ -357,6 +357,13 @@ strong{font-weight:700; color:var(--ie-navy)}
 .kpi-log{margin:0!important; padding-top:var(--s-1); font-size:.875rem!important; color:var(--g-900)}
 .kpi-log b{font-size:.6875rem; text-transform:uppercase; letter-spacing:.09em; color:var(--accent-strong); margin-right:6px}
 .kpi-wrap{overflow-x:auto}
+/* Direct: la misma tarjeta para la dirección creativa. Cabecera clara con
+   etiqueta navy, para distinguirla de Measure (azul) y de los prompts (navy). */
+.kpi.dir{border-color:var(--ie-navy)}
+.kpi.dir .kpi-h{background:var(--g-100); color:var(--ie-navy); border-bottom:1px solid var(--g-300)}
+.kpi.dir .kpi-tag{background:var(--ie-navy); color:#fff}
+.kpi.dir .kpi-log b{color:var(--ie-navy)}
+.kpi .eg{display:block; margin-top:4px; color:var(--g-600)}
 .chk{list-style:none; padding:0; margin:0; display:grid; gap:10px}
 .chk li{position:relative; padding-left:30px; font-size:.9375rem}
 .chk li::before{content:""; position:absolute; left:0; top:3px; width:16px; height:16px;
@@ -837,16 +844,16 @@ code{
       <div>
         <span class="pn">02</span>
         <h4>Brand and creative direction</h4>
-        <p>Learn to direct AI, not just prompt it. Shape how the solution looks, sounds and
-          tells its story, and produce front-end and back-end creative work that reflects the
-          client's brand.</p>
+        <p>Learn to direct AI, not just prompt it. Direct the language of the 1,483
+          explanations the tool writes, and one piece on how Forum Sport communicates price in
+          a category, both in the client&rsquo;s brand, with the reasoning written down.</p>
       </div>
       <div>
         <span class="pn">03</span>
         <h4>Data and measurement</h4>
         <p>Build the data layer and measure every process the week you build it: the data
           load, the scraper, the configurator&rsquo;s accuracy, how people use the tool. Every
-          result goes into one KPI log, and a supervision panel reads it. Not an add-on at
+          result goes into one KPI log, built as you go. Not an add-on at
           the end.</p>
       </div>
       <div>
@@ -931,21 +938,18 @@ code{
 <text x="1094" y="210" class="fg-wd" text-anchor="middle">and a demo</text>
 </svg></div>
 
-    <h3 class="rv">Measured every week, process by process</h3>
-    <p class="lead prose rv">Each process you build gets measured the week you build it. Every
-      session ends with a blue <b>Measure</b> card: the KPIs for that process, how to calculate
-      them, the target, and the line to add to your KPI log. By week 6 the log holds six weeks
-      of evidence, and your supervision panel reads it.</p>
+    <h3 class="rv">Measured process by process</h3>
+    <p class="lead prose rv">Each process you build gets measured the week you build it. Weeks
+      2 to 5 each end with a blue <b>Measure</b> card: the KPIs for that process, how to
+      calculate them, the target, and the line to add to your KPI log.</p>
     <div class="tbl rv">
       <table>
         <thead><tr><th>Week</th><th>Process</th><th>What you measure</th></tr></thead>
         <tbody>
-          <tr><td><b>01</b></td><td>Set-up</td><td>Publishing works &middot; the pricing hypothesis and its primary KPI</td></tr>
           <tr><td><b>02</b></td><td>Data load</td><td>Completeness &middot; totals that match &middot; data quality &middot; catalogue baselines</td></tr>
           <tr><td><b>03</b></td><td>Scraping</td><td>Coverage &middot; match rate &middot; fetch success &middot; freshness &middot; politeness &middot; price index baseline</td></tr>
           <tr><td><b>04</b></td><td>Configurator</td><td>Rule compliance &middot; coherence &middot; hand check &middot; thin evidence &middot; simulated impact</td></tr>
           <tr><td><b>05</b></td><td>Use</td><td>Task success &middot; time on task &middot; understanding &middot; accepted versus overridden prices</td></tr>
-          <tr><td><b>06</b></td><td>Supervision</td><td>The panel &middot; the hypothesis verdict &middot; freshness and speed on the day</td></tr>
         </tbody>
       </table>
     </div>
@@ -953,12 +957,26 @@ code{
     <div class="warn rv">
       <h4 style="margin-top:0">Two logs carry the whole framework</h4>
       <p>The <b>KPI log</b> is one table with five columns, week, KPI, value, target and how it
-        was measured, filled every session. The <b>override log</b> records every price a
+        was measured, filled in weeks 2 to 5. The <b>override log</b> records every price a
         person accepted or changed, from what, to what and why. It measures whether the tool
         is trusted, it is the governance record, and it is the evidence that a person, not
         the tool, decides, as the EU AI Act expects. There are no sales data, so business
         impact is simulated: what the recommended prices would do to the price index, the
         margin and the discounts, against the baselines you took in weeks 2 and 3.</p>
+    </div>
+
+    <h3 class="rv">Directed, not generated</h3>
+    <p class="lead prose rv">Two weeks carry a grey <b>Direct</b> card. The assistant produces
+      the words and the visuals; your team decides how they must sound and look, and writes
+      down why. Everything goes into one direction log.</p>
+    <div class="tbl rv">
+      <table>
+        <thead><tr><th>Week</th><th>What you direct</th><th>The output</th></tr></thead>
+        <tbody>
+          <tr><td><b>04</b></td><td>The language of the 1,483 explanations</td><td>A sentence template, a tone, a never-say list, five good and bad pairs</td></tr>
+          <tr><td><b>05</b></td><td>How Forum Sport communicates price in one category</td><td>One on-brand piece, with its brief and the versions you rejected</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
@@ -1066,12 +1084,12 @@ code{
           <tr>
             <td><b>Brand and creative direction</b></td>
             <td class="wt">10%</td>
-            <td>The solution looks and sounds like the client's. Front-end and back-end creative work are directed, with the reasoning written down, not generated and accepted.</td>
+            <td>The solution looks and sounds like the client&rsquo;s. The explanation sentences follow a template, a tone and a never-say list the team wrote, and pass a read-aloud test. One price-communication piece for a category is on brand and consistent with the pricing policy. Both are directed, with the brief, the rejected versions and the reasoning in the direction log, not generated and accepted.</td>
           </tr>
           <tr>
             <td><b>Data and measurement</b></td>
             <td class="wt">10%</td>
-            <td>A data layer that holds up, and every process measured the week it was built, with its KPIs, targets and results in the KPI log: load completeness, scraper coverage and freshness, configurator compliance and coherence, and an outside user&rsquo;s task success. Baselines taken before the engine, simulated impact against them, an override log, and a supervision panel that reads the log.</td>
+            <td>A data layer that holds up, and every process measured the week it was built, with its KPIs, targets and results in the KPI log: load completeness, scraper coverage and freshness, configurator compliance and coherence, and an outside user&rsquo;s task success. Baselines taken before the engine, simulated impact against them, an override log.</td>
           </tr>
           <tr>
             <td><b>User experience</b></td>
@@ -1155,18 +1173,6 @@ Do not install anything that is not strictly needed, and tell me before you inst
     <div class="gotcha rv">
       <p>It asks permission before every command it runs.</p>
       <p>Vercel complains about an output directory. Reply to the assistant with the exact error text, pasted whole.</p>
-    </div>
-
-    <div class="kpi rv" id="measure-01">
-      <div class="kpi-h"><span class="kpi-tag">Measure</span><span class="kpi-ttl">Week 01 &middot; Set-up and the hypothesis</span></div>
-      <div class="kpi-body">
-        <p>Two things to measure this week: that publishing works, and what the whole project is trying to move.</p>
-        <div class="kpi-wrap"><table>
-          <thead><tr><th>KPI</th><th>How you measure it</th><th>Target</th></tr></thead>
-          <tbody><tr><td>Publish works</td><td>Push a change, time how long until it shows at the public address</td><td>Live in under 2 min</td></tr><tr><td>Pricing hypothesis</td><td>One sentence: what changes, by how much, without breaking what. Example: within 5% of the market without average margin under 25%</td><td>Written and agreed</td></tr><tr><td>Primary KPI</td><td>The one number that tells you whether the hypothesis holds</td><td>Chosen and defined</td></tr></tbody>
-        </table></div>
-        <p class="kpi-log"><b>Log it</b>Start the team's KPI log today, a shared sheet with five columns: week, KPI, value, target, how it was measured. Every week adds rows to it.</p>
-      </div>
     </div>
 
     <p class="leave rv"><span class="arw">&rarr;</span> You leave with a live web address with your team name on it</p>
@@ -1288,7 +1294,7 @@ When you are done, tell me which key you used and why it is safe for that key to
           <thead><tr><th>KPI</th><th>How you measure it</th><th>Target</th></tr></thead>
           <tbody><tr><td>Completeness</td><td>Rows in the database &divide; rows in the spreadsheet</td><td>24,109 of 24,109</td></tr><tr><td>Totals match</td><td>Compare models, brands and categories with the <code>dimension values</code> tab</td><td>0 differences</td></tr><tr><td>Barcode quality</td><td>Share of rows with a valid barcode (EAN)</td><td>Over 99%</td></tr><tr><td>Image coverage</td><td>Share of models that show a photo</td><td>Report it</td></tr><tr><td>Baseline: margin</td><td>Average margin across the catalogue</td><td>Record it</td></tr><tr><td>Baseline: discounts</td><td>Share of models on discount, and their average discount</td><td>Record it</td></tr></tbody>
         </table></div>
-        <p class="kpi-log"><b>Log it</b>Move the KPI log into the database as a table called <code>kpi_log</code>, with the same five columns, and add this week&rsquo;s rows.</p>
+        <p class="kpi-log"><b>Log it</b>Create the team&rsquo;s KPI log: a table called <code>kpi_log</code> with five columns, week, KPI, value, target and how it was measured. Add this week&rsquo;s rows; weeks 3 to 5 add theirs.</p>
       </div>
     </div>
 
@@ -1661,13 +1667,25 @@ If a big move rests on one observation, say so right next to it rather than in a
       <p>A product changes band when it goes on sale, because the band follows today's selling price, not the list price. That is deliberate. Say it before someone discovers it.</p>
     </div>
 
+    <div class="kpi dir rv" id="direct-04">
+      <div class="kpi-h"><span class="kpi-tag">Direct</span><span class="kpi-ttl">Week 04 &middot; The sentence a buyer reads aloud</span></div>
+      <div class="kpi-body">
+        <p>The brief asks for one sentence per recommendation that a buyer could read aloud in a meeting, naming the rule that decided it. That is 1,483 sentences. The assistant writes them; your team decides how they must sound. That is direction, not code.</p>
+        <div class="kpi-wrap"><table>
+          <thead><tr><th>Decision</th><th>What you write</th><th>Done when</th></tr></thead>
+          <tbody><tr><td>Structure</td><td>The order every sentence follows: the move, the main reason with its number, the rule that decided it</td><td>Template agreed</td></tr><tr><td>Tone</td><td>Three words for the voice, for example direct, factual, calm, and the registers it never uses: sales talk, jargon</td><td>Written down</td></tr><tr><td>Never say</td><td>What the sentence must never contain: vague claims, &ldquo;optimal&rdquo;, &ldquo;the AI decided&rdquo;, certainty the data does not support, blame on a rival</td><td>At least 5 entries</td></tr><tr><td>Good and bad</td><td>Pairs of a sentence you reject and the one you accept, with the reason.<span class="eg">No: &ldquo;Price adjusted to market.&rdquo; Yes: &ldquo;Down to &euro;89.90 because three of four competitors are below us and it is last season.&rdquo;</span></td><td>5 pairs</td></tr><tr><td>Read-aloud test</td><td>Read 30 random sentences aloud; count the ones that break a rule, fix the template, repeat</td><td>0 of 30</td></tr></tbody>
+        </table></div>
+        <p class="kpi-log"><b>Write it down</b>Keep the template, the tone, the never-say list and the pairs in the team&rsquo;s direction log, and paste them into the prompt that writes the sentences, so the assistant follows your direction rather than its defaults.</p>
+      </div>
+    </div>
+
     <div class="kpi rv" id="measure-04">
       <div class="kpi-h"><span class="kpi-tag">Measure</span><span class="kpi-ttl">Week 04 &middot; Configurator accuracy</span></div>
       <div class="kpi-body">
         <p>The engine is accurate when it follows its own rules every time. Test it the way an auditor would.</p>
         <div class="kpi-wrap"><table>
           <thead><tr><th>KPI</th><th>How you measure it</th><th>Target</th></tr></thead>
-          <tbody><tr><td>Rule compliance</td><td>Share of prices inside the margin floor and the alignment ceiling, never above list price, no outlet raised</td><td>100%</td></tr><tr><td>Coherence</td><td>Pick 20 pairs of models with identical inputs: share that get the same position</td><td>100%</td></tr><tr><td>Hand check</td><td>Recalculate 10 random rows by hand in a spreadsheet and compare</td><td>10 of 10</td></tr><tr><td>Explained rows</td><td>Share of rows that carry a reason sentence</td><td>100%</td></tr><tr><td>Thin evidence</td><td>Share of rows with one rival only, or confidence under 50</td><td>Show it on screen</td></tr><tr><td>Simulated impact</td><td>Price index, margin and discount depth if every recommendation were applied, against the baselines</td><td>Compare with week 1</td></tr></tbody>
+          <tbody><tr><td>Rule compliance</td><td>Share of prices inside the margin floor and the alignment ceiling, never above list price, no outlet raised</td><td>100%</td></tr><tr><td>Coherence</td><td>Pick 20 pairs of models with identical inputs: share that get the same position</td><td>100%</td></tr><tr><td>Hand check</td><td>Recalculate 10 random rows by hand in a spreadsheet and compare</td><td>10 of 10</td></tr><tr><td>Explained rows</td><td>Share of rows that carry a reason sentence</td><td>100%</td></tr><tr><td>Thin evidence</td><td>Share of rows with one rival only, or confidence under 50</td><td>Show it on screen</td></tr><tr><td>Simulated impact</td><td>Price index, margin and discount depth if every recommendation were applied, against the baselines</td><td>Against the baselines</td></tr></tbody>
         </table></div>
         <p class="kpi-log"><b>Log it</b>Add the rows to <code>kpi_log</code>, and create the <code>override_log</code> table: model, recommended price, applied price, who, when and why.</p>
       </div>
@@ -1763,6 +1781,18 @@ Finally, list any key that exists in one language and not the other.</pre>
       <p>A missing translation fails silently and shows English. Ask for the list of missing keys, every time.</p>
     </div>
 
+    <div class="kpi dir rv" id="direct-05">
+      <div class="kpi-h"><span class="kpi-tag">Direct</span><span class="kpi-ttl">Week 05 &middot; How Forum Sport talks about price</span></div>
+      <div class="kpi-body">
+        <p>One bounded piece, not a new catalogue: how Forum Sport communicates price in one category. The tool&rsquo;s users are category managers; this piece is for the shopper, and it has to say what your pricing policy does.</p>
+        <div class="kpi-wrap"><table>
+          <thead><tr><th>Decision</th><th>What you write</th><th>Done when</th></tr></thead>
+          <tbody><tr><td>Category</td><td>Choose one, for example trail shoes or one brand&rsquo;s running line, and say why</td><td>One, justified</td></tr><tr><td>Price stance</td><td>One line on what the pricing policy means for that category, such as &ldquo;never the cheapest, always fair&rdquo;</td><td>Consistent with the engine</td></tr><tr><td>The piece</td><td>One asset in Forum Sport&rsquo;s brand: a category page header, a newsletter block or the price label on a product card</td><td>One asset, on brand</td></tr><tr><td>Directed, not generated</td><td>The brief you gave the assistant, the versions you rejected and why, the one you kept</td><td>Reasoning written down</td></tr><tr><td>Outside check</td><td>Show it to someone outside the team and ask what the price message is</td><td>They say it back</td></tr></tbody>
+        </table></div>
+        <p class="kpi-log"><b>Write it down</b>Add the piece, the brief behind it and the rejected versions to the direction log. Week 6 shows it next to the tool.</p>
+      </div>
+    </div>
+
     <div class="kpi rv" id="measure-05">
       <div class="kpi-h"><span class="kpi-tag">Measure</span><span class="kpi-ttl">Week 05 &middot; The tool in someone else&rsquo;s hands</span></div>
       <div class="kpi-body">
@@ -1825,18 +1855,6 @@ Finally, list any key that exists in one language and not the other.</pre>
     <div class="gotcha rv">
       <p>Live demos fail on wifi. Have the second tab already loaded before you walk in.</p>
       <p>Do not promise a daily crawl you have not actually scheduled. In the reference build, three competitors were returning zero pages for days and nothing on screen said so.</p>
-    </div>
-
-    <div class="kpi rv" id="measure-06">
-      <div class="kpi-h"><span class="kpi-tag">Measure</span><span class="kpi-ttl">Week 06 &middot; The supervision panel</span></div>
-      <div class="kpi-body">
-        <p>The demo closes with one screen that reads the KPI log: every KPI from the six weeks, where it started and where it is now.</p>
-        <div class="kpi-wrap"><table>
-          <thead><tr><th>KPI</th><th>How you measure it</th><th>Target</th></tr></thead>
-          <tbody><tr><td>Panel complete</td><td>Every KPI from weeks 1 to 5 shown with baseline, current value and target</td><td>All of them</td></tr><tr><td>Hypothesis verdict</td><td>Week 1&rsquo;s hypothesis against the simulated impact</td><td>Confirmed or refuted, said out loud</td></tr><tr><td>Freshness on the day</td><td>Share of rival prices seen in the last 7 days, on demo day</td><td>Over 90%</td></tr><tr><td>Page speed</td><td>Time until the page shows data, on the demo laptop</td><td>Under 3 s</td></tr></tbody>
-        </table></div>
-        <p class="kpi-log"><b>Log it</b>The panel is a page that reads <code>kpi_log</code>. Nothing on it is typed by hand.</p>
-      </div>
     </div>
 
     <p class="leave rv"><span class="arw">&rarr;</span> You leave with a live link and a ten-minute demo</p>
