@@ -759,6 +759,22 @@ footer a:hover{color:#fff}
 .alt ol{margin:0 0 6px; padding-left:20px; display:grid; gap:4px; font-size:.9375rem}
 .alt-url{margin:4px 0 8px 20px}
 .alt-url code{display:inline-block; font-size:.875rem; padding:6px 10px; background:var(--white); border-color:var(--accent-strong); color:var(--ie-navy); user-select:all}
+
+/* Semana 5: ejemplo de creatividades a partir de los datos. */
+.ex-data{display:grid; gap:var(--s-3); align-items:center; margin-top:var(--s-3); padding:var(--s-3);
+  border:1px solid var(--g-300); border-radius:var(--radius); background:var(--white); max-width:var(--container-text)}
+@media(min-width:700px){ .ex-data{grid-template-columns:180px 1fr} }
+.ex-prod img{width:100%; height:auto; background:#f2f2f2; border-radius:var(--radius)}
+.ex-facts{margin:0; display:grid; gap:8px}
+.ex-facts div{display:grid; grid-template-columns:150px 1fr; gap:var(--s-2); font-size:.9375rem}
+.ex-facts dt{font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--g-600); padding-top:3px}
+.ex-facts dd{margin:0; color:var(--ie-ink)} .ex-facts b{color:var(--creative)}
+.ex-grid{display:grid; gap:var(--s-3); margin-top:var(--s-3); align-items:start}
+@media(min-width:900px){ .ex-grid{grid-template-columns:1fr 1fr .72fr} }
+.ex-grid figure{margin:0}
+.ex-grid img{width:100%; height:auto; display:block; border-radius:var(--radius); box-shadow:var(--shadow-card)}
+.ex-grid figcaption{margin-top:10px; font-size:.875rem; line-height:1.45; color:var(--g-900)}
+.ex-grid figcaption b{display:block; font-size:.6875rem; text-transform:uppercase; letter-spacing:.09em; color:var(--ie-navy); margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -2170,6 +2186,41 @@ Finally, list any key that exists in one language and not the other.</pre>
         </table></div>
         <p class="kpi-log"><b>Write it down</b>Add the piece, its brief, the rejected versions and the quality checklist to the direction log, and show it in week 6&rsquo;s demo, next to the tool.</p>
       </div>
+    </div>
+
+    <h3 class="rv" id="example-creatives">An example: from the engine&rsquo;s price to three creatives</h3>
+    <p class="prose rv">One product, its data and the engine&rsquo;s recommendation, turned into three
+      pieces in three styles for young runners. Every number on the creatives comes from the
+      data; the visuals were made with Higgsfield from the product photo, and the real Forum
+      Sport logo was added afterwards.</p>
+
+    <div class="ex-data rv">
+      <div class="ex-prod"><img src="https://www.forumsport.com/images/nike-zapatilla-running-hombre-vaporfly-4-lateral-exterior-1001102847-500x500-f" alt="Nike Vaporfly 4, blue and pink" width="500" height="500" loading="lazy"></div>
+      <dl class="ex-facts">
+        <div><dt>Product</dt><dd>Nike Vaporfly 4, model 1001102847</dd></div>
+        <div><dt>Demand and stock</dt><dd>Online class D &middot; low stock</dd></div>
+        <div><dt>Price today</dt><dd>&euro;260.00</dd></div>
+        <div><dt>Engine recommends</dt><dd><b>&euro;222.00</b> &middot; &minus;&euro;38, &minus;14.6%</dd></div>
+        <div><dt>The rule that decided it</dt><dd>Band 5&rsquo;s minimum margin leaves no room to align with the reference: cost sets the price</dd></div>
+      </dl>
+    </div>
+
+    <div class="ex-grid rv">
+      <figure><img src="/lab/assets/creatives/vaporfly-poster-4x5.webp" alt="Graphic poster: the shoe over a red diagonal band, headline Fly faster. Pay less., old price 260 euros struck through, new price 222 euros, minus 15 per cent, Forum Sport logo" width="1792" height="2240" loading="lazy">
+        <figcaption><b>Graphic poster &middot; feed 4:5</b>The discount as a percentage, the brand&rsquo;s red and hand-lettered price.</figcaption></figure>
+      <figure><img src="/lab/assets/creatives/vaporfly-night-4x5.webp" alt="Night city scene: a runner&rsquo;s feet in the shoes on wet asphalt, headline Your next PB starts here, price bar with 222 euros and save 38 euros, Forum Sport logo" width="1792" height="2240" loading="lazy">
+        <figcaption><b>Night editorial &middot; feed 4:5</b>The saving in euros, sold through performance rather than price alone.</figcaption></figure>
+      <figure class="ex-tall"><img src="/lab/assets/creatives/vaporfly-story-9x16.webp" alt="Vertical story with stickers: Run faster. Save 38 euros., price drop, 222 euros, limited stock, shop now button, Forum Sport logo" width="1520" height="2688" loading="lazy">
+        <figcaption><b>Story &middot; 9:16</b>&ldquo;Limited stock&rdquo; is true because the data says stock is low.</figcaption></figure>
+    </div>
+
+    <div class="how rv" style="margin-top:var(--s-3)">
+      <div><b>Data in, claims out</b><p>The price, the saving and &ldquo;limited stock&rdquo; are read from the
+        catalogue and the engine. A first draft said &ldquo;online only&rdquo;; the data said this colour is
+        not, so it was cut.</p></div>
+      <div><b>Labelled</b><p>Every image says &ldquo;AI-generated image&rdquo;, as the quality checklist requires.</p></div>
+      <div><b>Still not publishable</b><p>Discounts must be shown against the lowest price of the last 30
+        days, and the dataset does not have it. Say so before the client asks.</p></div>
     </div>
 
     <div class="kpi rv" id="measure-05">
