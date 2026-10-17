@@ -513,16 +513,16 @@ code{
 .memo dt{font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em;
   color:var(--g-600); padding-top:2px}
 .memo dd{margin:0; font-size:.9375rem; color:var(--ie-navy); font-weight:600}
-.letter p{font-size:1.0625rem; line-height:1.7; color:var(--ie-ink); margin:0 0 var(--s-3)}
-.letter .opening{font-size:var(--fs-lead); line-height:1.55; color:var(--ie-navy)}
+/* Un solo tamaño para todo el cuerpo de la carta: el de la prosa de la página. */
+.letter p{font-size:var(--fs-body); line-height:1.7; color:var(--ie-ink); margin:0 0 var(--s-3)}
 .letter h3{font-size:.8125rem; letter-spacing:.1em; margin:var(--s-6) 0 var(--s-2); color:var(--accent-strong)}
 .letter b{color:var(--ie-navy)}
 .letter-pull{margin:var(--s-4) 0; padding:var(--s-3) 0 var(--s-3) var(--s-3);
   border-left:3px solid var(--accent)}
-.letter-pull p{font-family:var(--font-display); font-size:clamp(1.125rem,2.4vw,1.375rem);
+.letter-pull p{font-family:var(--font-display); font-size:1.125rem;
   font-weight:700; line-height:1.35; color:var(--ie-navy); margin:0}
 .signoff{margin:var(--s-6) 0 0!important; padding-top:var(--s-3); border-top:1px solid var(--g-300);
-  font-family:var(--font-display); font-weight:800; font-size:1.125rem!important; color:var(--ie-navy)!important}
+  font-family:var(--font-display); font-weight:800; font-size:var(--fs-body)!important; color:var(--ie-navy)!important}
 .signoff span{display:block; font-family:var(--font-sans); font-weight:400; font-size:.875rem;
   color:var(--g-600); margin-top:2px}
 .brief-side{display:grid; gap:var(--s-3)}
