@@ -2037,7 +2037,24 @@ If a big move rests on one observation, say so right next to it rather than in a
       <li>Their logo, in a vector file if you can get one</li>
       <li>Six values written down, and only six</li>
       <li>A phone to test on, not just a narrow window</li>
+      <li>A Higgsfield account on a paid plan, for the price piece&rsquo;s visuals</li>
     </ul>
+
+    <h3 class="rv">Set up Higgsfield</h3>
+    <article class="tc rv" id="setup-higgsfield">
+      <header class="tc-head"><span class="tc-logo tool-img"><img src="/lab/assets/logos/higgsfield.png" alt="" width="48" height="48" style="width:48px;height:48px"></span><div><p class="tc-name">Higgsfield</p><p class="tc-what">The AI image and video generator you use for the price piece&rsquo;s visuals, directed from Claude Code.</p></div></header>
+      <div class="tc-body">
+        <div class="tc-part"><p class="tc-h"><span>1</span>Create the account</p>
+          <ol><li>Go to <a href="https://higgsfield.ai" target="_blank" rel="noopener">higgsfield.ai</a> and sign up with your IE email.</li><li>Choose a paid plan: the connection to Claude works only with a paid subscription.</li></ol>
+          <p class="tc-warn">Every image or video Claude makes through Higgsfield spends credits, whatever your plan. Agree a team budget first.</p></div>
+        <div class="tc-part"><p class="tc-h"><span>2</span>Connect it through MCP</p>
+          <p>No key to copy: you log in through the browser. User scope, because it is your own paid account.</p>
+          <div class="prompt cmd"><div class="prompt-h"><span>Paste in the terminal</span><button class="copy" type="button">Copy</button></div><pre>claude mcp add --scope user --transport http higgsfield https://mcp.higgsfield.ai/mcp</pre></div></div>
+        <div class="tc-part"><p class="tc-h"><span>3</span>Log in and set a spending rule</p>
+          <ol><li>In the terminal type <code>claude</code>, then <code>/mcp</code>.</li><li>Choose <b>higgsfield</b>, then <b>Authenticate</b>, and sign in in the browser.</li><li>Start every creative session by telling Claude: <i>&ldquo;Ask me before every generation, and tell me its credit cost.&rdquo;</i> Higgsfield has no spending cap of its own.</li></ol>
+          <p>To check what is left, ask Claude: <i>&ldquo;What is my Higgsfield credit balance?&rdquo;</i></p></div>
+      </div>
+    </article>
 
     <h3 class="rv">What you do</h3>
     <ol class="steps rv">
@@ -2223,19 +2240,6 @@ Finally, list any key that exists in one language and not the other.</pre>
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
       <a class="btn" style="border-color:var(--g-300); color:var(--ie-navy)" href="https://forum-sport-pricing.vercel.app/#pricing" target="_blank" rel="noopener">Go straight to the engine <span class="arw">&rarr;</span></a>
-    </div>
-  </div>
-</section>
-
-<section class="navy" style="padding:var(--s-12) 0">
-  <div class="wrap" style="text-align:center">
-    <p class="eyebrow rv">Your turn</p>
-    <h2 class="rv" style="color:#fff">Start week 01</h2>
-    <p class="lead rv" style="max-width:640px; margin:0 auto var(--s-4)">Three free accounts
-      and one folder on your Desktop. By tonight there is a web address with your team name
-      on it.</p>
-    <div class="btn-row rv" style="justify-content:center">
-      <a class="btn btn-primary" href="#week-1">Go to week 01 <span class="arw">&rarr;</span></a>
     </div>
   </div>
 </section>
