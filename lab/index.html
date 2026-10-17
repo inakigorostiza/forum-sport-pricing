@@ -1436,41 +1436,6 @@ kbd{font-family:var(--font-mono); font-size:.8125em; padding:1px 6px; border:1px
       <li>Ask it to save the project on GitHub and publish it on Vercel.</li>
     </ol>
 
-    <h3 class="rv">How</h3>
-    <div class="how rv">
-      <div><b>Talk to Claude</b><p>Open the Claude panel in VS Code. That text box is where
-        you write instructions in plain words. Nothing it proposes runs until you approve it.</p></div>
-      <div><b>Save and publish</b><p>Paste the second prompt below. Claude uses the GitHub
-        connection to create the repository and the Vercel connection to publish it. Read each
-        step before you approve it. Vercel gives you a link ending <code>.vercel.app</code>:
-        open it on your phone.</p></div>
-    </div>
-
-    <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt, 1 of 2</span><button class="copy" type="button">Copy</button></div>
-      <pre>I am a marketing student and I do not write code. In this folder, create a single file called index.html: one page, no build step, no frameworks, nothing to install. It should show the team name "Team &lt;NAME&gt;" as a large heading, the line "Dynamic pricing lab, Forum Sport" under it, and today's date. White background, dark navy text, one sans-serif font, everything in a centred column no wider than 760px.
-
-Then explain to me in three sentences, with no technical words, what the file you just made actually is and how a browser turns it into what I see.</pre>
-    </div>
-
-    <div class="prompt rv">
-      <div class="prompt-h"><span>Copy this prompt, 2 of 2</span><button class="copy" type="button">Copy</button></div>
-      <pre>Publish this folder, step by step, and stop before each step to tell me what you are about to do.
-
-1) Using the GitHub connection, create a private repository called forum-sport-&lt;TEAM&gt; and save this folder into it.
-2) Tell me in one sentence each what "commit" and "push" mean, as if I had never heard either word.
-3) Using the Vercel connection, create a project from that repository, publish it and give me the public link.
-4) If any connection fails, tell me exactly what to click or type to finish it myself.
-
-Do not install anything that is not strictly needed, and tell me before you install anything at all.</pre>
-    </div>
-
-    <div class="gotcha rv">
-      <p>It asks permission before every command it runs.</p>
-      <p>Vercel complains about an output directory. Reply to the assistant with the exact error text, pasted whole.</p>
-      <p>A connection says &ldquo;Needs authentication&rdquo;. Type <code>claude</code> in the terminal, then <code>/mcp</code>, and log in again.</p>
-    </div>
-
     <p class="leave rv"><span class="arw">&rarr;</span> You leave with a live web address with your team name on it</p>
   </div>
 </section>
