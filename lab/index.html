@@ -625,6 +625,35 @@ code{
   .tl-card{padding:var(--s-2)}
   .tl-t{font-size:.8125rem; letter-spacing:.01em; min-height:2.4em}
 }
+
+/* Semana a semana: tres columnas con el color de sus tarjetas. */
+.wb{margin-top:var(--s-4); border:1px solid var(--g-300); border-radius:var(--radius); overflow:hidden; background:var(--white)}
+.wb-head{display:none}
+.wb-row{display:grid; gap:var(--s-2); padding:var(--s-3); border-top:1px solid var(--g-300)}
+.wb-row:first-of-type{border-top:0}
+.wb-wk{display:flex; align-items:center; gap:10px; text-decoration:none; font-family:var(--font-display);
+  font-weight:800; font-size:.9375rem; text-transform:uppercase; color:var(--ie-navy)}
+.wb-wk span{display:grid; place-items:center; width:36px; height:36px; border-radius:50%;
+  border:2px solid var(--ie-navy); font-size:.8125rem}
+.wb-wk:hover{color:var(--accent-strong)}
+.wb-c ul{margin:0; padding:0; list-style:none; display:grid; gap:4px}
+.wb-c li{position:relative; padding-left:14px; font-size:.875rem; line-height:1.45}
+.wb-c li::before{content:""; position:absolute; left:0; top:.55em; width:6px; height:6px; border-radius:50%; background:var(--g-600)}
+.wb-m li::before{background:var(--accent-strong)} .wb-d li::before{background:var(--creative)}
+.wb-lbl{margin:0 0 6px; font-size:.625rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--g-600)}
+.wb-none{margin:0; font-size:.8125rem; color:var(--g-600); font-style:italic}
+@media(min-width:900px){
+  .wb-head,.wb-row{grid-template-columns:150px repeat(3,minmax(0,1fr)); gap:var(--s-3)}
+  .wb-row{align-items:start}
+  .wb-wk{margin-top:-8px}
+  .wb-head{display:grid; padding:12px var(--s-3); background:var(--ie-navy); align-items:center}
+  .wb-head span{font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#fff}
+  .wb-head .wb-tag-m,.wb-head .wb-tag-d{justify-self:start; padding:3px 8px; border-radius:var(--radius-sm)}
+  .wb-tag-m{background:var(--accent-strong)} .wb-tag-d{background:var(--creative)}
+  .wb-row:first-of-type{border-top:0}
+  .wb-lbl{display:none}
+  .wb-row:nth-of-type(even){background:#fcfcfc}
+}
 </style>
 </head>
 <body>
@@ -1006,46 +1035,57 @@ code{
       </ol>
     </div>
 
-    <h3 class="rv">Measured process by process</h3>
-    <p class="lead prose rv">Each process you build gets measured the week you build it. Weeks
-      2 to 5 each end with a blue <b>Measure</b> card: the KPIs for that process, how to
-      calculate them, the target, and the line to add to your KPI log.</p>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Week</th><th>Process</th><th>What you measure</th></tr></thead>
-        <tbody>
-          <tr><td><b>02</b></td><td>Data load</td><td>Completeness &middot; totals that match &middot; data quality &middot; catalogue baselines</td></tr>
-          <tr><td><b>03</b></td><td>Scraping</td><td>Coverage &middot; match rate &middot; fetch success &middot; freshness &middot; politeness &middot; price index baseline</td></tr>
-          <tr><td><b>04</b></td><td>Configurator</td><td>Rule compliance &middot; coherence &middot; hand check &middot; thin evidence &middot; simulated impact</td></tr>
-          <tr><td><b>05</b></td><td>Use</td><td>Task success &middot; time on task &middot; understanding &middot; accepted versus overridden prices</td></tr>
-        </tbody>
-      </table>
+    <h3 class="rv">Week by week, the key points</h3>
+    <p class="lead prose rv">What you build, what you measure and what you direct, every
+      week. The blue and red cards in each session spell out the detail.</p>
+    <div class="wb rv">
+      <div class="wb-head" aria-hidden="true">
+        <span></span><span>Build</span><span class="wb-tag-m">Measure</span><span class="wb-tag-d">Creative direction</span>
+      </div>
+      <div class="wb-row">
+        <a class="wb-wk" href="#week-1"><span>01</span>Set-up</a>
+        <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>Three accounts, one repository</li><li>A first page live at a public address</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><p class="wb-none">Nothing this week</p></div>
+        <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><p class="wb-none">Nothing this week</p></div>
+      </div>
+      <div class="wb-row">
+        <a class="wb-wk" href="#week-2"><span>02</span>Data</a>
+        <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>The catalogue loaded into Supabase</li><li>A catalogue page with photos and filters</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><ul><li>Completeness: 24,109 of 24,109 rows</li><li>Totals match the source, barcodes valid</li><li>Baselines: margin and discounts</li><li>The KPI log starts</li></ul></div>
+        <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><p class="wb-none">Nothing this week</p></div>
+      </div>
+      <div class="wb-row">
+        <a class="wb-wk" href="#week-3"><span>03</span>Scraping</a>
+        <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>A daily scraper for the rivals you choose</li><li>Prices matched by barcode</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><ul><li>Coverage, match rate, fetch success</li><li>Freshness and politeness, per shop</li><li>Baseline: the price index</li></ul></div>
+        <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><p class="wb-none">Nothing this week</p></div>
+      </div>
+      <div class="wb-row">
+        <a class="wb-wk" href="#week-4"><span>04</span>Engine</a>
+        <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>The configurator rules and the band matrix</li><li>A confidence score, every parameter editable</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><ul><li>Rule compliance 100%, coherence, hand check</li><li>Thin evidence on screen</li><li>Simulated impact against the baselines</li><li>The override log starts</li></ul></div>
+        <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><ul><li>The sentence a buyer reads aloud: template and tone</li><li>A never-say list and five good and bad pairs</li><li>A read-aloud test on 30 sentences</li></ul></div>
+      </div>
+      <div class="wb-row">
+        <a class="wb-wk" href="#week-5"><span>05</span>Brand</a>
+        <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>The tool in Forum Sport&rsquo;s brand</li><li>Readable on a phone</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><ul><li>An outside user: task success and time</li><li>Understanding of one price</li><li>Prices accepted versus overridden</li></ul></div>
+        <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><ul><li>One category&rsquo;s price message: copy and AI visuals</li><li>A quality checklist and AI labelling</li><li>The brief and the rejected versions</li></ul></div>
+      </div>
+      <div class="wb-row">
+        <a class="wb-wk" href="#week-6"><span>06</span>Demo</a>
+        <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>Ten minutes, live, with the client</li><li>The three questions, answered with numbers</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><p class="wb-none">Nothing this week</p></div>
+        <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><ul><li>The price-communication piece, shown next to the tool</li></ul></div>
+      </div>
     </div>
-
-    <div class="warn rv">
-      <h4 style="margin-top:0">Two logs carry the whole framework</h4>
-      <p>The <b>KPI log</b> is one table with five columns, week, KPI, value, target and how it
-        was measured, filled in weeks 2 to 5. The <b>override log</b> records every price a
-        person accepted or changed, from what, to what and why. It measures whether the tool
-        is trusted, it is the governance record, and it is the evidence that a person, not
-        the tool, decides, as the EU AI Act expects. There are no sales data, so business
-        impact is simulated: what the recommended prices would do to the price index, the
-        margin and the discounts, against the baselines you took in weeks 2 and 3.</p>
-    </div>
-
-    <h3 class="rv">Directed, not generated</h3>
-    <p class="lead prose rv">Two weeks carry a grey <b>Creative direction</b> card. The assistant produces
-      the words and the visuals; your team decides how they must sound and look, and writes
-      down why. Everything goes into one direction log.</p>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Week</th><th>What you direct</th><th>The output</th></tr></thead>
-        <tbody>
-          <tr><td><b>04</b></td><td>The language of the 1,483 explanations</td><td>A sentence template, a tone, a never-say list, five good and bad pairs</td></tr>
-          <tr><td><b>05</b></td><td>How Forum Sport communicates the price of one category or product</td><td>Messages, AI visuals, a quality checklist and AI labelling, with the brief and the rejected versions</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <p class="prose rv" style="margin-top:var(--s-3); font-size:.9375rem">Three logs hold it
+      together. The <b>KPI log</b> takes every measurement, week, KPI, value, target and how
+      it was measured. The <b>override log</b> records every price a person accepted or
+      changed, and why: the evidence that a person, not the tool, decides. The
+      <b>direction log</b> keeps every creative brief, the versions rejected and the reasons.
+      With no sales data, business impact is simulated against the baselines of weeks 2
+      and 3.</p>
   </div>
 </section>
 
