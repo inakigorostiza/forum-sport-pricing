@@ -741,6 +741,33 @@ footer a{color:var(--ink-2)}
   color:var(--muted); opacity:.65; transition:.2s; font-size:11.5px; letter-spacing:.04em}
 .sig:hover{opacity:1; color:var(--accent)}
 @media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+
+/* ── Creative Studio ── */
+.cr-bar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 12px}
+.cr-bar input{flex:1 1 220px; min-width:0; padding:8px 10px; border:1px solid var(--rule); font:inherit; background:var(--surface); color:var(--ink)}
+.cr-table td:last-child{text-align:right}
+.cr-table tr.cr-on td{background:var(--stage)}
+.cr-panel{border:2px solid var(--ink); padding:16px; margin:0 0 20px; background:var(--surface)}
+.cr-prod{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+.cr-prod img{width:120px; height:120px; object-fit:contain; background:var(--stage)}
+.cr-prod h3{margin:2px 0; font-family:var(--display); text-transform:uppercase; font-size:20px}
+.cr-k{margin:0; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fs-red)}
+.cr-m{margin:0; color:var(--muted); font-size:13px}
+.cr-p{margin:6px 0 0; font-size:15px} .cr-p b{font-family:var(--price); font-size:24px; color:var(--fs-red)}
+.cr-form{display:flex; gap:14px; flex-wrap:wrap; margin:14px 0 6px}
+.cr-form .param{display:flex; flex-direction:column; gap:4px}
+.cr-acts{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px}
+.cr-go{background:var(--fs-red)!important; color:#fff!important; border-color:var(--fs-red)!important}
+.cr-status{margin:10px 0 0; font-weight:600}
+.cr-filt{display:flex; gap:6px; flex-wrap:wrap; margin:0 0 14px}
+.cr-filt .chip.on{background:var(--ink); color:var(--surface)}
+.cr-grid{display:grid; gap:16px; grid-template-columns:repeat(auto-fill, minmax(220px,1fr))}
+.cr-card{margin:0; border:1px solid var(--rule); background:var(--surface)}
+.cr-card img, .cr-card video{width:100%; display:block; background:var(--stage)}
+.cr-card figcaption{padding:10px 12px 12px; font-size:13px; line-height:1.5}
+.cr-card figcaption a{display:inline-block; margin-top:6px; font-weight:700; color:var(--ink)}
+.cr-rec{font-family:var(--price); font-size:20px; color:var(--fs-red)}
+.cr-vid{position:relative} .cr-wm{position:absolute; left:8px; bottom:44px; width:30%!important; background:transparent!important; pointer-events:none}
 </style>
 </head>
 <body>
@@ -816,6 +843,50 @@ const T = {
 "nav.pricing":   {es:"Herramienta de pricing", en:"Pricing tool"},
 "nav.pricingSub":{es:"Precio recomendado y los parámetros que lo fijan",
                   en:"Recommended price and the parameters behind it"},
+"nav.creative":  {es:"Creative Studio",      en:"Creative Studio"},
+"nav.creativeSub":{es:"Creatividades con el precio recomendado",
+                   en:"Creatives from the recommended price"},
+"cr.titulo":     {es:"Creative Studio", en:"Creative Studio"},
+"cr.sub":        {es:"Elige un producto, un canal, un formato y un objetivo. La creatividad se genera con IA en la identidad de Forum Sport, con su logo real, y se guarda en la galería.",
+                  en:"Pick a product, a channel, a format and a goal. The creative is generated with AI in Forum Sport's identity, with its real logo, and saved to the gallery."},
+"cr.buscar":     {es:"Buscar modelo…", en:"Search model…"},
+"cr.todas":      {es:"Todas las marcas", en:"All brands"},
+"cr.thAhora":    {es:"Precio hoy", en:"Price today"},
+"cr.thRec":      {es:"Recomendado", en:"Recommended"},
+"cr.thCambio":   {es:"Cambio", en:"Change"},
+"cr.crear":      {es:"Crear", en:"Create"},
+"cr.mas":        {es:"Ver más", en:"Show more"},
+"cr.de":         {es:"{n} de {t} modelos", en:"{n} of {t} models"},
+"cr.panel":      {es:"Nueva creatividad", en:"New creative"},
+"cr.tipo":       {es:"Tipo", en:"Type"},
+"cr.imagen":     {es:"Imagen", en:"Image"},
+"cr.video":      {es:"Vídeo (5 s)", en:"Video (5 s)"},
+"cr.canal":      {es:"Canal y formato", en:"Channel and format"},
+"cr.objetivo":   {es:"Objetivo", en:"Goal"},
+"cr.g.awareness":{es:"Notoriedad", en:"Awareness"},
+"cr.g.sale":     {es:"Bajada de precio", en:"Price drop"},
+"cr.g.clearance":{es:"Liquidación", en:"Clearance"},
+"cr.g.launch":   {es:"Lanzamiento", en:"Launch"},
+"cr.estimar":    {es:"Ver coste", en:"Check cost"},
+"cr.generar":    {es:"Generar", en:"Generate"},
+"cr.cerrar":     {es:"Cerrar", en:"Close"},
+"cr.coste":      {es:"Coste estimado: {c}", en:"Estimated cost: {c}"},
+"cr.reglas":     {es:"Los textos salen de los datos: precio hoy, precio recomendado y, solo si es cierto, «stock limitado» o «solo online». El logo real se añade al final. Toda pieza lleva «Imagen generada con IA».",
+                  en:"The copy comes from the data: today's price, the recommended price and, only when true, \"limited stock\" or \"online only\". The real logo is added at the end. Every piece says \"AI-generated image\"."},
+"cr.st.queued":  {es:"En cola…", en:"Queued…"},
+"cr.st.still":   {es:"Generando la imagen…", en:"Generating the image…"},
+"cr.st.brand":   {es:"Añadiendo el logo…", en:"Adding the logo…"},
+"cr.st.motion":  {es:"Animando el vídeo…", en:"Animating the video…"},
+"cr.st.done":    {es:"Lista. Ya está en la galería.", en:"Done. It's in the gallery."},
+"cr.st.failed":  {es:"No se pudo generar: {d}", en:"Generation failed: {d}"},
+"cr.galeria":    {es:"Galería", en:"Gallery"},
+"cr.galeriaSub": {es:"Todas las creatividades generadas, de la más reciente a la más antigua.", en:"Every creative generated, newest first."},
+"cr.vacia":      {es:"Todavía no hay creatividades.", en:"No creatives yet."},
+"cr.descargar":  {es:"Descargar", en:"Download"},
+"cr.filtroTodo": {es:"Todo", en:"All"},
+"cr.hfSetup":    {es:"Falta la clave de la API de Higgsfield.", en:"The Higgsfield API key is missing."},
+"cr.hfSetupComo":{es:"Crea una en console.higgsfield.ai y guárdala en Supabase → Edge Functions → Secrets como HIGGSFIELD_API_KEY_ID y HIGGSFIELD_API_KEY_SECRET.",
+                  en:"Create one at console.higgsfield.ai and save it in Supabase → Edge Functions → Secrets as HIGGSFIELD_API_KEY_ID and HIGGSFIELD_API_KEY_SECRET."},
 "nav.scraping":  {es:"Rastreo",              en:"Scraping"},
 "nav.scrapingSub":{es:"Estado de los competidores y lanzamiento manual",
                    en:"Competitor health and manual runs"},
@@ -1350,7 +1421,7 @@ let paramsOpen = false;            // render() rebuilds the DOM; keep the panel 
    puede enviar por correo, y el botón Atrás del navegador funciona. Los filtros
    son globales a propósito — se mantienen al cambiar de sección, porque
    "Nike, en rebaja" es la misma pregunta en las tres. */
-const SECCIONES = ["home", "explorer", "pricing", "scraping"];
+const SECCIONES = ["home", "explorer", "pricing", "creative", "scraping"];
 let SECCION = SECCIONES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
 addEventListener("hashchange", () => {
   const h = location.hash.slice(1);
@@ -2484,6 +2555,13 @@ function render(){
 
   /* El rastreo no mira el catálogo: no lleva barra de filtros, porque filtrar
      por marca no cambia qué competidores hay que rastrear. */
+  if(SECCION === "creative"){
+    app.innerHTML = "";
+    document.documentElement.style.setProperty("--filters-h", "0px");
+    seccionCreative(app);
+    document.getElementById("state")?.remove();
+    return;
+  }
   if(SECCION === "scraping"){
     app.innerHTML = "";
     document.documentElement.style.setProperty("--filters-h", "0px");
@@ -3573,6 +3651,270 @@ function botonSalir(sec){
   b.onclick = () => { opToken = ""; scEstado = null; scFallo = null; scMensaje = null;
                       try{ localStorage.removeItem(OP_KEY); }catch{} render(); };
   sec.append(b);
+}
+
+
+/* ── Creative Studio ──────────────────────────────────────────────────
+   Turns a model's recommended price into a branded creative. Everything that
+   spends money goes through the Edge Function `creative-studio`, behind the
+   same operator token as the scraping panel; the prompt is built there, from
+   the catalogue row, so a claim can only come from the data.
+
+   The logo is composited here, on a canvas: the function hands back the
+   generated still, we crop it to the channel's exact ratio, lay the official
+   logo into the corner the prompt kept empty, and send the JPEG back to be
+   stored. Video is then animated from that branded still. */
+const CR_FORMATS = [
+  {ch:"instagram", f:"feed",   label:"Instagram · feed 4:5",    aspect:"4:5",  gen:"3:4",  video:false},
+  {ch:"instagram", f:"story",  label:"Instagram · story 9:16",  aspect:"9:16", gen:"9:16", video:true},
+  {ch:"instagram", f:"reel",   label:"Instagram · reel 9:16",   aspect:"9:16", gen:"9:16", video:true},
+  {ch:"tiktok",    f:"video",  label:"TikTok · 9:16",           aspect:"9:16", gen:"9:16", video:true},
+  {ch:"youtube",   f:"video",  label:"YouTube · 16:9",          aspect:"16:9", gen:"16:9", video:true},
+  {ch:"youtube",   f:"shorts", label:"YouTube · Shorts 9:16",   aspect:"9:16", gen:"9:16", video:true},
+  {ch:"facebook",  f:"feed",   label:"Facebook · feed 1:1",     aspect:"1:1",  gen:"1:1",  video:true},
+  {ch:"display",   f:"banner", label:"Display · banner 16:9",   aspect:"16:9", gen:"16:9", video:false},
+];
+const CR_GOALS = ["sale","awareness","clearance","launch"];
+let crQ = "", crBrand = "", crShown = 40, crSel = null;
+let crForm = {kind:"image", fmt:0, goal:"sale"};
+let crJob = null;          // {id, stage, detail}
+let crCost = null, crFallo = null;
+let crGallery = null, crGalFiltro = "all";
+
+async function crApi(payload, raw=false){
+  const r = await fetch(`${URL_}/functions/v1/creative-studio`, {
+    method:"POST",
+    headers:{ apikey:ANON, Authorization:`Bearer ${ANON}`, "Content-Type":"application/json", "x-operator-token":opToken },
+    body: JSON.stringify(payload),
+  });
+  if(raw && r.ok) return r;
+  let j=null; try{ j=await r.json(); }catch{}
+  if(!r.ok) throw Object.assign(new Error((j && (j.detail||j.error)) || r.status), {status:r.status, cuerpo:j});
+  return j;
+}
+
+async function crLoadGallery(){
+  try{
+    const r = await fetch(`${URL_}/rest/v1/creatives_public?select=*&order=created_at.desc&limit=120`,
+      {headers:{apikey:ANON, Authorization:`Bearer ${ANON}`}});
+    crGallery = r.ok ? await r.json() : [];
+  }catch{ crGallery = []; }
+  if(SECCION === "creative") render();
+}
+
+const crLoad = src => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = ko; i.src = src; });
+
+/* Crop to the channel's ratio and lay the real logo into the empty corner.
+   The text of the logo is near-black, so on a dark corner we use the
+   white-text version; red and yellow stay as they are. */
+async function crBrandStill(blob, aspect){
+  const img = await crLoad(URL.createObjectURL(blob));
+  const [aw, ah] = aspect.split(":").map(Number);
+  let w = img.naturalWidth, h = img.naturalHeight;
+  let sx = 0, sy = 0;
+  if(w/h > aw/ah){ const nw = Math.round(h*aw/ah); sx = Math.round((w-nw)/2); w = nw; }
+  else           { const nh = Math.round(w*ah/aw); sy = Math.round((h-nh)/2); h = nh; }
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const g = c.getContext("2d");
+  g.drawImage(img, sx, sy, w, h, 0, 0, w, h);
+  const lw = Math.round(w * (aspect === "16:9" ? 0.22 : 0.30));
+  const m  = Math.round(w * 0.035);
+  const probe = g.getImageData(m, h - m - Math.round(lw*0.39), lw, Math.round(lw*0.39)).data;
+  let lum = 0; for(let i=0; i<probe.length; i+=16) lum += 0.2126*probe[i] + 0.7152*probe[i+1] + 0.0722*probe[i+2];
+  lum /= probe.length/16;
+  const logo = await crLoad(lum < 110 ? "assets/fs-logo-white.png" : "assets/fs-logo.png");
+  const lh = Math.round(lw * logo.naturalHeight / logo.naturalWidth);
+  g.drawImage(logo, m, h - m - lh, lw, lh);
+  return c.toDataURL("image/jpeg", 0.9);
+}
+
+async function crRun(row){
+  crFallo = null; crCost = null;
+  const fm = CR_FORMATS[crForm.fmt];
+  try{
+    crJob = {stage:"queued"}; render();
+    const r = await crApi({action:"create", modelo:row.modelo, kind:crForm.kind, channel:fm.ch, format:fm.f,
+                           goal:crForm.goal, price_rec:row.precio_rec});
+    crJob = {id:r.id, stage:"still"}; render();
+    while(true){
+      await new Promise(z => setTimeout(z, 5000));
+      const s = await crApi({action:"status", id:crJob.id});
+      if(s.stage === "brand"){
+        crJob.stage = "brand"; render();
+        const src = await crApi({action:"source", id:crJob.id}, true);
+        const jpeg = await crBrandStill(await src.blob(), fm.aspect);
+        const f = await crApi({action:"finalize", id:crJob.id, jpeg});
+        crJob.stage = f.stage; render();
+        if(f.stage === "done") break;
+        continue;
+      }
+      crJob.stage = s.stage; crJob.detail = s.detail; render();
+      if(s.stage === "done" || s.stage === "failed") break;
+    }
+  }catch(e){
+    crFallo = e; if(crJob) crJob.stage = "failed";
+  }
+  render(); crLoadGallery();
+}
+
+function crSetupNote(sec, e){
+  const p = document.createElement("p"); p.className = "note";
+  if(e.status === 503 && e.cuerpo && e.cuerpo.error === "higgsfield_setup") p.innerHTML = `<b>${t("cr.hfSetup")}</b><br>${t("cr.hfSetupComo")}`;
+  else if(e.status === 503) p.innerHTML = `<b>${t("sc.setup")}</b><br>${t("sc.setupComo")}`;
+  else if(e.status === 401) p.innerHTML = `<span class="warn">${t("sc.tokenMal")}</span>`;
+  else p.innerHTML = `<span class="warn">${String(e.message)}</span>`;
+  sec.append(p);
+}
+
+function seccionCreative(app){
+  if(crGallery === null){ crGallery = []; crLoadGallery(); }
+  const recs = recomendaciones(ROWS);
+  const byModel = new Map(ROWS.map(r => [r.modelo, r]));
+  let rows = recs.map(x => ({...byModel.get(x.modelo), ...x}))
+    .filter(r => r.precio_rec && r.actual);
+  const brands = [...new Set(rows.map(r => r.marca))].sort();
+  const q = crQ.trim().toLowerCase();
+  if(q) rows = rows.filter(r => (r.nombre_modelo + " " + r.marca).toLowerCase().includes(q));
+  if(crBrand) rows = rows.filter(r => r.marca === crBrand);
+  rows.sort((a,b) => (a.precio_rec - a.actual) - (b.precio_rec - b.actual));
+
+  const sec = document.createElement("section"); sec.className = "card wide";
+  sec.innerHTML = `<h2>${t("cr.titulo")}</h2><p class="sub">${t("cr.sub")}</p>`;
+  app.append(sec);
+
+  /* panel for the selected product */
+  if(crSel !== null){
+    const row = rows.find(r => r.modelo === crSel) || recs.map(x => ({...byModel.get(x.modelo), ...x})).find(r => r.modelo === crSel);
+    if(row) sec.append(crPanel(row));
+  }
+
+  const bar = document.createElement("div"); bar.className = "cr-bar";
+  const inp = document.createElement("input"); inp.type = "search"; inp.placeholder = t("cr.buscar"); inp.value = crQ;
+  inp.setAttribute("aria-label", t("cr.buscar"));
+  inp.oninput = () => { crQ = inp.value; crShown = 40; render(); document.querySelector(".cr-bar input")?.focus(); };
+  const sel = document.createElement("select"); sel.setAttribute("aria-label", t("cr.todas"));
+  sel.innerHTML = `<option value="">${t("cr.todas")}</option>` + brands.map(b => `<option${b===crBrand?" selected":""}>${b}</option>`).join("");
+  sel.onchange = () => { crBrand = sel.value; crShown = 40; render(); };
+  const cnt = document.createElement("span"); cnt.className = "f-count";
+  cnt.textContent = t("cr.de", {n: nf.format(Math.min(crShown, rows.length)), t: nf.format(rows.length)});
+  bar.append(inp, sel, cnt); sec.append(bar);
+
+  const tb = document.createElement("table"); tb.className = "t-comp cr-table";
+  tb.innerHTML = `<thead><tr><th>${t("g.thModelo")}</th><th>${t("cr.thAhora")}</th><th>${t("cr.thRec")}</th><th>${t("cr.thCambio")}</th><th></th></tr></thead><tbody></tbody>`;
+  const body = tb.tBodies[0];
+  for(const r of rows.slice(0, crShown)){
+    const d = r.precio_rec - r.actual;
+    const tr = document.createElement("tr");
+    if(r.modelo === crSel) tr.className = "cr-on";
+    tr.innerHTML = `<td class="prod-cell"><span class="prod"><img class="thumb" src="${r.img_thumb}" alt="" loading="lazy" width="46" height="46"
+        onerror="this.setAttribute('data-failed','');this.removeAttribute('src')"><span class="prod-name">${r.nombre_modelo}<small>${r.marca}</small></span></span></td>
+      <td>${eur2.format(r.actual)}</td><td><b>${eur2.format(r.precio_rec)}</b></td>
+      <td class="${d<0?"barato":d>0?"caro":""}">${d>0?"+":""}${eur2.format(d)}</td><td></td>`;
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t("cr.crear");
+    b.onclick = () => { crSel = r.modelo; crJob = null; crCost = null; crFallo = null; render(); window.scrollTo({top:0, behavior:"smooth"}); };
+    tr.lastElementChild.append(b); body.append(tr);
+  }
+  const wrap = document.createElement("div"); wrap.className = "tbl-wrap"; wrap.append(tb); sec.append(wrap);
+  if(rows.length > crShown){
+    const more = document.createElement("button"); more.type = "button"; more.className = "ghost"; more.textContent = t("cr.mas");
+    more.onclick = () => { crShown += 40; render(); }; sec.append(more);
+  }
+
+  app.append(crGallerySection());
+}
+
+function crPanel(row){
+  const box = document.createElement("div"); box.className = "cr-panel";
+  const formats = CR_FORMATS.map((f,i) => ({...f, i})).filter(f => crForm.kind === "image" || f.video);
+  if(!formats.some(f => f.i === crForm.fmt)) crForm.fmt = formats[0].i;
+  const d = row.precio_rec - row.actual;
+  box.innerHTML = `<div class="cr-prod"><img src="${row.img_thumb.replace("-200x200-f","-500x500-f")}" alt="" width="160" height="160">
+      <div><p class="cr-k">${t("cr.panel")}</p><h3>${row.nombre_modelo}</h3><p class="cr-m">${row.marca}</p>
+      <p class="cr-p"><s>${eur2.format(row.actual)}</s> <b>${eur2.format(row.precio_rec)}</b> <span class="${d<0?"barato":"caro"}"> ${d>0?"+":""}${eur2.format(d)}</span></p></div></div>`;
+  const form = document.createElement("div"); form.className = "cr-form";
+  const group = (label, html) => `<label class="param"><span>${label}</span>${html}</label>`;
+  form.innerHTML =
+    group(t("cr.tipo"), `<select data-k="kind"><option value="image"${crForm.kind==="image"?" selected":""}>${t("cr.imagen")}</option><option value="video"${crForm.kind==="video"?" selected":""}>${t("cr.video")}</option></select>`) +
+    group(t("cr.canal"), `<select data-k="fmt">${formats.map(f => `<option value="${f.i}"${f.i===crForm.fmt?" selected":""}>${f.label}</option>`).join("")}</select>`) +
+    group(t("cr.objetivo"), `<select data-k="goal">${CR_GOALS.map(g => `<option value="${g}"${g===crForm.goal?" selected":""}>${t("cr.g."+g)}</option>`).join("")}</select>`);
+  form.querySelectorAll("select").forEach(s => s.onchange = () => {
+    const k = s.dataset.k; crForm[k] = k === "fmt" ? Number(s.value) : s.value; crCost = null; render();
+  });
+  box.append(form);
+
+  const acts = document.createElement("div"); acts.className = "cr-acts";
+  const busy = crJob && !["done","failed"].includes(crJob.stage);
+  if(!opToken){
+    const f = document.createElement("form"); f.className = "sc-puerta";
+    f.innerHTML = `<label class="param"><span>${t("sc.token")}</span></label>`;
+    const i = document.createElement("input"); i.type = "password"; i.autocomplete = "off"; i.className = "sc-token";
+    i.setAttribute("aria-label", t("sc.token"));
+    const b = document.createElement("button"); b.className = "chip"; b.type = "submit"; b.textContent = t("sc.entrar");
+    f.querySelector("label").append(i); f.append(b);
+    f.onsubmit = e => { e.preventDefault(); opToken = i.value.trim(); if(!opToken) return; try{ localStorage.setItem(OP_KEY, opToken); }catch{} render(); };
+    acts.append(f);
+  } else {
+    const est = document.createElement("button"); est.type = "button"; est.className = "ghost"; est.textContent = t("cr.estimar"); est.disabled = busy;
+    est.onclick = async () => {
+      crFallo = null; const fm = CR_FORMATS[crForm.fmt];
+      try{
+        const r = await crApi({action:"estimate", modelo:row.modelo, kind:crForm.kind, channel:fm.ch, format:fm.f, goal:crForm.goal, price_rec:row.precio_rec});
+        const pick = o => o ? (o.credits ?? o.credit ?? o.cost_credits ?? null) : null;
+        const usd  = o => o ? (o.usd ?? o.cost_usd ?? o.price_usd ?? null) : null;
+        const cr_ = (pick(r.image)||0) + (pick(r.video)||0), us = (usd(r.image)||0) + (usd(r.video)||0);
+        crCost = [cr_ ? `${cr_} credits` : "", us ? `$${us.toFixed(2)}` : ""].filter(Boolean).join(" · ") || JSON.stringify(r);
+      }catch(e){ crFallo = e; }
+      render();
+    };
+    const gen = document.createElement("button"); gen.type = "button"; gen.className = "chip cr-go"; gen.textContent = t("cr.generar"); gen.disabled = busy;
+    gen.onclick = () => crRun(row);
+    acts.append(est, gen);
+  }
+  const close = document.createElement("button"); close.type = "button"; close.className = "ghost"; close.textContent = t("cr.cerrar");
+  close.onclick = () => { crSel = null; crJob = null; crCost = null; crFallo = null; render(); };
+  acts.append(close);
+  box.append(acts);
+
+  if(crCost){ const p = document.createElement("p"); p.className = "note"; p.textContent = t("cr.coste", {c: crCost}); box.append(p); }
+  if(crJob){
+    const p = document.createElement("p"); p.className = "cr-status" + (crJob.stage === "failed" ? " warn" : "");
+    p.setAttribute("role","status");
+    p.textContent = crJob.stage === "failed" ? t("cr.st.failed", {d: crFallo ? crFallo.message : (crJob.detail || "")}) : t("cr.st."+crJob.stage);
+    box.append(p);
+  }
+  if(crFallo && !crJob) crSetupNote(box, crFallo);
+  const note = document.createElement("p"); note.className = "note"; note.textContent = t("cr.reglas"); box.append(note);
+  return box;
+}
+
+function crGallerySection(){
+  const sec = document.createElement("section"); sec.className = "card wide";
+  sec.innerHTML = `<h2>${t("cr.galeria")}</h2><p class="sub">${t("cr.galeriaSub")}</p>`;
+  const chans = ["all", ...new Set((crGallery||[]).map(g => g.channel))];
+  const fb = document.createElement("div"); fb.className = "cr-filt";
+  for(const c of chans){
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip" + (c===crGalFiltro?" on":"");
+    b.setAttribute("aria-pressed", c===crGalFiltro); b.textContent = c === "all" ? t("cr.filtroTodo") : c;
+    b.onclick = () => { crGalFiltro = c; render(); }; fb.append(b);
+  }
+  sec.append(fb);
+  const list = (crGallery||[]).filter(g => crGalFiltro === "all" || g.channel === crGalFiltro);
+  if(!list.length){ const p = document.createElement("p"); p.className = "note"; p.textContent = t("cr.vacia"); sec.append(p); return sec; }
+  const grid = document.createElement("div"); grid.className = "cr-grid";
+  for(const g of list){
+    const fig = document.createElement("figure"); fig.className = "cr-card";
+    const media = g.video_url
+      ? `<div class="cr-vid"><video src="${g.video_url}" poster="${g.image_url}" controls muted playsinline loop preload="none"></video><img class="cr-wm" src="assets/fs-logo-white.png" alt=""></div>`
+      : `<img src="${g.image_url}" alt="${g.marca} ${g.nombre_modelo}" loading="lazy">`;
+    const fm = CR_FORMATS.find(f => f.ch === g.channel && f.f === g.format);
+    fig.innerHTML = `${media}<figcaption><b>${g.nombre_modelo}</b> · ${g.marca}<br>
+      <s>${eur2.format(g.price_now)}</s> <span class="cr-rec">${eur2.format(g.price_rec)}</span><br>
+      <small>${fm ? fm.label : g.channel} · ${t("cr.g."+g.goal)} · ${g.kind === "video" ? t("cr.video") : t("cr.imagen")}</small>
+      <a href="${g.video_url || g.image_url}" download target="_blank" rel="noopener">${t("cr.descargar")}</a></figcaption>`;
+    grid.append(fig);
+  }
+  sec.append(grid);
+  return sec;
 }
 
 /* La navegación de secciones. Patrón de pestañas completo —roles, aria-selected
