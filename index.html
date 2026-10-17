@@ -869,6 +869,8 @@ const T = {
 "cr.g.launch":   {es:"Lanzamiento", en:"Launch"},
 "cr.estimar":    {es:"Ver coste", en:"Check cost"},
 "cr.sinSaldo":   {es:"La cuenta de la API de Higgsfield no tiene saldo. Recárgala en console.higgsfield.ai y vuelve a intentarlo: no se ha cobrado nada.", en:"The Higgsfield API account has no balance. Top it up at console.higgsfield.ai and try again: nothing was charged."},
+"cr.tokenMal":   {es:"El token de operador no es correcto. Escríbelo de nuevo arriba.", en:"The operator token is not correct. Enter it again above."},
+"cr.cambiarToken":{es:"Cambiar token", en:"Change token"},
 "cr.porUso":     {es:"según uso, unos céntimos", en:"billed by usage, a few cents"},
 "cr.generar":    {es:"Generar", en:"Generate"},
 "cr.cerrar":     {es:"Cerrar", en:"Close"},
@@ -3755,8 +3757,13 @@ async function crRun(row){
     }
   }catch(e){
     crFallo = e; if(crJob) crJob.stage = "failed";
+    if(e.status === 401) crForgetToken();
   }
   render(); crLoadGallery();
+}
+
+function crForgetToken(){
+  opToken = ""; try{ localStorage.removeItem(OP_KEY); }catch{}
 }
 
 function crSetupNote(sec, e){
@@ -3853,7 +3860,8 @@ function crPanel(row){
     i.setAttribute("aria-label", t("sc.token"));
     const b = document.createElement("button"); b.className = "chip"; b.type = "submit"; b.textContent = t("sc.entrar");
     f.querySelector("label").append(i); f.append(b);
-    f.onsubmit = e => { e.preventDefault(); opToken = i.value.trim(); if(!opToken) return; try{ localStorage.setItem(OP_KEY, opToken); }catch{} render(); };
+    f.onsubmit = e => { e.preventDefault(); opToken = i.value.replace(/[\s"'`]/g, ""); if(!opToken) return;
+      crFallo = null; crJob = null; try{ localStorage.setItem(OP_KEY, opToken); }catch{} render(); };
     acts.append(f);
   } else {
     const est = document.createElement("button"); est.type = "button"; est.className = "ghost"; est.textContent = t("cr.estimar"); est.disabled = busy;
@@ -3867,12 +3875,14 @@ function crPanel(row){
           ? `${label}: ${Number(o.credits).toFixed(2)} cr ($${Number(o.usd).toFixed(2)})`
           : `${label}: ${t("cr.porUso")}`;
         crCost = [part(r.image, t("cr.imagen")), part(r.video, t("cr.video"))].filter(Boolean).join(" · ");
-      }catch(e){ crFallo = e; }
+      }catch(e){ crFallo = e; if(e.status === 401) crForgetToken(); }
       render();
     };
     const gen = document.createElement("button"); gen.type = "button"; gen.className = "chip cr-go"; gen.textContent = t("cr.generar"); gen.disabled = busy;
     gen.onclick = () => crRun(row);
-    acts.append(est, gen);
+    const out = document.createElement("button"); out.type = "button"; out.className = "ghost"; out.textContent = t("cr.cambiarToken");
+    out.onclick = () => { crForgetToken(); crFallo = null; crJob = null; render(); };
+    acts.append(est, gen, out);
   }
   const close = document.createElement("button"); close.type = "button"; close.className = "ghost"; close.textContent = t("cr.cerrar");
   close.onclick = () => { crSel = null; crJob = null; crCost = null; crFallo = null; render(); };
@@ -3885,7 +3895,8 @@ function crPanel(row){
     p.setAttribute("role","status");
     const why = crFallo ? crFallo.message : (crJob.detail || "");
     p.textContent = crJob.stage !== "failed" ? t("cr.st."+crJob.stage)
-      : /not_enough_credits/.test(why) ? t("cr.sinSaldo") : t("cr.st.failed", {d: why});
+      : /not_enough_credits/.test(why) ? t("cr.sinSaldo")
+      : /unauthorized/.test(why) ? t("cr.tokenMal") : t("cr.st.failed", {d: why});
     box.append(p);
   }
   if(crFallo && !crJob) crSetupNote(box, crFallo);
