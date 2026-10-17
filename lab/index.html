@@ -25,6 +25,8 @@
   --ie-navy:#0a1a3c; --ie-navy-700:#16264f; --ie-blue:#0097dc; --ie-blue-data:#2f6fed;
   --ie-ink:#1a1a1a;
   --accent:var(--ie-blue); --accent-strong:var(--ie-blue-data);
+  /* Creative direction labels: IE dark red, 6.0:1 with white text (AA). */
+  --creative:#c02622;
   --g-900:#2c2c2c; --g-600:#6b6b6b; --g-300:#d8d8d8; --g-100:#f4f4f4; --white:#fff;
 
   --font-sans:"Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
@@ -361,7 +363,7 @@ strong{font-weight:700; color:var(--ie-navy)}
    etiqueta navy, para distinguirla de Measure (azul) y de los prompts (navy). */
 .kpi.dir{border-color:var(--ie-navy)}
 .kpi.dir .kpi-h{background:var(--g-100); color:var(--ie-navy); border-bottom:1px solid var(--g-300)}
-.kpi.dir .kpi-tag{background:var(--ie-navy); color:#fff}
+.kpi.dir .kpi-tag{background:var(--creative); color:#fff}
 .kpi.dir .kpi-log b{color:var(--ie-navy)}
 .kpi .eg{display:block; margin-top:4px; color:var(--g-600)}
 .chk{list-style:none; padding:0; margin:0; display:grid; gap:10px}
@@ -551,7 +553,7 @@ code{
 .ov-tag{display:inline-block; font-family:var(--font-display); font-size:.6875rem; font-weight:800;
   text-transform:uppercase; letter-spacing:.12em; color:#fff; background:var(--accent-strong);
   padding:3px 8px; border-radius:var(--radius-sm)}
-.ov-dir .ov-tag{background:var(--ie-navy)}
+.ov-dir .ov-tag{background:var(--creative)}
 .ov-card h3{margin:var(--s-2) 0 var(--s-1); font-size:1.125rem}
 .ov-card p{font-size:.9375rem; margin:0 0 var(--s-2)}
 .ov-when{margin:0!important; padding-top:var(--s-1); border-top:1px solid var(--g-300);
@@ -596,7 +598,7 @@ code{
 .tl-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; padding-top:8px}
 .tl-chip{font-size:.625rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
   padding:3px 7px; border-radius:var(--radius-sm); color:#fff}
-.tl-m{background:var(--accent-strong)} .tl-d{background:var(--ie-navy)}
+.tl-m{background:var(--accent-strong)} .tl-d{background:var(--creative)}
 .tl-none{background:var(--g-100); color:var(--g-600)}
 .tl-01{--c:#0097dc} .tl-02{--c:#0b85cd} .tl-03{--c:#1570bb} .tl-04{--c:#1a58a0}
 .tl-05{--c:#173b78} .tl-06{--c:#0a1a3c}
@@ -606,7 +608,7 @@ code{
 .tl-last .tl-t{color:#fff}
 .tl-last .tl-out{color:#c9d2e6; border-top-color:#2b3c63}
 .tl-last .tl-dot{background:var(--ie-navy); color:#fff}
-.tl-last .tl-d{background:#fff; color:var(--ie-navy)}
+.tl-last .tl-d{background:var(--creative); color:#fff}
 .tint .tl-dot{box-shadow:0 0 0 5px var(--g-100)}
 @media(min-width:1000px){
   .tl-phases{display:grid; grid-template-columns:1fr 1fr; gap:var(--s-2); margin-bottom:var(--s-3)}
