@@ -1069,7 +1069,7 @@ code{
       <div class="wb-row">
         <a class="wb-wk" href="#week-5"><span>05</span>Brand</a>
         <div class="wb-c wb-b"><p class="wb-lbl">Build</p><ul><li>The tool in Forum Sport&rsquo;s brand</li><li>Readable on a phone</li></ul></div>
-        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><ul><li>An outside user: task success and time</li><li>Understanding of one price</li><li>Prices accepted versus overridden</li></ul></div>
+        <div class="wb-c wb-m"><p class="wb-lbl">Measure</p><ul><li>Impressions and clicks on the price piece</li><li>Click-through rate, version against version</li><li>AI Act: every AI asset labelled, a person decides</li></ul></div>
         <div class="wb-c wb-d"><p class="wb-lbl">Creative direction</p><ul><li>One category&rsquo;s price message: copy and AI visuals</li><li>A quality checklist and AI labelling</li><li>The brief and the rejected versions</li></ul></div>
       </div>
       <div class="wb-row">
@@ -1197,7 +1197,7 @@ code{
           <tr>
             <td><b>Data and measurement</b></td>
             <td class="wt">10%</td>
-            <td>A data layer that holds up, and every process measured the week it was built, with its KPIs, targets and results in the KPI log: load completeness, scraper coverage and freshness, configurator compliance and coherence, and an outside user&rsquo;s task success. Baselines taken before the engine, simulated impact against them, an override log.</td>
+            <td>A data layer that holds up, and every process measured the week it was built, with its KPIs, targets and results in the KPI log: load completeness, scraper coverage and freshness, configurator compliance and coherence, the price piece&rsquo;s impressions, clicks and click-through rate, and AI Act checks: labelling, a person deciding, transparency on screen. Baselines taken before the engine, simulated impact against them, an override log.</td>
           </tr>
           <tr>
             <td><b>User experience</b></td>
@@ -1901,14 +1901,14 @@ Finally, list any key that exists in one language and not the other.</pre>
     </div>
 
     <div class="kpi rv" id="measure-05">
-      <div class="kpi-h"><span class="kpi-tag">Measure</span><span class="kpi-ttl">Week 05 &middot; The tool in someone else&rsquo;s hands</span></div>
+      <div class="kpi-h"><span class="kpi-tag">Measure</span><span class="kpi-ttl">Week 05 &middot; The price piece and AI Act compliance</span></div>
       <div class="kpi-body">
-        <p>Sit someone from outside the team in front of the tool, give them three tasks and do not help.</p>
+        <p>This week&rsquo;s output faces the shopper, so measure it like a campaign, and check it meets the EU AI Act before anyone outside the team sees it.</p>
         <div class="kpi-wrap"><table>
           <thead><tr><th>KPI</th><th>How you measure it</th><th>Target</th></tr></thead>
-          <tbody><tr><td>Task success</td><td>Tasks completed unaided: find the models to cut for one brand, explain one price, change one rule</td><td>3 of 3</td></tr><tr><td>Time on task</td><td>Seconds per task, timed</td><td>Under 2 min each</td></tr><tr><td>Understanding</td><td>They explain one recommended price back to you correctly</td><td>Yes</td></tr><tr><td>Accepted vs overridden</td><td>From the <code>override_log</code> during the test, with the reasons they gave</td><td>Report it</td></tr><tr><td>Fixes made</td><td>Problems you saw, and how many you fixed before week 6</td><td>All the blocking ones</td></tr></tbody>
+          <tbody><tr><td>Impressions</td><td>Each time the price piece is seen: publish it on a test page and log every view to an <code>events</code> table</td><td>Report it</td></tr><tr><td>Clicks</td><td>Clicks on the piece&rsquo;s call to action, logged the same way</td><td>Report it</td></tr><tr><td>Click-through rate</td><td>Clicks &divide; impressions. Show two message versions and compare them</td><td>Report the winner</td></tr><tr><td>AI labelling</td><td>Share of AI-generated images and texts in the piece marked as AI-generated</td><td>100%</td></tr><tr><td>A person decides</td><td>Share of applied prices traceable to a person in the <code>override_log</code></td><td>100%</td></tr><tr><td>Transparency</td><td>The tool says on screen that its prices are recommendations, and how they are made</td><td>On screen</td></tr></tbody>
         </table></div>
-        <p class="kpi-log"><b>Log it</b>Add the rows to <code>kpi_log</code>. Keep the override reasons word for word: they are the best evidence you will have.</p>
+        <p class="kpi-log"><b>Log it</b>Add the rows to <code>kpi_log</code>. Views and clicks go to an <code>events</code> table: what was shown, which version, and when.</p>
       </div>
     </div>
 
