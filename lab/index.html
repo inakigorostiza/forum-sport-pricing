@@ -556,6 +556,16 @@ code{
 .ov-card p{font-size:.9375rem; margin:0 0 var(--s-2)}
 .ov-when{margin:0!important; padding-top:var(--s-1); border-top:1px solid var(--g-300);
   font-size:.6875rem!important; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--g-600)}
+
+/* Contexto: el KPI a la derecha del párrafo en escritorio, debajo en móvil. */
+.ctx-top{display:grid; gap:var(--s-4); align-items:end;
+  margin-bottom:var(--s-4); padding-bottom:var(--s-3); border-bottom:1px solid var(--g-300)}
+@media(min-width:900px){ .ctx-top{grid-template-columns:minmax(0,1fr) auto; gap:var(--s-8)} }
+.ctx-top .lead{margin:0}
+.ctx-kpi{margin:0!important; padding:0!important; border:0!important;
+  flex-direction:column; align-items:flex-end; gap:var(--s-1)!important; text-align:right}
+.ctx-kpi .bigcap{max-width:24ch}
+@media(max-width:899px){ .ctx-kpi{align-items:flex-start; text-align:left} }
 </style>
 </head>
 <body>
@@ -623,15 +633,16 @@ code{
       <p class="sec-sub">Forum Sport</p>
     </div>
     <h2 class="rv">Where Forum Sport&rsquo;s prices sit today</h2>
+    <div class="ctx-top">
     <p class="lead prose rv">Forum Sport is a Spanish sports retailer, online and in store.
       The scope here is its men&rsquo;s running and trail catalogue: 1,483 shoe models.
       Online, its price sits one tab away from every rival selling the same shoe. The
       question is not whether shoppers compare. It is whether Forum Sport knows what they
       will find.</p>
-
-    <div class="statline rv">
+    <div class="statline ctx-kpi rv">
       <p class="bignum">73.3%</p>
       <p class="bigcap">of compared models are more expensive than the cheapest rival</p>
+    </div>
     </div>
 
     <div class="fig rv"><svg viewBox="0 0 1110 542" role="img" aria-label="Average price gap against each competitor. Forum Sport is more expensive than nine of fourteen rivals, by up to 22 per cent, and cheaper than five; Tradeinn, at 61.8 per cent cheaper, is off the scale." class="figsvg">
