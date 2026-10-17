@@ -688,6 +688,40 @@ code{
 .dg-note{margin-top:var(--s-2); min-height:1.6em}
 .dg-note p{margin:0; font-size:.9375rem; color:var(--g-900)}
 .dg-note b{color:var(--ie-navy)}
+
+/* ── Semana 1: ideas, tarjetas por herramienta y comandos de terminal ── */
+kbd{font-family:var(--font-mono); font-size:.8125em; padding:1px 6px; border:1px solid var(--g-300);
+  border-bottom-width:2px; border-radius:4px; background:var(--white); color:var(--ie-navy)}
+.idea{margin-top:var(--s-3); padding:var(--s-3); background:var(--g-100); border-radius:var(--radius);
+  border-left:4px solid var(--accent); max-width:var(--container-text)}
+.idea p{font-size:.9375rem; margin:0 0 var(--s-2)} .idea p:last-child{margin-bottom:0}
+.idea ul{margin:0 0 var(--s-2); padding-left:20px; font-size:.9375rem; display:grid; gap:4px}
+.idea-n{font-family:var(--font-display); font-weight:800; font-size:.875rem!important; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--ie-navy)}
+.idea .tbl table{font-size:.875rem}
+.idea td:first-child code{white-space:nowrap}
+.tc{margin-top:var(--s-4); border:1px solid var(--g-300); border-radius:var(--radius); background:var(--white);
+  overflow:hidden; max-width:var(--container-text); box-shadow:0 2px 10px rgba(10,26,60,.05)}
+.tc-head{display:flex; gap:var(--s-2); align-items:center; padding:var(--s-3); border-bottom:1px solid var(--g-300)}
+.tc-logo{flex:none; display:grid; place-items:center; width:48px; height:48px; border-radius:10px;
+  border:1px solid var(--g-300); background:var(--white)} .tc-logo svg{width:26px; height:26px}
+.tc-name{margin:0; font-family:var(--font-display); font-weight:800; font-size:1.125rem; text-transform:uppercase; color:var(--ie-navy)}
+.tc-what{margin:2px 0 0; font-size:.875rem; color:var(--g-600); line-height:1.45}
+.tc-body{display:grid}
+.tc-part{padding:var(--s-3); border-top:1px solid var(--g-300)} .tc-part:first-child{border-top:0}
+.tc-h{margin:0 0 var(--s-1); display:flex; align-items:center; gap:10px; font-weight:700; color:var(--ie-navy); font-size:.9375rem}
+.tc-h span{display:grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--ie-navy);
+  color:#fff; font-size:.75rem; font-family:var(--font-display)}
+.tc-part p,.tc-part li{font-size:.9375rem; line-height:1.55}
+.tc-part p{margin:0 0 var(--s-1)}
+.tc-part ol{margin:0 0 var(--s-1); padding-left:20px; display:grid; gap:4px}
+.tc-warn{color:var(--creative); font-weight:600}
+.prompt.cmd{border-color:#1b2433; margin-top:var(--s-1); margin-bottom:var(--s-1)}
+.prompt.cmd .prompt-h{background:#1b2433}
+.prompt.cmd pre{background:#0f1520; color:#e6edf3; font-size:.8125rem; padding:12px 14px}
+.cmd-os{display:inline-block; margin-right:8px; padding:1px 6px; border-radius:3px; background:#2f6fed; color:#fff;
+  font-size:.625rem; letter-spacing:.06em}
+.tint .idea{background:var(--white)}
 </style>
 </head>
 <body>
@@ -1300,36 +1334,116 @@ code{
 
     <h3 class="rv">Before you start</h3>
     <ul class="chk rv">
-      <li>A GitHub account, free, with your IE email</li>
-      <li>A Vercel account, <b>signed up with GitHub</b>, not with email</li>
-      <li>A Supabase account, signed up with GitHub</li>
-      <li>Claude Code installed</li>
-      <li>A folder on your Desktop called <code>forum-sport-&lt;team&gt;</code></li>
-      <li>Nothing else. No Python, no database software</li>
+      <li>A laptop with macOS 13 or later, or Windows 10 or later</li>
+      <li>A Claude plan that includes Claude Code (Pro or higher)</li>
+      <li>Your IE email, for every account</li>
+      <li>Nothing else: no Python, no database software</li>
     </ul>
+
+    <h3 class="rv">Three ideas before you install anything</h3>
+    <div class="idea rv">
+      <p class="idea-n">1 &middot; The terminal</p>
+      <p>A terminal is a window where you talk to your computer by typing instead of
+        clicking. You paste a line, press <kbd>Enter</kbd>, and the computer does it. That is
+        all you need from it: every command you will use is on this page, ready to copy.</p>
+      <ul>
+        <li><b>Inside VS Code</b> (the easiest): <b>Terminal &rarr; New Terminal</b>.</li>
+        <li><b>On a Mac</b>: <kbd>Cmd</kbd> + <kbd>Space</kbd>, type <i>Terminal</i>, press Enter.</li>
+        <li><b>On Windows</b>: <kbd>Win</kbd> + <kbd>X</kbd> &rarr; <i>Terminal</i> or <i>Windows PowerShell</i>. The line starts with <code>PS C:\</code>.</li>
+      </ul>
+      <p>Dark boxes on this page are terminal commands. White boxes are prompts you write to Claude.</p>
+    </div>
+
+    <div class="idea rv">
+      <p class="idea-n">2 &middot; What an MCP is</p>
+      <p>MCP, the Model Context Protocol, is a standard way to plug an AI assistant into other
+        services, a bit like a USB-C port. Without it, you copy things from a website into the
+        chat and back. With it, Claude Code can look at your GitHub, publish on Vercel or count
+        rows in Supabase itself, and it asks your permission before it acts.</p>
+    </div>
+<div class="fig rv mcp-fig"><svg viewBox="0 0 1000 360" role="img" aria-label="Without MCP you copy and paste between Claude and each service. With MCP, Claude Code talks to GitHub, Vercel and Supabase directly, through one standard connector each." class="figsvg">
+<style>.m-h{font:800 12px var(--font-display);fill:#6b6b6b;letter-spacing:.12em}.m-n{font:700 14px var(--font-sans);fill:#0a1a3c}.m-s{font:400 12px var(--font-sans);fill:#6b6b6b}.m-w{font:800 15px var(--font-display);fill:#fff}.m-ws{font:400 12px var(--font-sans);fill:#c9d2e6}.m-p{font:800 10.5px var(--font-display);fill:#fff;letter-spacing:.1em}.m-q{font:italic 400 12px var(--font-sans);fill:#2c2c2c}.m-fl{fill:none;stroke:#2f6fed;stroke-width:2;stroke-dasharray:7 6;animation:dgflow 1.2s linear infinite}.m-x{fill:none;stroke:#b8b8b8;stroke-width:2;stroke-dasharray:3 5}</style>
+<text x="30" y="34" class="m-h">WITHOUT MCP</text>
+<rect x="30" y="52" width="150" height="56" rx="8" fill="#fff" stroke="#c9ced8"/><text x="105" y="85" text-anchor="middle" class="m-n">Claude</text>
+<rect x="250" y="52" width="150" height="56" rx="8" fill="#fff" stroke="#c9ced8"/><text x="325" y="78" text-anchor="middle" class="m-n">You</text><text x="325" y="96" text-anchor="middle" class="m-s">copy, paste, repeat</text>
+<rect x="470" y="52" width="150" height="56" rx="8" fill="#fff" stroke="#c9ced8"/><text x="545" y="85" text-anchor="middle" class="m-n">Each website</text>
+<path d="M180 80H250M400 80H470" class="m-x"/>
+<line x1="30" y1="140" x2="970" y2="140" stroke="#d8d8d8"/>
+<text x="30" y="178" class="m-h">WITH MCP</text>
+<rect x="30" y="226" width="190" height="96" rx="12" fill="#0a1a3c"/><text x="125" y="286" text-anchor="middle" class="m-w">Claude Code</text><text x="125" y="306" text-anchor="middle" class="m-ws">asks the service itself</text>
+<path d="M220 274H330" class="m-fl"/>
+<path d="M330 214V334" class="m-fl"/>
+<path d="M330 214H440M330 274H440M330 334H440" class="m-fl"/>
+<rect x="300" y="261" width="60" height="26" rx="13" fill="#2f6fed"/><text x="330" y="278" text-anchor="middle" class="m-p">MCP</text>
+<rect x="440" y="194" width="170" height="40" rx="8" fill="#fff" stroke="#c9ced8"/><text x="458" y="219" class="m-n">GitHub</text>
+<rect x="440" y="254" width="170" height="40" rx="8" fill="#fff" stroke="#c9ced8"/><text x="458" y="279" class="m-n">Vercel</text>
+<rect x="440" y="314" width="170" height="40" rx="8" fill="#fff" stroke="#c9ced8"/><text x="458" y="339" class="m-n">Supabase</text>
+<text x="640" y="219" class="m-q">&#8220;Create a private repository and save my files.&#8221;</text>
+<text x="640" y="279" class="m-q">&#8220;Publish the site and give me the link.&#8221;</text>
+<text x="640" y="339" class="m-q">&#8220;How many models are in the catalogue?&#8221;</text>
+<svg x="580" y="204" width="20" height="20" viewBox="0 0 24 24"><path fill="#181717" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg><svg x="580" y="264" width="20" height="20" viewBox="0 0 24 24"><path fill="#000000" d="m12 1.608 12 20.784H0Z"/></svg><svg x="580" y="324" width="20" height="20" viewBox="0 0 24 24"><path fill="#3ECF8E" d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C-.33 13.427.65 15.455 2.409 15.455h9.579l.113 7.51c.014.985 1.259 1.408 1.873.636l9.262-11.653c1.093-1.375.113-3.403-1.645-3.403h-9.642z"/></svg><svg x="111" y="236" width="28" height="28" viewBox="0 0 24 24"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg></svg></div>
+<p class="cap">Fig. 03. MCP is a standard plug. One connector per service, and Claude can read and act there for you, always asking before it does.</p>
+
+    <div class="idea rv">
+      <p class="idea-n">3 &middot; Where a connection is saved</p>
+      <p>When you add an MCP connection you choose its <b>scope</b>, with <code>--scope</code>:</p>
+      <div class="tbl" style="margin-top:var(--s-2)"><table>
+        <thead><tr><th>Scope</th><th>Who gets it</th><th>Use it for</th></tr></thead>
+        <tbody>
+          <tr><td><code>local</code></td><td>Only you, only in this project. The default if you write nothing.</td><td>Trying something out</td></tr>
+          <tr><td><code>project</code></td><td>Everyone on the team: it is saved in a file called <code>.mcp.json</code> inside the project and travels with it to GitHub.</td><td>Connections with no password, like Supabase</td></tr>
+          <tr><td><code>user</code></td><td>Only you, in every project on your computer.</td><td>Anything with a key, like GitHub, and your own accounts, like Vercel</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin-top:var(--s-2)">To see your connections, type <code>claude mcp list</code> in the terminal: each line should say <b>Connected</b>. Inside Claude Code, <code>/mcp</code> shows the same and lets you log in.</p>
+    </div>
+
+    <h3 class="rv">Set up, tool by tool</h3>
+    <p class="prose rv">Do them in this order. Each one takes five to ten minutes.</p>
+
+    <article class="tc rv" id="setup-vscode">
+      <header class="tc-head"><span class="tc-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#007ACC" d="M23.15 2.59 18.21.21a1.49 1.49 0 0 0-1.7.29L7.04 9.13 2.91 6a1 1 0 0 0-1.27.06L.32 7.26a1 1 0 0 0 0 1.48L3.9 12 .32 15.26a1 1 0 0 0 0 1.48l1.32 1.2a1 1 0 0 0 1.27.06l4.13-3.13 9.47 8.63a1.49 1.49 0 0 0 1.7.29l4.94-2.38a1.5 1.5 0 0 0 .85-1.35V3.94a1.5 1.5 0 0 0-.85-1.35zM18 17.45 10.82 12 18 6.55z"/></svg></span><div><p class="tc-name">Visual Studio Code</p><p class="tc-what">The editor: the window where you see your project&rsquo;s files, talk to Claude and open a terminal, all in one place.</p></div></header>
+      <div class="tc-body"><div class="tc-part"><p class="tc-h"><span>1</span>Download and install</p><ol><li>Go to <a href="https://code.visualstudio.com/download" target="_blank" rel="noopener">code.visualstudio.com/download</a> and download the version for your computer.</li><li>Install it like any other app. On a Mac, drag it into <b>Applications</b>.</li></ol></div><div class="tc-part"><p class="tc-h"><span>2</span>Open your project folder</p><ol><li>Create a folder on your Desktop called <code>forum-sport-&lt;team&gt;</code>.</li><li>In VS Code: <b>File &rarr; Open Folder&hellip;</b> and choose it. Everything you do from now on happens inside this folder.</li></ol></div><div class="tc-part"><p class="tc-h"><span>3</span>Open the terminal inside VS Code</p><ol><li>Menu <b>Terminal &rarr; New Terminal</b>, or press <kbd>Ctrl</kbd> + <kbd>`</kbd>.</li><li>A panel opens at the bottom, already sitting in your project folder. Every command on this page goes there.</li></ol></div></div>
+    </article>
+    <article class="tc rv" id="setup-claude">
+      <header class="tc-head"><span class="tc-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg></span><div><p class="tc-name">Claude Code</p><p class="tc-what">The assistant that writes and changes your project&rsquo;s code from what you tell it in plain words.</p></div></header>
+      <div class="tc-body"><div class="tc-part"><p class="tc-h"><span>1</span>Have the right account</p><p>Claude Code needs a paid Claude plan (Pro or higher) or the access your programme gives you; the free plan does not include it. <a href="https://claude.com/pricing" target="_blank" rel="noopener">See the plans</a>.</p></div><div class="tc-part"><p class="tc-h"><span>2</span>Install it from the terminal</p><p>On Windows, first install <a href="https://git-scm.com/downloads/win" target="_blank" rel="noopener">Git for Windows</a>: click Next on every screen.</p><div class="prompt cmd"><div class="prompt-h"><span><span class="cmd-os">macOS</span>Paste in the terminal</span><button class="copy" type="button">Copy</button></div><pre>curl -fsSL https://claude.ai/install.sh | bash</pre></div><div class="prompt cmd"><div class="prompt-h"><span><span class="cmd-os">Windows</span>Paste in PowerShell</span><button class="copy" type="button">Copy</button></div><pre>irm https://claude.ai/install.ps1 | iex</pre></div><p>It shows no progress while it downloads: wait for &ldquo;successfully installed&rdquo;. Then open a <b>new</b> terminal and check it worked:</p><div class="prompt cmd"><div class="prompt-h"><span>Paste in the terminal</span><button class="copy" type="button">Copy</button></div><pre>claude --version</pre></div></div><div class="tc-part"><p class="tc-h"><span>3</span>Add it to VS Code and sign in</p><ol><li>In VS Code press <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd>, search <b>Claude Code</b> (by Anthropic) and click <b>Install</b>. Or open <a href="https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code" target="_blank" rel="noopener">the extension page</a>.</li><li>Click the Claude spark icon in the left sidebar or at the top right of an open file.</li><li>Sign in with your Claude account when the browser opens.</li></ol><p>That panel is where you write to Claude. The terminal is where you paste commands. Two different boxes.</p></div></div>
+    </article>
+    <article class="tc rv" id="setup-github">
+      <header class="tc-head"><span class="tc-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#181717" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></span><div><p class="tc-name">GitHub</p><p class="tc-what">Where your project lives online, with every change recorded: who made it, when, and the power to go back.</p></div></header>
+      <div class="tc-body"><div class="tc-part"><p class="tc-h"><span>1</span>Create the account</p><ol><li>Sign up at <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a> with your IE email. Free.</li><li>Optional: students get extra tools free through the <a href="https://education.github.com/pack" target="_blank" rel="noopener">GitHub Student Developer Pack</a>.</li></ol><p>Git, the program that records changes, comes with Git for Windows. On a Mac, the first time anything needs it, macOS offers to install it: accept.</p></div><div class="tc-part"><p class="tc-h"><span>2</span>Create a key for Claude</p><p>The GitHub connector needs a personal access token, a long password that lets Claude act on your behalf.</p><ol><li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li><li>Name it <code>claude-code</code>, expiry 90 days, repository access <b>All repositories</b>.</li><li>Under permissions give <b>Read and write</b> to Administration, Contents, Issues and Pull requests.</li><li>Click <b>Generate token</b> and copy it at once: GitHub shows it only one time.</li></ol><p class="tc-warn">A token is a password. Never paste it into a chat, a file or GitHub itself.</p></div><div class="tc-part"><p class="tc-h"><span>3</span>Connect it through MCP</p><p>Replace <code>YOUR_TOKEN</code> with the key you just copied. User scope keeps the key on your own computer, out of the project.</p><div class="prompt cmd"><div class="prompt-h"><span><span class="cmd-os">macOS</span>Paste in the terminal</span><button class="copy" type="button">Copy</button></div><pre>claude mcp add-json --scope user github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_TOKEN"}}'</pre></div><div class="prompt cmd"><div class="prompt-h"><span><span class="cmd-os">Windows</span>Paste in PowerShell</span><button class="copy" type="button">Copy</button></div><pre>claude mcp add --scope user --transport http github https://api.githubcopilot.com/mcp -H "Authorization: Bearer YOUR_TOKEN"</pre></div></div></div>
+    </article>
+    <article class="tc rv" id="setup-vercel">
+      <header class="tc-head"><span class="tc-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#000000" d="m12 1.608 12 20.784H0Z"/></svg></span><div><p class="tc-name">Vercel</p><p class="tc-what">Hosting: it puts your project at a public address and republishes it every time GitHub changes, so you never work only on your laptop.</p></div></header>
+      <div class="tc-body"><div class="tc-part"><p class="tc-h"><span>1</span>Create the account</p><ol><li>Go to <a href="https://vercel.com/signup" target="_blank" rel="noopener">vercel.com/signup</a>, choose <b>Hobby</b> (free).</li><li>Click <b>Continue with GitHub</b>, not email: Vercel then sees your repositories.</li></ol></div><div class="tc-part"><p class="tc-h"><span>2</span>Connect it through MCP</p><p>No key to copy: Vercel asks you to log in through the browser.</p><div class="prompt cmd"><div class="prompt-h"><span>Paste in the terminal</span><button class="copy" type="button">Copy</button></div><pre>claude mcp add --scope user --transport http vercel https://mcp.vercel.com</pre></div></div><div class="tc-part"><p class="tc-h"><span>3</span>Log in</p><ol><li>In the terminal type <code>claude</code> and press Enter.</li><li>Inside Claude Code type <code>/mcp</code>, choose <b>vercel</b> and then <b>Authenticate</b>.</li><li>The browser opens: log in to Vercel and click <b>Allow</b>.</li></ol></div></div>
+    </article>
+    <article class="tc rv" id="setup-supabase">
+      <header class="tc-head"><span class="tc-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#3ECF8E" d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C-.33 13.427.65 15.455 2.409 15.455h9.579l.113 7.51c.014.985 1.259 1.408 1.873.636l9.262-11.653c1.093-1.375.113-3.403-1.645-3.403h-9.642z"/></svg></span><div><p class="tc-name">Supabase</p><p class="tc-what">The online database: from week 2 it holds the catalogue, the competitor prices and your logs.</p></div></header>
+      <div class="tc-body"><div class="tc-part"><p class="tc-h"><span>1</span>Create the account</p><ol><li>Go to <a href="https://supabase.com/dashboard/sign-up" target="_blank" rel="noopener">supabase.com/dashboard/sign-up</a> and click <b>Continue with GitHub</b>.</li><li>Do not create a project yet. That is week 2.</li></ol></div><div class="tc-part"><p class="tc-h"><span>2</span>Connect it through MCP</p><p>Project scope: the connection is saved in your project folder, so everyone on the team gets it. It holds no password.</p><div class="prompt cmd"><div class="prompt-h"><span>Paste in the terminal</span><button class="copy" type="button">Copy</button></div><pre>claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp"</pre></div></div><div class="tc-part"><p class="tc-h"><span>3</span>Log in</p><ol><li>In the terminal type <code>claude</code>, then <code>/mcp</code>.</li><li>Choose <b>supabase</b>, then <b>Authenticate</b>, and allow access in the browser.</li></ol></div></div>
+    </article>
+
+    <div class="prompt rv">
+      <div class="prompt-h"><span>Copy this prompt to Claude &middot; check your connections</span><button class="copy" type="button">Copy</button></div>
+      <pre>List the MCP connections you can use right now. For each one, tell me in one plain sentence what it lets you do for this project, and test it with one harmless, read-only action. If any connection is not working, tell me exactly what to type to fix it.</pre>
+    </div>
 
     <h3 class="rv">What you do</h3>
     <ol class="steps rv">
-      <li>Create the three accounts.</li>
-      <li>Open the assistant and point it at your folder.</li>
-      <li>Ask it for a one-page site that says Hello Forum Sport.</li>
-      <li>Put the folder on GitHub.</li>
-      <li>Connect GitHub to Vercel and publish.</li>
+      <li>Install VS Code and Claude Code.</li>
+      <li>Create the GitHub, Vercel and Supabase accounts.</li>
+      <li>Connect the three through MCP and check they say Connected.</li>
+      <li>Ask Claude for a one-page site that says Hello Forum Sport.</li>
+      <li>Ask it to save the project on GitHub and publish it on Vercel.</li>
     </ol>
 
     <h3 class="rv">How</h3>
     <div class="how rv">
-      <div><b>Open the assistant</b><p>It asks which folder to work in. Choose Desktop →
-        <code>forum-sport-&lt;team&gt;</code> → Open. You now have one text box at the bottom
-        of the screen. That box is the whole interface: you write your instructions into
-        it. It is not a terminal, and nothing it proposes runs until you approve it.</p></div>
-      <div><b>Put it on GitHub</b><p>Paste the second prompt below. It will ask permission
-        before each command: read the line, then approve it. A browser window opens for
-        GitHub. Click Authorize.</p></div>
-      <div><b>Publish</b><p>vercel.com → <b>Add New</b> → <b>Project</b> → import the
-        repository you just created → <b>Deploy</b>. About forty seconds. Vercel shows a
-        URL ending <code>.vercel.app</code>. Open it on your phone. That is the published
-        page.</p></div>
+      <div><b>Talk to Claude</b><p>Open the Claude panel in VS Code. That text box is where
+        you write instructions in plain words. Nothing it proposes runs until you approve it.</p></div>
+      <div><b>Save and publish</b><p>Paste the second prompt below. Claude uses the GitHub
+        connection to create the repository and the Vercel connection to publish it. Read each
+        step before you approve it. Vercel gives you a link ending <code>.vercel.app</code>:
+        open it on your phone.</p></div>
     </div>
 
     <div class="prompt rv">
@@ -1343,9 +1457,10 @@ Then explain to me in three sentences, with no technical words, what the file yo
       <div class="prompt-h"><span>Copy this prompt, 2 of 2</span><button class="copy" type="button">Copy</button></div>
       <pre>Publish this folder, step by step, and stop before each step to tell me what you are about to do.
 
-1) Create a private GitHub repository called forum-sport-&lt;TEAM&gt; and push this folder into it.
+1) Using the GitHub connection, create a private repository called forum-sport-&lt;TEAM&gt; and save this folder into it.
 2) Tell me in one sentence each what "commit" and "push" mean, as if I had never heard either word.
-3) Then tell me exactly what to click on vercel.com to connect that repository and publish it. I will do that part myself in the browser.
+3) Using the Vercel connection, create a project from that repository, publish it and give me the public link.
+4) If any connection fails, tell me exactly what to click or type to finish it myself.
 
 Do not install anything that is not strictly needed, and tell me before you install anything at all.</pre>
     </div>
@@ -1353,6 +1468,7 @@ Do not install anything that is not strictly needed, and tell me before you inst
     <div class="gotcha rv">
       <p>It asks permission before every command it runs.</p>
       <p>Vercel complains about an output directory. Reply to the assistant with the exact error text, pasted whole.</p>
+      <p>A connection says &ldquo;Needs authentication&rdquo;. Type <code>claude</code> in the terminal, then <code>/mcp</code>, and log in again.</p>
     </div>
 
     <p class="leave rv"><span class="arw">&rarr;</span> You leave with a live web address with your team name on it</p>
@@ -1611,7 +1727,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         </tbody>
       </table>
     </div>
-    <p class="cap">Fig. 03. Five of five Cloudflare sites refuse. None of the eight without it do.</p>
+    <p class="cap">Fig. 04. Five of five Cloudflare sites refuse. None of the eight without it do.</p>
 
     <div class="warn rv">
       <h4 style="margin-top:0">Why changing the user agent does not help</h4>
@@ -1766,7 +1882,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
     <div class="shot rv">
       <img src="/lab/assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
     </div>
-    <p class="cap">Fig. 04. The band matrix as the configurator shows it, editable on screen. The values are the client&rsquo;s, not ours.</p>
+    <p class="cap">Fig. 05. The band matrix as the configurator shows it, editable on screen. The values are the client&rsquo;s, not ours.</p>
 
     <div class="prompt rv">
       <div class="prompt-h"><span>Copy this prompt, 1 of 3 · the engine</span><button class="copy" type="button">Copy</button></div>
@@ -1834,12 +1950,12 @@ If a big move rests on one observation, say so right next to it rather than in a
 <line x1="470" y1="28" x2="470" y2="84" stroke="var(--accent)" stroke-width="2"/>
 <text x="478" y="132" class="fg-c">CEILING WITH ONE RIVAL: 45, ONE OBSERVATION CANNOT CORROBORATE ITSELF</text>
 </svg></div>
-    <p class="cap">Fig. 05. What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
+    <p class="cap">Fig. 06. What the hundred points are made of. The score grades the market data behind a recommendation, not the price itself.</p>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/pricing-table.webp" alt="The recommendation table: model, band, current price, recommended price, difference, recommended position, recommended margin, confidence and the reason in words" loading="lazy" width="2236" height="1120">
     </div>
-    <p class="cap">Fig. 06. Each row states the rule that decided its price, in words a buyer could read aloud.</p>
+    <p class="cap">Fig. 07. Each row states the rule that decided its price, in words a buyer could read aloud.</p>
 
     <div class="gotcha rv">
       <p>Someone asks "is this the optimal price?". The answer is no. It is the defensible price. Optimal needs demand data that does not exist.</p>
@@ -1953,7 +2069,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         <img src="/lab/assets/shots/phone.webp" alt="The pricing tool on a 390 pixel phone screen, with columns dropped rather than squeezed" loading="lazy" width="1170" height="2532">
       </div>
     </div>
-    <p class="cap">Fig. 07. The same build in Spanish and in dark mode (left), and at 390px on a phone (right).</p>
+    <p class="cap">Fig. 08. The same build in Spanish and in dark mode (left), and at 390px on a phone (right).</p>
 
     <div class="gotcha rv">
       <p>Dark mode makes the accent unreadable. Change the value, not the component. That is what naming them was for.</p>
@@ -2073,7 +2189,7 @@ Finally, list any key that exists in one language and not the other.</pre>
         <img src="/lab/assets/shots/scraping.webp" alt="The scraping section, asking for an operator token before it will show anything" loading="lazy" width="2320" height="374">
       </div>
     </div>
-    <p class="cap">Fig. 08. Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
+    <p class="cap">Fig. 09. Positioning over time (left). The scraping panel (right) shows nothing without an operator token: who you watch, and how, is not public data.</p>
 
     <div class="btn-row rv">
       <a class="btn btn-primary" href="https://forum-sport-pricing.vercel.app" target="_blank" rel="noopener">Open the live tool <span class="arw">&rarr;</span></a>
