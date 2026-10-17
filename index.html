@@ -773,6 +773,20 @@ footer a{color:var(--ink-2)}
 .cr-tab{font:700 13px var(--display); text-transform:uppercase; letter-spacing:var(--tracking-nav); padding:10px 16px; margin-bottom:-1px;
   border:0; border-bottom:3px solid transparent; background:none; color:var(--muted); cursor:pointer}
 .cr-tab.on{color:var(--ink); border-bottom-color:var(--fs-red)}
+
+.cr-card{position:relative}
+.cr-full{position:absolute; top:8px; right:8px; z-index:2; width:34px; height:34px; border:0; background:rgba(34,34,34,.78); color:#fff;
+  font-size:18px; line-height:1; cursor:pointer}
+.cr-full:hover,.cr-full:focus-visible{background:var(--fs-red)}
+.cr-lb{border:0; padding:0; width:100vw; height:100vh; max-width:none; max-height:none; background:#111; color:#fff}
+.cr-lb::backdrop{background:rgba(0,0,0,.6)}
+.cr-lb-bar{display:flex; gap:14px; align-items:center; padding:12px 18px; font:700 13px var(--display); text-transform:uppercase; letter-spacing:var(--tracking-nav)}
+.cr-lb-bar span{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cr-lb-bar a, .cr-lb-bar button{color:#fff; background:none; border:1px solid rgba(255,255,255,.4); padding:7px 12px; font:inherit; cursor:pointer; text-decoration:none}
+.cr-lb-x{font-size:20px!important; padding:2px 12px!important}
+.cr-lb-media{height:calc(100vh - 62px); display:flex; align-items:center; justify-content:center; padding:0 18px 18px}
+.cr-lb-media img, .cr-lb-media video{max-width:100%; max-height:100%; object-fit:contain; display:block}
+.cr-lb-media:fullscreen{background:#000; padding:0}
 </style>
 </head>
 <body>
@@ -876,6 +890,9 @@ const T = {
 "cr.sinSaldo":   {es:"La cuenta de la API de Higgsfield no tiene saldo. Recárgala en console.higgsfield.ai y vuelve a intentarlo: no se ha cobrado nada.", en:"The Higgsfield API account has no balance. Top it up at console.higgsfield.ai and try again: nothing was charged."},
 "cr.tokenMal":   {es:"El token de operador no es correcto. Escríbelo de nuevo arriba.", en:"The operator token is not correct. Enter it again above."},
 "cr.cambiarToken":{es:"Cambiar token", en:"Change token"},
+"cr.idioma":     {es:"Idioma de la pieza", en:"Language of the piece"},
+"cr.pantalla":   {es:"Ver a pantalla completa", en:"View full screen"},
+"cr.pantallaReal":{es:"Pantalla completa", en:"Full screen"},
 "cr.porUso":     {es:"según uso, unos céntimos", en:"billed by usage, a few cents"},
 "cr.generar":    {es:"Generar", en:"Generate"},
 "cr.cerrar":     {es:"Cerrar", en:"Close"},
@@ -3686,7 +3703,7 @@ const CR_FORMATS = [
 ];
 const CR_GOALS = ["sale","awareness","clearance","launch"];
 let crQ = "", crBrand = "", crShown = 40, crSel = null;
-let crForm = {kind:"image", fmt:0, goal:"sale"};
+let crForm = {kind:"image", fmt:0, goal:"sale", lang:"en"};
 let crJob = null;          // {id, stage, detail}
 let crCost = null, crFallo = null;
 let crGallery = null, crGalFiltro = "all", crVista = "products";
@@ -3744,7 +3761,7 @@ async function crRun(row){
   try{
     crJob = {stage:"queued"}; render();
     const r = await crApi({action:"create", modelo:row.modelo, kind:crForm.kind, channel:fm.ch, format:fm.f,
-                           goal:crForm.goal, price_rec:row.precio_rec});
+                           goal:crForm.goal, lang:crForm.lang, price_rec:row.precio_rec});
     crJob = {id:r.id, stage:"still"}; render();
     while(true){
       await new Promise(z => setTimeout(z, 5000));
@@ -3860,7 +3877,8 @@ function crPanel(row){
   form.innerHTML =
     group(t("cr.tipo"), `<select data-k="kind"><option value="image"${crForm.kind==="image"?" selected":""}>${t("cr.imagen")}</option><option value="video"${crForm.kind==="video"?" selected":""}>${t("cr.video")}</option></select>`) +
     group(t("cr.canal"), `<select data-k="fmt">${formats.map(f => `<option value="${f.i}"${f.i===crForm.fmt?" selected":""}>${f.label}</option>`).join("")}</select>`) +
-    group(t("cr.objetivo"), `<select data-k="goal">${CR_GOALS.map(g => `<option value="${g}"${g===crForm.goal?" selected":""}>${t("cr.g."+g)}</option>`).join("")}</select>`);
+    group(t("cr.objetivo"), `<select data-k="goal">${CR_GOALS.map(g => `<option value="${g}"${g===crForm.goal?" selected":""}>${t("cr.g."+g)}</option>`).join("")}</select>`) +
+    group(t("cr.idioma"), `<select data-k="lang"><option value="en"${crForm.lang==="en"?" selected":""}>English</option><option value="es"${crForm.lang==="es"?" selected":""}>Español</option></select>`);
   form.querySelectorAll("select").forEach(s => s.onchange = () => {
     const k = s.dataset.k; crForm[k] = k === "fmt" ? Number(s.value) : s.value; crCost = null; render();
   });
@@ -3883,7 +3901,7 @@ function crPanel(row){
     est.onclick = async () => {
       crFallo = null; const fm = CR_FORMATS[crForm.fmt];
       try{
-        const r = await crApi({action:"estimate", modelo:row.modelo, kind:crForm.kind, channel:fm.ch, format:fm.f, goal:crForm.goal, price_rec:row.precio_rec});
+        const r = await crApi({action:"estimate", modelo:row.modelo, kind:crForm.kind, channel:fm.ch, format:fm.f, goal:crForm.goal, lang:crForm.lang, price_rec:row.precio_rec});
         /* Higgsfield returns a fixed estimate for video ({credits, usd} as strings)
            and only a pricing description for token-billed images. */
         const part = (o, label) => !o ? "" : o.type === "estimate"
@@ -3937,14 +3955,41 @@ function crGalleryInto(sec){
     const media = g.video_url
       ? `<div class="cr-vid"><video src="${g.video_url}" poster="${g.image_url}" controls muted playsinline loop preload="none"></video><img class="cr-wm" src="assets/fs-logo-white.png" alt=""></div>`
       : `<img src="${g.image_url}" alt="${g.marca} ${g.nombre_modelo}" loading="lazy">`;
+    const full = document.createElement("button"); full.type = "button"; full.className = "cr-full";
+    full.setAttribute("aria-label", t("cr.pantalla")); full.title = t("cr.pantalla"); full.textContent = "⤢";
+    full.onclick = () => crLightbox(g);
     const fm = CR_FORMATS.find(f => f.ch === g.channel && f.f === g.format);
     fig.innerHTML = `${media}<figcaption><b>${g.nombre_modelo}</b> · ${g.marca}<br>
       <s>${eur2.format(g.price_now)}</s> <span class="cr-rec">${eur2.format(g.price_rec)}</span><br>
-      <small>${fm ? fm.label : g.channel} · ${t("cr.g."+g.goal)} · ${g.kind === "video" ? t("cr.video") : t("cr.imagen")}</small>
+      <small>${fm ? fm.label : g.channel} · ${t("cr.g."+g.goal)} · ${g.kind === "video" ? t("cr.video") : t("cr.imagen")} · ${(g.lang || "en").toUpperCase()}</small>
       <a href="${g.video_url || g.image_url}" download target="_blank" rel="noopener">${t("cr.descargar")}</a></figcaption>`;
+    fig.prepend(full);
+    const m = fig.querySelector("img:not(.cr-wm)");
+    if(m && !g.video_url){ m.style.cursor = "zoom-in"; m.onclick = () => crLightbox(g); }
     grid.append(fig);
   }
   sec.append(grid);
+}
+
+/* Full-screen view: a native <dialog> so focus, Esc and the backdrop work for
+   free; the browser's own fullscreen is offered on top for presenting. */
+function crLightbox(g){
+  const d = document.createElement("dialog"); d.className = "cr-lb";
+  d.setAttribute("aria-label", `${g.marca} ${g.nombre_modelo}`);
+  const media = g.video_url
+    ? `<video src="${g.video_url}" poster="${g.image_url}" controls autoplay muted playsinline loop></video>`
+    : `<img src="${g.image_url}" alt="${g.marca} ${g.nombre_modelo}">`;
+  d.innerHTML = `<div class="cr-lb-bar"><span>${g.nombre_modelo} · ${g.marca}</span>
+      <button type="button" class="cr-lb-fs">${t("cr.pantallaReal")}</button>
+      <a href="${g.video_url || g.image_url}" download target="_blank" rel="noopener">${t("cr.descargar")}</a>
+      <button type="button" class="cr-lb-x" aria-label="${t("cr.cerrar")}">×</button></div>
+    <div class="cr-lb-media">${media}</div>`;
+  document.body.append(d);
+  d.querySelector(".cr-lb-x").onclick = () => d.close();
+  d.querySelector(".cr-lb-fs").onclick = () => { const el = d.querySelector(".cr-lb-media"); (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); };
+  d.addEventListener("click", e => { if(e.target === d) d.close(); });
+  d.addEventListener("close", () => d.remove());
+  d.showModal();
 }
 
 /* La navegación de secciones. Patrón de pestañas completo —roles, aria-selected

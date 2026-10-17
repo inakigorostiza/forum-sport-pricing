@@ -108,7 +108,25 @@ const FORMATS: Record<string, { aspect: string; gen: string; video: boolean; sty
 };
 const GOALS = ["awareness", "sale", "clearance", "launch"];
 
-const eur = (n: number) => n.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€";
+/* Prices are written the way each language writes them: 222,00€ in Spanish,
+   €222.00 in English. */
+const eur = (n: number, lang: string) => lang === "es"
+  ? n.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "€"
+  : "€" + n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/* Every word a shopper reads, per language. */
+const COPY: Record<string, Record<string, string>> = {
+  en: {
+    awareness: "RUN YOUR WAY.", saleCut: "SAME PACE. LOWER PRICE.", sale: "YOUR NEXT PAIR.",
+    clearanceLow: "LAST PAIRS.", clearance: "DON'T MISS IT.", launch: "OUT NOW.",
+    stock: "LIMITED STOCK", online: "ONLINE ONLY", ai: "AI-generated image", lang: "English",
+  },
+  es: {
+    awareness: "CORRE A TU MANERA.", saleCut: "MISMO RITMO. MENOS PRECIO.", sale: "TU PRÓXIMO PAR.",
+    clearanceLow: "ÚLTIMAS UNIDADES.", clearance: "OPORTUNIDAD.", launch: "YA DISPONIBLE.",
+    stock: "STOCK LIMITADO", online: "SOLO ONLINE", ai: "Imagen generada con IA", lang: "Spanish",
+  },
+};
 
 type Model = {
   modelo: number; brand_code: string; nombre_modelo: string; tipo_producto: string;
@@ -119,24 +137,25 @@ type Model = {
 /* The prompt. Every word a shopper will read is fixed here, from the data:
    the model writes no claim of its own, and is told to leave the logo corner
    empty so the real logo can be composited afterwards. */
-function buildPrompt(m: Model, rec: number, goal: string, style: string) {
+function buildPrompt(m: Model, rec: number, goal: string, style: string, lang: string) {
+  const C = COPY[lang];
   const now = Number(m.precio_rebaja);
   const cut = rec < now - 0.5;
   const pct = cut ? Math.round((1 - rec / now) * 100) : 0;
   const lowStock = m.nivel_stock === "bajo" || m.nivel_stock === "muy bajo";
   const headline: Record<string, string> = {
-    awareness: "CORRE A TU MANERA.",
-    sale: cut ? "MISMO RITMO. MENOS PRECIO." : "TU PRÓXIMO PAR.",
-    clearance: lowStock ? "ÚLTIMAS UNIDADES." : "OPORTUNIDAD.",
-    launch: "YA DISPONIBLE.",
+    awareness: C.awareness,
+    sale: cut ? C.saleCut : C.sale,
+    clearance: lowStock ? C.clearanceLow : C.clearance,
+    launch: C.launch,
   };
   const badges: string[] = [];
   if (cut) badges.push(`a small square red tag with white text '-${pct}%'`);
-  if (lowStock) badges.push("a small black square sticker with white condensed caps 'STOCK LIMITADO'");
-  if (m.exclusivo_online) badges.push("a small black square sticker with white condensed caps 'SOLO ONLINE'");
+  if (lowStock) badges.push(`a small black square sticker with white condensed caps '${C.stock}'`);
+  if (m.exclusivo_online) badges.push(`a small black square sticker with white condensed caps '${C.online}'`);
   const price = cut
-    ? `the old price '${eur(now)}' smaller and struck through with a thin line, and the new price '${eur(rec)}' very large in a hand-lettered condensed brush script in red #E32219`
-    : `the price '${eur(rec)}' very large in a hand-lettered condensed brush script in red #E32219`;
+    ? `the old price '${eur(now, lang)}' smaller and struck through with a thin line, and the new price '${eur(rec, lang)}' very large in a hand-lettered condensed brush script in red #E32219`
+    : `the price '${eur(rec, lang)}' very large in a hand-lettered condensed brush script in red #E32219`;
   const layout: Record<string, string> = {
     poster: "Bold graphic retail poster: flat light grey #F2F2F2 background with one thick diagonal band in red #E32219 behind the product, crisp motion streaks.",
     story: "Vertical social story in a fresh collage style: flat light grey #F2F2F2 background, the product cut out with a thick white sticker outline, short red #E32219 speed marks, sticker-style labels.",
@@ -150,9 +169,9 @@ function buildPrompt(m: Model, rec: number, goal: string, style: string) {
     `All typography in bold condensed sans-serif capitals (Roboto Condensed style) in near-black #222222 unless stated. Headline: '${headline[goal]}'.`,
     `Price block: ${price}.`,
     badges.length ? `Also: ${badges.join("; ")}.` : "",
-    `Very small grey text in the bottom-right corner: 'Imagen generada con IA'.`,
+    `Very small grey text in the bottom-right corner: '${C.ai}'.`,
     `Leave the bottom-left corner completely empty and flat: a clean area of about 32% of the width and 13% of the height with no text, no objects and no logo. Do not write the words Forum Sport or any retailer logo anywhere.`,
-    `Square corners only, flat design, no emoji, no icons, no rounded buttons. Spanish text must be spelled exactly as given.`,
+    `All text is in ${C.lang}. Square corners only, flat design, no emoji, no icons, no rounded buttons. Text must be spelled exactly as given.`,
   ].filter(Boolean).join(" ");
 }
 
@@ -176,15 +195,16 @@ async function prepare(body: Record<string, unknown>) {
   const key = `${body.channel}:${body.format}`;
   const f = FORMATS[key];
   const goal = String(body.goal);
+  const lang = body.lang === "es" ? "es" : "en";
   if (!Number.isFinite(modelo) || !f || !GOALS.includes(goal)) throw new Error("bad request");
   if (kind === "video" && !f.video) throw new Error("this format has no video version");
   const m = await loadModel(modelo);
   const rec = Math.round(Number(body.price_rec) * 100) / 100;
   // The recommended price comes from the browser's engine; keep it sane.
   if (!(rec > 0 && rec <= Number(m.precio) && rec >= Number(m.precio_rebaja) * 0.3)) throw new Error("price out of range");
-  const prompt = buildPrompt(m, rec, goal, f.style);
+  const prompt = buildPrompt(m, rec, goal, f.style, lang);
   const imageBody = { prompt, image_urls: [m.img_full], aspect_ratio: f.gen, resolution: "2k", quality: "high" };
-  return { modelo, kind, f, goal, m, rec, prompt, imageBody, channel: String(body.channel), format: String(body.format) };
+  return { modelo, kind, f, goal, lang, m, rec, prompt, imageBody, channel: String(body.channel), format: String(body.format) };
 }
 
 Deno.serve(async (req) => {
@@ -216,7 +236,7 @@ Deno.serve(async (req) => {
         method: "POST",
         body: JSON.stringify({
           modelo: p.modelo, kind: p.kind, channel: p.channel, format: p.format, aspect: p.f.aspect,
-          goal: p.goal, prompt: p.prompt, price_now: p.m.precio_rebaja, price_rec: p.rec, status: "queued",
+          goal: p.goal, lang: p.lang, prompt: p.prompt, price_now: p.m.precio_rebaja, price_rec: p.rec, status: "queued",
         }),
       });
       try {
