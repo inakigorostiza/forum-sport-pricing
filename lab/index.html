@@ -739,6 +739,17 @@ kbd{font-family:var(--font-mono); font-size:.8125em; padding:1px 6px; border:1px
   background:var(--ie-navy); color:#c9d2e6}
 .team-q .team-tag{color:#8fa3cc}
 .team-q ol{margin:var(--s-1) 0 0; padding-left:20px; display:grid; gap:4px; font-size:.9375rem; color:#fff}
+
+/* Pie: el lockup IE + Next Best You en blanco (no hay versión clara del
+   archivo, así que se pasa a monocromo con un filtro) y el profesorado. */
+footer .ft-logo{height:56px; width:auto; filter:brightness(0) invert(1)}
+.ft-prof{text-align:right}
+.ft-h{margin:0 0 6px; font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#8fa3cc}
+.ft-prof ul{margin:0; padding:0; list-style:none; display:grid; gap:4px}
+.ft-prof b{color:#fff; font-weight:600} .ft-prof b:not(:last-child){margin-right:8px}
+footer a{color:#c9d2e6; text-decoration-color:var(--accent)}
+footer a:hover{color:#fff}
+@media(max-width:620px){ .ft-prof{text-align:left} }
 </style>
 </head>
 <body>
@@ -2231,8 +2242,14 @@ Finally, list any key that exists in one language and not the other.</pre>
 
 <footer>
   <div class="wrap">
-    <img src="/lab/assets/ie-logo-light.svg" alt="IE Business School">
-    <span>End-to-end AI Marketing Lab · Figures measured 13 October 2026 on live data.</span>
+    <img class="ft-logo" src="/lab/assets/next-best-you.webp" alt="IE Business School · Igniting the next best you" width="860" height="342">
+    <div class="ft-prof">
+      <p class="ft-h">End-to-End AI Marketing Lab &middot; Professors</p>
+      <ul>
+        <li><b>I&ntilde;aki Gorostiza</b> <a href="mailto:igorostiza@faculty.ie.edu">igorostiza@faculty.ie.edu</a></li>
+        <li><b>Cristina Carranza</b></li>
+      </ul>
+    </div>
   </div>
 </footer>
 
