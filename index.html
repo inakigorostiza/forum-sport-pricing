@@ -768,6 +768,11 @@ footer a{color:var(--ink-2)}
 .cr-card figcaption a{display:inline-block; margin-top:6px; font-weight:700; color:var(--ink)}
 .cr-rec{font-family:var(--price); font-size:20px; color:var(--fs-red)}
 .cr-vid{position:relative} .cr-wm{position:absolute; left:8px; bottom:44px; width:30%!important; background:transparent!important; pointer-events:none}
+
+.cr-tabs{display:flex; gap:0; border-bottom:1px solid var(--rule); margin:0 0 16px}
+.cr-tab{font:700 13px var(--display); text-transform:uppercase; letter-spacing:var(--tracking-nav); padding:10px 16px; margin-bottom:-1px;
+  border:0; border-bottom:3px solid transparent; background:none; color:var(--muted); cursor:pointer}
+.cr-tab.on{color:var(--ink); border-bottom-color:var(--fs-red)}
 </style>
 </head>
 <body>
@@ -885,7 +890,8 @@ const T = {
 "cr.st.failed":  {es:"No se pudo generar: {d}", en:"Generation failed: {d}"},
 "cr.galeria":    {es:"Galería", en:"Gallery"},
 "cr.galeriaSub": {es:"Todas las creatividades generadas, de la más reciente a la más antigua.", en:"Every creative generated, newest first."},
-"cr.vacia":      {es:"Todavía no hay creatividades.", en:"No creatives yet."},
+"cr.vacia":      {es:"Todavía no hay creatividades. Elige un producto en «Productos» y genera la primera.", en:"No creatives yet. Pick a product under Products and generate the first one."},
+"cr.vProductos":  {es:"Productos", en:"Products"},
 "cr.descargar":  {es:"Descargar", en:"Download"},
 "cr.filtroTodo": {es:"Todo", en:"All"},
 "cr.hfSetup":    {es:"Falta la clave de la API de Higgsfield.", en:"The Higgsfield API key is missing."},
@@ -3683,7 +3689,7 @@ let crQ = "", crBrand = "", crShown = 40, crSel = null;
 let crForm = {kind:"image", fmt:0, goal:"sale"};
 let crJob = null;          // {id, stage, detail}
 let crCost = null, crFallo = null;
-let crGallery = null, crGalFiltro = "all";
+let crGallery = null, crGalFiltro = "all", crVista = "products";
 
 async function crApi(payload, raw=false){
   const r = await fetch(`${URL_}/functions/v1/creative-studio`, {
@@ -3759,6 +3765,7 @@ async function crRun(row){
     crFallo = e; if(crJob) crJob.stage = "failed";
     if(e.status === 401) crForgetToken();
   }
+  if(crJob && crJob.stage === "done") crVista = "gallery";
   render(); crLoadGallery();
 }
 
@@ -3790,6 +3797,16 @@ function seccionCreative(app){
   const sec = document.createElement("section"); sec.className = "card wide";
   sec.innerHTML = `<h2>${t("cr.titulo")}</h2><p class="sub">${t("cr.sub")}</p>`;
   app.append(sec);
+
+  /* Two views: the products to create from, and the gallery of what exists. */
+  const tabs = document.createElement("div"); tabs.className = "cr-tabs"; tabs.setAttribute("role","tablist");
+  for(const [k, label] of [["products", t("cr.vProductos")], ["gallery", t("cr.galeria") + ` (${(crGallery||[]).length})`]]){
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("role","tab");
+    b.setAttribute("aria-selected", crVista === k); b.className = "cr-tab" + (crVista === k ? " on" : ""); b.textContent = label;
+    b.onclick = () => { crVista = k; render(); }; tabs.append(b);
+  }
+  sec.append(tabs);
+  if(crVista === "gallery"){ crGalleryInto(sec); return; }
 
   /* panel for the selected product */
   if(crSel !== null){
@@ -3828,8 +3845,6 @@ function seccionCreative(app){
     const more = document.createElement("button"); more.type = "button"; more.className = "ghost"; more.textContent = t("cr.mas");
     more.onclick = () => { crShown += 40; render(); }; sec.append(more);
   }
-
-  app.append(crGallerySection());
 }
 
 function crPanel(row){
@@ -3904,9 +3919,8 @@ function crPanel(row){
   return box;
 }
 
-function crGallerySection(){
-  const sec = document.createElement("section"); sec.className = "card wide";
-  sec.innerHTML = `<h2>${t("cr.galeria")}</h2><p class="sub">${t("cr.galeriaSub")}</p>`;
+function crGalleryInto(sec){
+  const sub = document.createElement("p"); sub.className = "sub"; sub.textContent = t("cr.galeriaSub"); sec.append(sub);
   const chans = ["all", ...new Set((crGallery||[]).map(g => g.channel))];
   const fb = document.createElement("div"); fb.className = "cr-filt";
   for(const c of chans){
@@ -3916,7 +3930,7 @@ function crGallerySection(){
   }
   sec.append(fb);
   const list = (crGallery||[]).filter(g => crGalFiltro === "all" || g.channel === crGalFiltro);
-  if(!list.length){ const p = document.createElement("p"); p.className = "note"; p.textContent = t("cr.vacia"); sec.append(p); return sec; }
+  if(!list.length){ const p = document.createElement("p"); p.className = "note"; p.textContent = t("cr.vacia"); sec.append(p); return; }
   const grid = document.createElement("div"); grid.className = "cr-grid";
   for(const g of list){
     const fig = document.createElement("figure"); fig.className = "cr-card";
@@ -3931,7 +3945,6 @@ function crGallerySection(){
     grid.append(fig);
   }
   sec.append(grid);
-  return sec;
 }
 
 /* La navegación de secciones. Patrón de pestañas completo —roles, aria-selected
