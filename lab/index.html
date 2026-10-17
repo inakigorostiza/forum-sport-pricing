@@ -542,6 +542,20 @@ code{
 .side-tests li::before{content:counter(t,decimal-leading-zero); position:absolute; left:0; top:0;
   font-family:var(--font-display); font-weight:800; color:var(--accent-strong)}
 .side-tests b{color:var(--ie-navy)}
+
+/* Overview: las dos disciplinas, con los mismos colores que sus tarjetas. */
+.ov{margin-top:var(--s-4)}
+.ov-card{background:var(--white); border:1px solid var(--g-300); border-top:4px solid var(--accent-strong);
+  border-radius:var(--radius); padding:var(--s-3)}
+.ov-dir{border-top-color:var(--ie-navy)}
+.ov-tag{display:inline-block; font-family:var(--font-display); font-size:.6875rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.12em; color:#fff; background:var(--accent-strong);
+  padding:3px 8px; border-radius:var(--radius-sm)}
+.ov-dir .ov-tag{background:var(--ie-navy)}
+.ov-card h3{margin:var(--s-2) 0 var(--s-1); font-size:1.125rem}
+.ov-card p{font-size:.9375rem; margin:0 0 var(--s-2)}
+.ov-when{margin:0!important; padding-top:var(--s-1); border-top:1px solid var(--g-300);
+  font-size:.6875rem!important; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--g-600)}
 </style>
 </head>
 <body>
@@ -699,8 +713,32 @@ code{
     <p class="lead prose rv">This is the finished tool, running on real data. By week 6
       yours does the same three things: shows the catalogue, shows what every rival charges
       for the same shoe, and recommends a price with the reason attached.</p>
+    <p class="prose rv">The tool is half of what you deliver. A price nobody can check, or an
+      explanation nobody wants to read aloud, never gets applied. Two disciplines run through
+      the six weeks, and each has its own card in the sessions.</p>
 
-    <div class="video rv">
+    <div class="two ov rv">
+      <div class="ov-card ov-data">
+        <span class="ov-tag">Measure</span>
+        <h3>Data</h3>
+        <p>Every process is measured the week you build it: does the catalogue match its
+          source, does the scraper cover enough of the market and stay fresh, does the
+          configurator follow its own rules every time. Without those numbers nobody can
+          tell a good recommendation from a lucky one, least of all the client.</p>
+        <p class="ov-when">Weeks 2 to 5 &middot; one KPI log</p>
+      </div>
+      <div class="ov-card ov-dir">
+        <span class="ov-tag">Creative direction</span>
+        <h3>Creative direction</h3>
+        <p>The assistant will write 1,483 explanations and make any visual you ask for. Your
+          team decides how they must sound and look: the voice of every explanation, and one
+          piece on how Forum Sport communicates a price to the shopper. Directed, with the
+          reasoning written down, not generated and accepted.</p>
+        <p class="ov-when">Weeks 4 and 6 &middot; one direction log</p>
+      </div>
+    </div>
+
+    <div class="video rv" style="margin-top:var(--s-6)">
       <iframe src="https://www.youtube-nocookie.com/embed/nhxEy5DFKs8?rel=0&amp;modestbranding=1"
               title="End-to-end AI Marketing Lab, walkthrough of the finished tool"
               loading="lazy" allowfullscreen
