@@ -454,7 +454,7 @@ footer img{height:36px}
 .pillars-base b{color:#fff; font-size:.875rem; font-weight:600}
 
 /* Rúbrica: cinco columnas, y las tres de banda son prosa. */
-.t-rubric th:nth-child(1){width:17%} .t-rubric th:nth-child(2){width:8%}
+.t-rubric th:nth-child(1){width:18%} .t-rubric th:nth-child(2){width:8%} .t-rubric th:nth-child(4){width:20%}
 .t-rubric td{font-size:.875rem; line-height:1.5}
 #stack table td:last-child, #stack table th:last-child{white-space:nowrap}
 .t-rubric .wt{font-family:var(--font-display); font-weight:800; color:var(--ie-navy);
@@ -662,6 +662,21 @@ code{
 .tool-logo svg{width:20px; height:20px}
 .tool-img{overflow:hidden; border:0}
 .tool-img img{width:36px; height:36px; display:block}
+
+/* Rúbrica: la escala de 0 a 10 y las listas de comprobación. */
+.scale{display:grid; gap:var(--s-2); grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:900px){ .scale{grid-template-columns:repeat(4,minmax(0,1fr))} }
+.sc{background:var(--white); border:1px solid var(--g-300); border-top:4px solid var(--c);
+  border-radius:var(--radius); padding:var(--s-2) var(--s-3) var(--s-3)}
+.sc-1{--c:#b8b8b8} .sc-2{--c:#0097dc} .sc-3{--c:#2f6fed} .sc-4{--c:#0a1a3c}
+.sc-n{display:block; font-family:var(--font-display); font-weight:800; font-size:1.75rem;
+  color:var(--ie-navy); font-variant-numeric:tabular-nums; line-height:1.1}
+.sc b{display:block; margin:4px 0 6px; font-size:.75rem; text-transform:uppercase;
+  letter-spacing:.1em; color:var(--ie-navy)}
+.sc p{margin:0; font-size:.875rem; line-height:1.45}
+.rb-list{margin:0; padding:0; list-style:none; display:grid; gap:4px}
+.rb-list li{position:relative; padding-left:18px}
+.rb-list li::before{content:"\2713"; position:absolute; left:0; top:0; font-weight:700; color:var(--accent-strong)}
 </style>
 </head>
 <body>
@@ -1169,51 +1184,65 @@ code{
     </div>
     <h2 class="rv">How you will be marked</h2>
     <p class="lead prose rv">Half the mark is the working tool. The other half is split
-      evenly across the five areas around it, which is how a tool that runs but carries no
-      strategy, no measurement and no compliance still fails. Within each row the same
-      question decides it: can you show it, and can you defend it? The table states what a
-      distinction requires. Both sections of the cohort are marked against it.</p>
+      evenly across five areas around it, so a tool that runs but has no strategy, no
+      measurement and no compliance still fails. Every area is graded the same way, out of 10.</p>
 
+    <h3 class="rv">One scale for every area</h3>
+    <div class="scale rv">
+      <div class="sc sc-1"><span class="sc-n">0&ndash;4</span><b>Missing</b><p>Not there, or there with nothing to show for it.</p></div>
+      <div class="sc sc-2"><span class="sc-n">5&ndash;6</span><b>Done</b><p>It exists and it works.</p></div>
+      <div class="sc sc-3"><span class="sc-n">7&ndash;8</span><b>Solid</b><p>It works, and you can explain every number in it.</p></div>
+      <div class="sc sc-4"><span class="sc-n">9&ndash;10</span><b>Outstanding</b><p>It holds up when someone outside the team uses it or questions it.</p></div>
+    </div>
+
+    <h3 class="rv">What we look at in each area</h3>
     <div class="tbl rv">
       <table class="t-rubric">
-        <thead><tr>
-          <th>Area</th><th>Weight</th>
-          <th>Distinction<br><span class="rb">80–100</span></th>
-        </tr></thead>
+        <thead><tr><th>Area</th><th>Weight</th><th>What we check</th><th>Where we see it</th></tr></thead>
         <tbody>
           <tr>
             <td><b>The MVP</b></td>
             <td class="wt">50%</td>
-            <td>A working tool at a public address, on live data, that a category manager could open unaided: the catalogue, what each rival charges, a recommended price per model and the rule that decided it. It holds up when someone outside the team drives it.</td>
+            <td><ul class="rb-list"><li>A public link, running on live data</li><li>The catalogue, what each rival charges, and a recommended price with its reason</li><li>Someone outside the team can use it without help</li></ul></td>
+            <td>The live link, and the week 6 demo</td>
           </tr>
           <tr>
             <td><b>Strategy and governance</b></td>
             <td class="wt">10%</td>
-            <td>A governance pack that names what the system is for, who owns it, what it must never do, and how a wrong recommendation is caught. Tied to the client's marketing strategy, not to the technology.</td>
+            <td><ul class="rb-list"><li>A pricing policy that says what role each segment plays</li><li>What the tool is for, who owns it and what it must never do</li><li>How a wrong price gets caught before it is applied</li></ul></td>
+            <td>The governance pack, at every check-in</td>
           </tr>
           <tr>
             <td><b>Brand</b></td>
             <td class="wt">10%</td>
-            <td>The solution looks and sounds like the client&rsquo;s: colours, type and voice taken from the client&rsquo;s own site, written down once as named values and applied everywhere, and it holds up on a phone.</td>
+            <td><ul class="rb-list"><li>Forum Sport&rsquo;s colours, type and voice</li><li>Applied everywhere, not page by page</li><li>Readable on a phone</li></ul></td>
+            <td>The tool, from week 5</td>
           </tr>
           <tr>
             <td><b>Creative direction</b></td>
             <td class="wt">10%</td>
-            <td>The explanation sentences follow a template, a tone and a never-say list the team wrote, and pass a read-aloud test. One price-communication piece for a category or product is on brand and consistent with the pricing policy, its AI visuals pass the team&rsquo;s quality checklist, and every AI-generated asset is labelled. Both are directed, with the brief, the rejected versions and the reasoning in the direction log, not generated and accepted.</td>
+            <td><ul class="rb-list"><li>The explanation sentence: template, tone, never-say list, read-aloud test</li><li>The price piece: messages, AI visuals, quality checklist, labels</li><li>The briefs and the rejected versions, with the reasons</li></ul></td>
+            <td>Weeks 4 and 5, and the direction log</td>
           </tr>
           <tr>
             <td><b>Data and measurement</b></td>
             <td class="wt">10%</td>
-            <td>A data layer that holds up, and every process measured the week it was built, with its KPIs, targets and results in the KPI log: load completeness, scraper coverage and freshness, configurator compliance and coherence, the price piece&rsquo;s impressions, clicks and click-through rate, and AI Act checks: labelling, a person deciding, transparency on screen. Baselines taken before the engine, simulated impact against them, an override log.</td>
+            <td><ul class="rb-list"><li>Every Measure card from weeks 2 to 5 filled in, against its target</li><li>Baselines, and the simulated impact against them</li><li>Impressions and clicks on the price piece</li></ul></td>
+            <td>The KPI log, at every check-in</td>
           </tr>
-                  <tr>
+          <tr>
             <td><b>GDPR and AI compliance</b></td>
             <td class="wt">10%</td>
-            <td>A register that states, for every source and every use of the assistant: what is collected, the lawful basis for holding it, what personal data you deliberately do not collect, where it is stored and for how long, and who is accountable. The system&rsquo;s risk class under the EU AI Act is argued rather than asserted, and the person who applies the price is documented as the decision-maker, not named in a disclaimer.</td>
+            <td><ul class="rb-list"><li>A register of what data you hold, why, for how long and who answers for it</li><li>The system&rsquo;s EU AI Act risk class, argued</li><li>A person decides every price, and every AI asset is labelled</li></ul></td>
+            <td>The register, and week 5&rsquo;s checks</td>
           </tr>
-</tbody>
+        </tbody>
       </table>
     </div>
+    <p class="prose rv" style="margin-top:var(--s-3); font-size:.9375rem">Your final mark is the
+      weighted sum: the MVP&rsquo;s score counts five times, every other area once. Work shown
+      at the check-ins counts; work that appears only in the last weekend does not reach
+      &ldquo;Solid&rdquo;.</p>
   </div>
 </section>
 
