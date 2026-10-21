@@ -37,6 +37,35 @@ h1{
 }
 h1 span{ color:var(--red); }
 p{ margin-top:1rem; color:var(--muted); font-size:1.125rem; }
+
+/* A yellow cat that walks back and forth along the bottom of the page.
+   The walk moves the wrapper; the flip turns it round at each end; the body
+   bobs and the legs and tail swing on their own shorter loops. */
+html,body{ overflow-x:hidden; }
+.cat{
+  position:fixed; bottom:12px; left:0; width:120px; height:84px;
+  pointer-events:none;
+  animation:cat-walk 14s linear infinite;
+}
+.cat svg{ width:100%; height:100%; overflow:visible; animation:cat-turn 14s steps(1) infinite; }
+.cat .body{ animation:cat-bob .5s ease-in-out infinite alternate; }
+.cat .leg{ transform-box:fill-box; transform-origin:50% 0; animation:cat-step .5s ease-in-out infinite alternate; }
+.cat .leg.b{ animation-delay:-.25s; }
+.cat .tail{ transform-box:fill-box; transform-origin:0% 100%; animation:cat-tail 1.2s ease-in-out infinite alternate; }
+@keyframes cat-walk{
+  0%  { transform:translateX(-130px); }
+  50% { transform:translateX(calc(100vw + 10px)); }
+  100%{ transform:translateX(-130px); }
+}
+@keyframes cat-turn{ 0%{ transform:scaleX(1); } 50%{ transform:scaleX(-1); } }
+@keyframes cat-bob{ to{ transform:translateY(-3px); } }
+@keyframes cat-step{ from{ transform:rotate(18deg); } to{ transform:rotate(-18deg); } }
+@keyframes cat-tail{ from{ transform:rotate(-12deg); } to{ transform:rotate(14deg); } }
+/* No motion for people who ask for none: the cat just sits in the corner. */
+@media (prefers-reduced-motion: reduce){
+  .cat, .cat svg, .cat .body, .cat .leg, .cat .tail{ animation:none; }
+  .cat{ left:16px; }
+}
 </style>
 </head>
 <body>
@@ -44,5 +73,25 @@ p{ margin-top:1rem; color:var(--muted); font-size:1.125rem; }
   <h1>Hello, <span>world</span></h1>
   <p>It works.</p>
 </main>
+<div class="cat" aria-hidden="true">
+  <svg viewBox="0 0 120 84">
+    <g class="body">
+      <path class="tail" d="M22 44 C6 40 4 22 14 14" fill="none" stroke="#F5C518" stroke-width="7" stroke-linecap="round"/>
+      <rect class="leg"   x="30" y="54" width="8" height="22" rx="4" fill="#E0B000"/>
+      <rect class="leg b" x="44" y="54" width="8" height="22" rx="4" fill="#F5C518"/>
+      <rect class="leg"   x="70" y="54" width="8" height="22" rx="4" fill="#E0B000"/>
+      <rect class="leg b" x="84" y="54" width="8" height="22" rx="4" fill="#F5C518"/>
+      <ellipse cx="60" cy="48" rx="40" ry="16" fill="#F5C518"/>
+      <path d="M44 38 l6 -4 M58 36 l6 -4 M72 38 l6 -4" stroke="#E0B000" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="98" cy="34" r="16" fill="#F5C518"/>
+      <path d="M86 24 L88 8 L97 20 Z M100 20 L110 8 L111 25 Z" fill="#F5C518"/>
+      <path d="M89 20 L90 13 L95 19 Z M103 19 L108 13 L108 21 Z" fill="#F7A8B8"/>
+      <circle cx="93" cy="32" r="2.4" fill="#222"/>
+      <circle cx="104" cy="32" r="2.4" fill="#222"/>
+      <path d="M97 38 l1.5 1.6 1.5 -1.6 Z" fill="#E86A7A"/>
+      <path d="M90 39 h-12 M90 41 l-11 3 M106 39 h12 M106 41 l11 3" stroke="#222" stroke-width="1" stroke-linecap="round"/>
+    </g>
+  </svg>
+</div>
 </body>
 </html>
