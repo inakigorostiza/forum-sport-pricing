@@ -783,6 +783,100 @@ footer a:hover{color:#fff}
 .fix-os{margin:var(--s-3) 0 4px!important; font-size:.6875rem!important; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-strong)}
 .fix ol{margin:0 0 var(--s-1); padding-left:20px; display:grid; gap:6px}
 .fix .prompt.cmd{margin:6px 0}
+
+/* ── Week 4: how the price is decided ─────────────────────────────── */
+.pk{margin-top:var(--s-4)}
+.pk-h{margin:0 0 var(--s-2); font-family:var(--font-display); font-weight:800; font-size:.8125rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-strong)}
+.pk-grid{display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.pk-card{background:var(--white); border:1px solid var(--g-300); border-radius:var(--radius); padding:12px 14px}
+.pk-card b{display:block; color:var(--ie-navy); font-size:.875rem}
+.pk-card p{margin:4px 0 0; font-size:.8125rem; line-height:1.45; color:var(--g-900)}
+.pk-wide{grid-column:1/-1}
+@media(min-width:900px){ .pk-wide{grid-column:span 2} }
+.abcd{display:flex; gap:8px; align-items:flex-end; margin-top:10px; height:96px}
+.abcd span{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:2px}
+.abcd i{display:block; width:100%; max-width:46px; height:var(--h); background:linear-gradient(var(--accent-strong),var(--ie-navy)); border-radius:3px 3px 0 0; transform-origin:bottom; animation:grow 900ms var(--ease) both}
+.abcd b{font-family:var(--font-display); font-size:.875rem!important; color:var(--ie-navy)}
+.abcd em{font-style:normal; font-size:.6875rem; color:var(--g-600); white-space:nowrap}
+@keyframes grow{from{transform:scaleY(0)}}
+
+.flow{list-style:none; margin:var(--s-6) 0 0; padding:0; display:grid; gap:var(--s-3); position:relative}
+@media(min-width:1000px){ .flow{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.fl{position:relative; background:var(--white); border:1px solid var(--g-300); border-top:4px solid var(--accent-strong); border-radius:var(--radius); padding:var(--s-3) var(--s-3) var(--s-3) calc(var(--s-3) + 46px);
+  animation:rise 700ms var(--ease) both; animation-delay:calc(var(--i)*120ms)}
+@keyframes rise{from{opacity:0; transform:translateY(14px)}}
+.fl-n{position:absolute; left:var(--s-3); top:var(--s-3); width:34px; height:34px; border-radius:50%; background:var(--ie-navy); color:#fff; display:grid; place-items:center; font-family:var(--font-display); font-weight:800}
+.fl h4{margin:4px 0 6px; font-size:1rem; letter-spacing:.02em; text-transform:none; color:var(--ie-navy)}
+.fl p{font-size:.9375rem; margin:0 0 10px}
+.fl-note{font-size:.8125rem!important; color:var(--g-900); border-left:3px solid var(--g-300); padding-left:10px}
+.fl-vis{width:100%; max-width:340px; height:auto; display:block; margin:6px 0 10px}
+.fl-t{font:700 11px var(--font-sans); fill:#2f6fed; letter-spacing:.06em; text-transform:uppercase}
+.fl-s{font:400 10.5px var(--font-sans); fill:#6b6b6b}
+.med{animation:pulse 1.8s ease-in-out infinite; transform-origin:130px 40px}
+@keyframes pulse{50%{transform:scale(1.25)}}
+
+.hm{display:grid; gap:4px; font-size:.75rem}
+.hm-row{display:grid; grid-template-columns:110px repeat(3,1fr); gap:4px; align-items:stretch}
+.hm-head div{font-size:.625rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--g-600); text-align:center}
+.hm-lab{display:flex; flex-direction:column; justify-content:center}
+.hm-lab b{color:var(--ie-navy); font-size:.75rem} .hm-lab span{color:var(--g-600); font-size:.6875rem}
+.hm-cell{background:var(--bg); color:var(--fg); border-radius:4px; min-height:58px; padding:6px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;
+  animation:pop 500ms var(--ease) both; animation-delay:calc(300ms + var(--i)*60ms); transition:transform var(--t) var(--ease)}
+.hm-cell:hover{transform:scale(1.06)}
+.hm-v{font-family:var(--font-display); font-weight:800; font-size:1.125rem}
+.hm-n{font-size:.625rem; line-height:1.2; margin-top:2px; font-weight:600}
+@keyframes pop{from{opacity:0; transform:scale(.8)}}
+
+.adj{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px}
+.adj-c{font-size:.8125rem; padding:6px 10px; border-radius:999px; border:1px solid var(--g-300); background:var(--g-100); animation:rise 500ms var(--ease) both; animation-delay:calc(400ms + var(--i)*90ms)}
+.adj-c b{font-family:var(--font-display); margin-right:4px}
+.adj-c.dn b{color:var(--creative)} .adj-c.up b{color:#137333}
+.cap-bar{position:relative; height:10px; border-radius:5px; background:linear-gradient(90deg,var(--creative) 0%, #f3c0bd 70%, #cfe9d8 80%, #137333 100%)}
+.cap-z{position:absolute; left:80%; top:-4px; bottom:-4px; width:2px; background:var(--ie-navy)}
+.cap-l{display:flex; justify-content:space-between; font-size:.6875rem; color:var(--g-600); margin-top:4px; position:relative}
+.cap-l span:nth-child(2){position:absolute; left:80%; transform:translateX(-50%)}
+.capx p{font-size:.8125rem!important; margin:6px 0 0}
+
+.bands{display:grid; gap:6px; margin-bottom:10px}
+.bd{display:grid; grid-template-columns:62px 98px 1fr; grid-template-areas:"n r bar" "t t c"; gap:2px 10px; align-items:center; font-size:.8125rem;
+  padding:6px 0; border-bottom:1px solid var(--g-300); animation:rise 500ms var(--ease) both; animation-delay:calc(500ms + var(--i)*80ms)}
+.bd-n{grid-area:n; font-weight:700; color:var(--ie-navy)} .bd-r{grid-area:r; color:var(--g-600)}
+.bd-bar{grid-area:bar; height:8px; background:var(--g-100); border-radius:4px; overflow:hidden}
+.bd-floor{display:block; height:100%; background:var(--accent-strong); border-radius:4px; animation:grow-x 900ms var(--ease) both; animation-delay:calc(700ms + var(--i)*80ms)}
+@keyframes grow-x{from{width:0}}
+.bd-t{grid-area:t} .bd-c{grid-area:c; text-align:right; color:var(--g-900)}
+
+.calc{margin-top:var(--s-6); border:2px solid var(--ie-navy); border-radius:var(--radius); background:var(--white); padding:var(--s-3)}
+.calc-h{display:flex; justify-content:space-between; align-items:center; gap:var(--s-2); flex-wrap:wrap; margin-bottom:var(--s-2)}
+.calc-pre{display:flex; gap:6px; flex-wrap:wrap}
+.calc-pre button{font:700 .75rem var(--font-sans); text-transform:uppercase; letter-spacing:.06em; padding:7px 12px; border:1px solid var(--g-300); border-radius:999px; background:var(--white); color:var(--ie-navy); cursor:pointer}
+.calc-pre button[aria-pressed="true"]{background:var(--ie-navy); color:#fff; border-color:var(--ie-navy)}
+.calc-in{display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); align-items:end}
+.calc-in label{display:flex; flex-direction:column; gap:4px; font-size:.75rem; font-weight:700; color:var(--g-600); text-transform:uppercase; letter-spacing:.06em}
+.calc-in input, .calc-in select{font:inherit; font-size:.9375rem; text-transform:none; letter-spacing:0; font-weight:400; color:var(--ie-ink); padding:8px 10px; border:1px solid var(--g-300); border-radius:var(--radius); background:var(--white)}
+.calc-ck{grid-column:1/-1; display:flex; gap:14px; flex-wrap:wrap}
+.calc-ck label{flex-direction:row; align-items:center; gap:6px; text-transform:none; letter-spacing:0; font-size:.875rem; color:var(--ie-ink); font-weight:600}
+.calc-ck input{accent-color:var(--accent-strong); width:16px; height:16px}
+.calc-out{margin-top:var(--s-3); padding-top:var(--s-3); border-top:1px solid var(--g-300)}
+.lanes{display:grid; gap:10px}
+.ln{display:grid; grid-template-columns:230px 1fr; gap:14px; align-items:center}
+.ln-l em{white-space:nowrap}
+.ln-l{font-size:.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--g-600); display:flex; justify-content:space-between; gap:8px}
+.ln-l em{font-style:normal; font-family:var(--font-display); font-size:.875rem; letter-spacing:0; color:var(--ie-navy)}
+.ln-t{position:relative; height:22px; background:var(--g-100); border-radius:11px}
+.dot{position:absolute; top:50%; width:16px; height:16px; border-radius:50%; transform:translate(-50%,-50%); transition:left 600ms var(--ease)}
+.dot.ref{background:var(--g-600)} .dot.tgt{background:var(--accent-strong)}
+.dot.fin{width:22px; height:22px; background:var(--creative); box-shadow:0 0 0 4px rgba(192,38,34,.18)}
+.ln-fin .ln-l em{color:var(--creative); font-size:1rem}
+.rng{position:absolute; top:3px; bottom:3px; border-radius:8px; background:rgba(47,111,237,.25); border:1px solid rgba(47,111,237,.6); transition:left 600ms var(--ease), width 600ms var(--ease)}
+.rng.cross{background:repeating-linear-gradient(45deg,rgba(192,38,34,.22) 0 6px,transparent 6px 12px); border-color:var(--creative)}
+@media(max-width:560px){ .ln{grid-template-columns:1fr} }
+.calc-steps{display:grid; gap:6px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); margin-top:var(--s-3)}
+.cs{background:var(--g-100); border-radius:var(--radius); padding:8px 10px}
+.cs b{display:block; font-size:.625rem; text-transform:uppercase; letter-spacing:.08em; color:var(--g-600)}
+.cs span{font-family:var(--font-display); font-weight:800; font-size:1.0625rem; color:var(--ie-navy)}
+.cs.fin{background:var(--ie-navy)} .cs.fin b{color:#8fa3cc} .cs.fin span{color:#fff}
+.calc-why{margin:var(--s-2) 0 0; font-size:.9375rem; font-weight:600; color:var(--ie-navy)}
 </style>
 </head>
 <body>
@@ -1095,8 +1189,8 @@ footer a:hover{color:#fff}
 
     <div class="facts rv" style="margin-top:var(--s-4)">
       <div class="fact"><p class="n">24,109</p><p class="c">SKUs behind 1,483 models</p></div>
-      <div class="fact"><p class="n">742</p><p class="c">Models with a competitor price</p></div>
-      <div class="fact"><p class="n">495</p><p class="c">Where margin beats alignment</p></div>
+      <div class="fact"><p class="n">820</p><p class="c">Models with a competitor price</p></div>
+      <div class="fact"><p class="n">417</p><p class="c">Where margin beats alignment</p></div>
       <div class="fact"><p class="n">4</p><p class="c">Sections: overview, explorer, pricing, scraping</p></div>
     </div>
 
@@ -1911,87 +2005,130 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
       <li>Score the data quality, separately from the price.</li>
     </ol>
 
-    <h3 class="rv">The rules, one step at a time</h3>
-    <p class="prose rv">Every number below is a default in the configurator, editable on screen.
-      The band matrix is the client&rsquo;s, unmodified. The client gave the direction of the
-      other rules in words; the figures that translate them are ours, and your team may argue
-      for different ones in its pricing policy.</p>
+    <h3 class="rv">How the price is decided</h3>
+    <p class="lead prose rv">Four steps, always in the same order. Read them like a recipe: each one
+      starts from what the step before left on the table.</p>
 
-    <div class="how rv">
-      <div><b>1 · Reference</b><p>If the manager fixes a rival for a product, that rival is
-        the reference. Otherwise it is the <b>median</b> of the rivals selected in the
-        filters, switchable to the cheapest or the mean. The median stops one odd price
-        dragging the recommendation.</p></div>
-      <div><b>2 · Demand &times; stock</b><p>Demand from the online ABCD class: high is AA and
-        A, medium is B and unclassified, low is C and D. Stock: low is very low and low, high
-        is high and very high. The grid below gives the target as a percentage of the
-        reference. The four corners are the client&rsquo;s four rules.</p></div>
-      <div><b>3 · Context</b><p>Points are added to the target. The sum is capped between
-        &minus;8 and +2, so no stack of labels runs away with the price.</p></div>
-      <div><b>4 · Barriers</b><p>The band is set by today&rsquo;s selling price. The floor is
-        the higher of cost &divide; (1 &minus; min. margin %) and cost + min. margin &euro;,
-        <b>both of them, not whichever is convenient</b>. The ceiling is the reference
-        &times; the band&rsquo;s maximum alignment, plus 3 points for an online exclusive.
-        Never above list price, and an outlet price never goes up. When floor and ceiling
-        collide, margin wins, and the row says so out loud.</p></div>
-      <div><b>5 · Close</b><p>No rival at all: the price can only go down, never up. One
-        rival: recommend, but flag the row as weak evidence. Round to the euro without
-        breaking a barrier. Every row carries one sentence naming the rule that decided it,
-        and a person, not the tool, applies the price.</p></div>
+    <div class="pk rv">
+      <p class="pk-h">First, what the tool knows about each shoe</p>
+      <div class="pk-grid">
+        <div class="pk-card pk-wide"><b>Sales class</b><p>A grade for how much it sells online.</p>
+          <div class="abcd">
+            <span style="--h:100%"><i></i><b>AA</b><em>sells a lot</em></span>
+            <span style="--h:78%"><i></i><b>A</b><em>sells well</em></span>
+            <span style="--h:55%"><i></i><b>B</b><em>average</em></span>
+            <span style="--h:32%"><i></i><b>C</b><em>sells little</em></span>
+            <span style="--h:14%"><i></i><b>D</b><em>hardly sells</em></span>
+          </div></div>
+        <div class="pk-card"><b>Stock</b><p>How many pairs are left: very low, low, medium, high or very high.</p></div>
+        <div class="pk-card"><b>Outlet</b><p>Whether it sits in the sale-and-end-of-line section.</p></div>
+        <div class="pk-card"><b>Season</b><p>This year&rsquo;s model, or one from a past season.</p></div>
+        <div class="pk-card"><b>Extended catalogue</b><p>Sold online but not held in Forum Sport&rsquo;s own stock.</p></div>
+        <div class="pk-card"><b>Online exclusive</b><p>Sold only on the website.</p></div>
+        <div class="pk-card"><b>Margin</b><p>What the shop keeps from each sale. The cost is worked out from it.</p></div>
+        <div class="pk-card"><b>Rival prices</b><p>What other shops charge for the very same shoe, matched by barcode.</p></div>
+      </div>
     </div>
 
-    <h3 class="rv">Target position by demand and stock</h3>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Demand \ Stock</th><th>Low</th><th>Medium</th><th>High</th></tr></thead>
-        <tbody>
-          <tr><td><b>High</b> &middot; AA, A</td><td><b>102%</b> &middot; defend price and margin</td><td>100%</td><td><b>99%</b> &middot; hold, or a moderate cut</td></tr>
-          <tr><td><b>Medium</b> &middot; B, unclassified</td><td>101%</td><td>99%</td><td>97%</td></tr>
-          <tr><td><b>Low</b> &middot; C, D</td><td><b>100%</b> &middot; little need to cut</td><td>98%</td><td><b>95%</b> &middot; first candidate for a cut</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <ol class="flow rv">
+      <li class="fl" style="--i:0">
+        <span class="fl-n">1</span>
+        <h4>Who do we compare with?</h4>
+        <p>We look at what other shops charge for the same shoe and take the <b>middle price</b>
+          (the median). That is <b>the reference</b>. One very cheap or very expensive shop
+          can&rsquo;t drag it.</p>
+        <svg class="fl-vis" viewBox="0 0 260 70" aria-hidden="true">
+          <line x1="10" y1="40" x2="250" y2="40" stroke="#d8d8d8" stroke-width="2"/>
+          <circle cx="40" cy="40" r="7" fill="#9aa5ba"/><circle cx="95" cy="40" r="7" fill="#9aa5ba"/>
+          <circle class="med" cx="130" cy="40" r="10" fill="#2f6fed"/>
+          <circle cx="165" cy="40" r="7" fill="#9aa5ba"/><circle cx="235" cy="40" r="7" fill="#9aa5ba"/>
+          <text x="130" y="18" text-anchor="middle" class="fl-t">reference</text>
+          <text x="40" y="64" text-anchor="middle" class="fl-s">cheapest</text>
+          <text x="235" y="64" text-anchor="middle" class="fl-s">dearest</text>
+        </svg>
+        <p class="fl-note">The manager can fix a specific rival for a product instead. No rival at all? The price can only go down, never up.</p>
+      </li>
+      <li class="fl" style="--i:1">
+        <span class="fl-n">2</span>
+        <h4>How far from the reference?</h4>
+        <p><b>The more a shoe sells and the fewer pairs are left, the more we defend its price.</b>
+          Shoes that hardly sell and fill the warehouse go cheapest. Each cell is a % of the reference.</p>
+        <div class="hm" role="img" aria-label="Target position: high demand 102, 100, 99; medium demand 101, 99, 97; low demand 100, 98, 95 per cent of the reference, for low, medium and high stock.">
+          <div class="hm-row hm-head"><div></div><div>Low stock</div><div>Medium stock</div><div>High stock</div></div>
+          <div class="hm-row"><div class="hm-lab"><b>High demand</b><span>AA · A</span></div><div class="hm-cell" style="--bg:#0a1a3c;--fg:#fff;--i:0"><span class="hm-v">102%</span><span class=hm-n>Defend price and margin</span></div><div class="hm-cell" style="--bg:#495773;--fg:#fff;--i:1"><span class="hm-v">100%</span></div><div class="hm-cell" style="--bg:#69768f;--fg:#fff;--i:2"><span class="hm-v">99%</span><span class=hm-n>Hold, or a small cut</span></div></div><div class="hm-row"><div class="hm-lab"><b>Medium demand</b><span>B · no class</span></div><div class="hm-cell" style="--bg:#2a3958;--fg:#fff;--i:3"><span class="hm-v">101%</span></div><div class="hm-cell" style="--bg:#69768f;--fg:#fff;--i:4"><span class="hm-v">99%</span></div><div class="hm-cell" style="--bg:#a9b3c7;--fg:#0a1a3c;--i:5"><span class="hm-v">97%</span></div></div><div class="hm-row"><div class="hm-lab"><b>Low demand</b><span>C · D</span></div><div class="hm-cell" style="--bg:#495773;--fg:#fff;--i:6"><span class="hm-v">100%</span><span class=hm-n>Little need to cut</span></div><div class="hm-cell" style="--bg:#8994ab;--fg:#0a1a3c;--i:7"><span class="hm-v">98%</span></div><div class="hm-cell" style="--bg:#e8f0fe;--fg:#0a1a3c;--i:8"><span class="hm-v">95%</span><span class=hm-n>First to cut</span></div></div>
+        </div>
+      </li>
+      <li class="fl" style="--i:2">
+        <span class="fl-n">3</span>
+        <h4>Small corrections</h4>
+        <p><b>Then we nudge that % up or down</b> for the shoe&rsquo;s situation, in points.</p>
+        <div class="adj">
+          <span class="adj-c dn" style="--i:0"><b>&minus;3</b> in the outlet</span>
+          <span class="adj-c dn" style="--i:1"><b>&minus;3</b> from a past season</span>
+          <span class="adj-c dn" style="--i:2"><b>&minus;2</b> end of season, for every shoe</span>
+          <span class="adj-c up" style="--i:3"><b>+2</b> extended catalogue: not our stock, less pressure to clear</span>
+          <span class="adj-c up" style="--i:4"><b>+3</b> online exclusive: a higher ceiling in step 4</span>
+        </div>
+        <div class="capx"><div class="cap-bar"><span class="cap-z"></span></div>
+          <div class="cap-l"><span>&minus;8</span><span>0</span><span>+2</span></div>
+          <p>All corrections added together never go beyond <b>&minus;8</b> or <b>+2</b> points.</p></div>
+      </li>
+      <li class="fl" style="--i:3">
+        <span class="fl-n">4</span>
+        <h4>The shop&rsquo;s limits</h4>
+        <p><b>The price can&rsquo;t drop so low the shop stops making money, or rise far above the rivals.</b>
+          The limits depend on what the shoe costs today.</p>
+        <div class="bands"><div class="bd" style="--i:0"><div class="bd-n">Band 1</div><div class="bd-r">under €30</div>
+  <div class="bd-bar"><span class="bd-floor" style="width:78.0%"></span></div>
+  <div class="bd-t"><b>30%</b> and at least <b>€2</b> profit</div>
+  <div class="bd-c">no more than <b>102%</b> of the reference</div></div><div class="bd" style="--i:1"><div class="bd-n">Band 2</div><div class="bd-r">€30 – €60</div>
+  <div class="bd-bar"><span class="bd-floor" style="width:70.2%"></span></div>
+  <div class="bd-t"><b>27%</b> and at least <b>€8</b> profit</div>
+  <div class="bd-c">no more than <b>101%</b> of the reference</div></div><div class="bd" style="--i:2"><div class="bd-n">Band 3</div><div class="bd-r">€60 – €100</div>
+  <div class="bd-bar"><span class="bd-floor" style="width:62.400000000000006%"></span></div>
+  <div class="bd-t"><b>24%</b> and at least <b>€14</b> profit</div>
+  <div class="bd-c">no more than <b>100%</b> of the reference</div></div><div class="bd" style="--i:3"><div class="bd-n">Band 4</div><div class="bd-r">€100 – €200</div>
+  <div class="bd-bar"><span class="bd-floor" style="width:52.0%"></span></div>
+  <div class="bd-t"><b>20%</b> and at least <b>€20</b> profit</div>
+  <div class="bd-c">no more than <b>99%</b> of the reference</div></div><div class="bd" style="--i:4"><div class="bd-n">Band 5</div><div class="bd-r">€200 and over</div>
+  <div class="bd-bar"><span class="bd-floor" style="width:46.800000000000004%"></span></div>
+  <div class="bd-t"><b>18%</b> and at least <b>€36</b> profit</div>
+  <div class="bd-c">no more than <b>98%</b> of the reference</div></div></div>
+        <p class="fl-note"><b>Never above the list price, and an outlet shoe never goes up.</b> If the floor ends up above the ceiling, <b>the margin wins</b> and the row says so. Then the price is rounded to the euro.</p>
+      </li>
+    </ol>
 
-    <h3 class="rv">Context adjustments</h3>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Variable</th><th>What the brief says</th><th>Default</th></tr></thead>
-        <tbody>
-          <tr><td><b>Outlet</b></td><td>More willing to cut the price</td><td>&minus;3 points, and never raised</td></tr>
-          <tr><td><b>Previous season</b></td><td>More promotional pressure</td><td>&minus;3 points</td></tr>
-          <tr><td><b>Current season</b></td><td>Not untouchable either, given the other factors</td><td>0, moved only by demand, stock and timing</td></tr>
-          <tr><td><b>End of season</b></td><td>Start versus end of season matters</td><td>&minus;2 points on everything, one switch for the whole catalogue</td></tr>
-          <tr><td><b>Extended catalogue</b></td><td>Less pressure to clear: it is not Forum&rsquo;s own stock</td><td>+2 points</td></tr>
-          <tr><td><b>Own stock</b></td><td>Prioritise selling through own inventory</td><td>0, high stock already pushes the price down</td></tr>
-          <tr><td><b>Online exclusive</b></td><td>More freedom to adapt the price</td><td>+3 points on the alignment ceiling</td></tr>
-        </tbody>
-      </table>
+    <div class="calc rv" id="price-calc">
+      <div class="calc-h"><p class="pk-h" style="margin:0">Try it</p>
+        <div class="calc-pre"><button type="button" data-p="vf" aria-pressed="true">Nike Vaporfly 4 (real)</button>
+          <button type="button" data-p="hi">Best seller</button><button type="button" data-p="cl">Clearance</button></div></div>
+      <div class="calc-in">
+        <label>Rival prices (&euro;, comma-separated)<input id="c-riv" value="181.99"></label>
+        <label>Price today (&euro;)<input id="c-now" type="number" value="260" step="1"></label>
+        <label>List price (&euro;)<input id="c-pvp" type="number" value="260" step="1"></label>
+        <label>Margin today (%)<input id="c-mg" type="number" value="30" step="1"></label>
+        <label>Sales class<select id="c-cls"><option>AA</option><option>A</option><option>B</option><option>C</option><option selected>D</option><option value="">No class</option></select></label>
+        <label>Stock<select id="c-stk"><option value="0">Very low</option><option value="0" selected>Low</option><option value="1">Medium</option><option value="2">High</option><option value="2">Very high</option></select></label>
+        <div class="calc-ck">
+          <label><input type="checkbox" id="c-out"> Outlet</label>
+          <label><input type="checkbox" id="c-old"> Past season</label>
+          <label><input type="checkbox" id="c-end"> End of season</label>
+          <label><input type="checkbox" id="c-ext"> Extended catalogue</label>
+          <label><input type="checkbox" id="c-exc"> Online exclusive</label>
+        </div>
+      </div>
+      <div class="calc-out" aria-live="polite">
+        <div class="lanes">
+          <div class="ln"><span class="ln-l">Reference<em id="lv-ref"></em></span><div class="ln-t"><i class="dot ref" id="ru-ref"></i></div></div>
+          <div class="ln"><span class="ln-l">Target<em id="lv-tgt"></em></span><div class="ln-t"><i class="dot tgt" id="ru-tgt"></i></div></div>
+          <div class="ln"><span class="ln-l">Allowed range<em id="lv-band"></em></span><div class="ln-t"><i class="rng" id="ru-band"></i></div></div>
+          <div class="ln ln-fin"><span class="ln-l">Recommended<em id="lv-fin"></em></span><div class="ln-t"><i class="dot fin" id="ru-fin"></i></div></div>
+        </div>
+        <div class="calc-steps" id="c-steps"></div>
+        <p class="calc-why" id="c-why"></p>
+      </div>
     </div>
-
-    <h3 class="rv">The client&rsquo;s band matrix</h3>
-    <div class="tbl rv">
-      <table>
-        <thead><tr><th>Band</th><th>Selling price today</th><th>Min. margin %</th><th>Min. margin &euro;</th><th>Max. alignment vs reference</th></tr></thead>
-        <tbody>
-          <tr><td><b>1</b></td><td>0&ndash;30 &euro;</td><td>30%</td><td>2 &euro;</td><td>102%</td></tr>
-          <tr><td><b>2</b></td><td>30&ndash;60 &euro;</td><td>27%</td><td>8 &euro;</td><td>101%</td></tr>
-          <tr><td><b>3</b></td><td>60&ndash;100 &euro;</td><td>24%</td><td>14 &euro;</td><td>100%</td></tr>
-          <tr><td><b>4</b></td><td>100&ndash;200 &euro;</td><td>20%</td><td>20 &euro;</td><td>99%</td></tr>
-          <tr><td><b>5</b></td><td>200 &euro; and over</td><td>18%</td><td>36 &euro;</td><td>98%</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="cap">The two floors are not redundant: the euro floor binds on 212 models, and on 64 of the 79 in the top band.</p>
-
-    <h3 class="rv">One shoe, start to finish</h3>
-    <div class="how rv">
-      <div><b>The shoe</b><p>Illustrative figures: selling at 120 &euro;, list price 140 &euro;, cost 80 &euro;, demand B, high stock, previous season, own stock, not outlet, start of season. Rivals at 105, 110 and 118 &euro;.</p></div>
-      <div><b>1 &middot; Reference</b><p>Median of 105, 110 and 118 &euro; = <b>110 &euro;</b>.</p></div>
-      <div><b>2 &middot; Grid</b><p>Medium demand, high stock = <b>97%</b>.</p></div>
-      <div><b>3 &middot; Context</b><p>Previous season &minus;3 points = 94%, so 103.40 &euro;.</p></div>
-      <div><b>4 &middot; Barriers</b><p>Band 4. Floor: the higher of 80 &divide; 0.80 and 80 + 20 = 100 &euro;. Ceiling: 110 &times; 99% = 108.90 &euro;. 103.40 &euro; sits inside.</p></div>
-      <div><b>5 &middot; Close</b><p><b>103 &euro;</b>, down 17 &euro;, at a 22% margin. Make it outlet and end of season too: the adjustments hit the &minus;8 cap, the target falls to 97.90 &euro;, below the floor, so margin wins at <b>100 &euro;</b> and the row says the band&rsquo;s minimum margin stopped the cut.</p></div>
-    </div>
+    <p class="cap">The calculator runs the same rules as the reference tool&rsquo;s engine. The Vaporfly preset uses the tool&rsquo;s live figures: one rival at &euro;181.99, class D, low stock, current season.</p>
 
     <div class="shot rv">
       <img src="/lab/assets/shots/band-matrix.webp" alt="The client's five price bands with, for each, the minimum margin in per cent, the minimum margin in euros and the maximum alignment against the reference" loading="lazy" width="2236" height="420">
@@ -2339,8 +2476,8 @@ Finally, list any key that exists in one language and not the other.</pre>
         <thead><tr><th>They ask</th><th>You answer</th><th>The number behind it</th></tr></thead>
         <tbody>
           <tr><td>Is this our real pricing model?</td><td>No, and it was never meant to be. It is a recommender built from the policy you gave us and prices your rivals publish openly.</td><td>5 bands, your matrix, unmodified</td></tr>
-          <tr><td>Why is this higher than the rival's?</td><td>Because band 4 requires 20% and €20 of margin, and aligning would break both. Where the floor and the ceiling collide, margin wins, and the row says so.</td><td>495 of 1,483 models</td></tr>
-          <tr><td>Can we trust it?</td><td>On the models where we have market data, yes, to the degree the score states. Below 50 we are telling you not to act yet, in the open.</td><td>742 models with a competitor price</td></tr>
+          <tr><td>Why is this higher than the rival's?</td><td>Because band 4 requires 20% and €20 of margin, and aligning would break both. Where the floor and the ceiling collide, margin wins, and the row says so.</td><td>417 of 1,483 models</td></tr>
+          <tr><td>Can we trust it?</td><td>On the models where we have market data, yes, to the degree the score states. Below 50 we are telling you not to act yet, in the open.</td><td>820 models with a competitor price</td></tr>
         </tbody>
       </table>
     </div>
@@ -2458,6 +2595,80 @@ document.querySelectorAll('.prompt').forEach(box => {
   });
 });
 
+</script>
+
+<script>
+/* Week 4 calculator: the same rules as the reference tool's engine. */
+(function(){
+  const root = document.getElementById('price-calc'); if(!root) return;
+  const $ = id => document.getElementById(id);
+  const GRID = [[102,100,99],[101,99,97],[100,98,95]];
+  const CUTS = [30,60,100,200], MGP = [30,27,24,20,18], MGE = [2,8,14,20,36], CMAX = [102,101,100,99,98];
+  const PRE = {
+    vf:{riv:"181.99", now:260, pvp:260, mg:30, cls:"D", stk:1, out:0, old:0, end:0, ext:0, exc:0},
+    hi:{riv:"119, 125, 129", now:139, pvp:150, mg:40, cls:"AA", stk:3, out:0, old:0, end:0, ext:0, exc:0},
+    cl:{riv:"79, 85, 92, 99", now:95, pvp:120, mg:35, cls:"D", stk:4, out:1, old:1, end:1, ext:0, exc:0},
+  };
+  const eur = v => '€' + v.toFixed(2);
+  function set(p){
+    $('c-riv').value = p.riv; $('c-now').value = p.now; $('c-pvp').value = p.pvp; $('c-mg').value = p.mg;
+    $('c-cls').value = p.cls; $('c-stk').selectedIndex = p.stk;
+    $('c-out').checked = !!p.out; $('c-old').checked = !!p.old; $('c-end').checked = !!p.end; $('c-ext').checked = !!p.ext; $('c-exc').checked = !!p.exc;
+    run();
+  }
+  function run(){
+    const rivals = $('c-riv').value.split(/[,;\s]+/).map(Number).filter(v => v > 0).sort((a,b) => a-b);
+    const now = +$('c-now').value || 0, pvp = Math.max(+$('c-pvp').value || now, now), mg = (+$('c-mg').value || 0)/100;
+    const cls = $('c-cls').value, stk = +$('c-stk').value;
+    const out = $('c-out').checked, old = $('c-old').checked, end = $('c-end').checked, ext = $('c-ext').checked, exc = $('c-exc').checked;
+    const ref = rivals.length ? (rivals.length % 2 ? rivals[rivals.length>>1] : (rivals[rivals.length/2-1] + rivals[rivals.length/2]) / 2) : null;
+    const dem = cls==="AA"||cls==="A" ? 0 : cls==="C"||cls==="D" ? 2 : 1;
+    const base = GRID[dem][stk];
+    const adjRaw = (out?-3:0) + (old?-3:0) + (end?-2:0) + (ext?2:0);
+    const adj = Math.max(-8, Math.min(2, adjRaw));
+    const target = base + adj;
+    const cost = now * (1 - mg);
+    let band = CUTS.findIndex(c => now < c); if(band < 0) band = 4;
+    const floor = Math.max(cost / (1 - MGP[band]/100), cost + MGE[band]);
+    const hard = Math.min(pvp, out ? now : Infinity);
+    const align = ref ? ref * (CMAX[band] + (exc?3:0)) / 100 : Infinity;
+    const ceil = Math.min(hard, align);
+    const raw = ref ? ref * target / 100 : now * (1 + Math.min(0, target - 100)/100);
+    let price, why;
+    if(floor > ceil + 1e-9){
+      if(floor <= hard + 1e-9){ price = Math.ceil(floor - 1e-9); why = `Margin wins: band ${band+1} needs at least ${eur(floor)} to keep its minimum profit, which is above the ${eur(align)} ceiling against the rivals.`; }
+      else { price = Math.floor(hard + 1e-9); why = out ? `Outlet: it can only go down, and even today's price is below band ${band+1}'s minimum profit, so it stays.` : `Even at the list price, band ${band+1}'s minimum profit is out of reach.`; }
+    } else {
+      price = Math.round(Math.min(Math.max(raw, floor), ceil));
+      if(price < floor) price = Math.ceil(floor); if(price > ceil) price = Math.floor(ceil);
+      why = !ref ? `No rival sells it: only the downward part of the target applies, to today's price.`
+          : raw < floor ? `The target would cut too deep: held at band ${band+1}'s minimum profit.`
+          : raw > ceil ? (Math.abs(ceil - hard) < 1e-9 ? `Capped by the ${out ? "outlet rule (it never goes up)" : "list price"}.` : `Capped at ${CMAX[band] + (exc?3:0)}% of the reference${exc ? " (online exclusive: +3 points)" : ""}.`)
+          : `On target: ${target}% of the reference (${base}% from demand × stock${adj ? `, ${adj>0?"+":""}${adj} for context` : ""}).`;
+    }
+    $('c-steps').innerHTML =
+      `<div class="cs"><b>1 · Reference</b><span>${ref ? eur(ref) : "none"}</span></div>` +
+      `<div class="cs"><b>2 · Demand × stock</b><span>${base}%</span></div>` +
+      `<div class="cs"><b>3 · Corrections</b><span>${adj>0?"+":""}${adj} pts${adj!==adjRaw?" (capped)":""}</span></div>` +
+      `<div class="cs"><b>4 · Limits</b><span>${floor > ceil + 1e-9 ? `floor ${eur(floor)} &gt; ceiling ${eur(ceil)}` : `${eur(floor)} to ${isFinite(ceil) ? eur(ceil) : "—"}`}</span></div>` +
+      `<div class="cs fin"><b>Recommended</b><span>${eur(price)}</span></div>`;
+    $('c-why').textContent = why;
+    const pts = [ref, raw, floor, isFinite(ceil) ? ceil : null, price, now].filter(v => v != null && isFinite(v));
+    const lo = Math.min(...pts) * 0.92, hi = Math.max(...pts) * 1.06, X = v => ((v - lo) / (hi - lo) * 100).toFixed(2) + '%';
+    const bandEl = $('ru-band'); const top = isFinite(ceil) ? ceil : hi;
+    const a = Math.min(floor, top), b = Math.max(floor, top);
+    bandEl.style.left = X(a); bandEl.style.width = ((b - a) / (hi - lo) * 100).toFixed(2) + '%';
+    bandEl.classList.toggle('cross', floor > ceil + 1e-9);
+    $('lv-band').innerHTML = floor > ceil + 1e-9 ? 'floor &gt; ceiling' : `${eur(floor)}–${isFinite(ceil) ? eur(ceil) : "∞"}`;
+    const place = (id, lv, v) => { const el = $(id); el.style.display = v == null ? 'none' : ''; if(v != null) el.style.left = X(v); $(lv).textContent = v == null ? 'none' : eur(v); };
+    place('ru-ref', 'lv-ref', ref); place('ru-tgt', 'lv-tgt', raw); place('ru-fin', 'lv-fin', price);
+  }
+  root.querySelectorAll('input,select').forEach(el => el.addEventListener('input', () => {
+    root.querySelectorAll('.calc-pre button').forEach(b => b.setAttribute('aria-pressed','false')); run(); }));
+  root.querySelectorAll('.calc-pre button').forEach(b => b.onclick = () => {
+    root.querySelectorAll('.calc-pre button').forEach(x => x.setAttribute('aria-pressed', x===b ? 'true':'false')); set(PRE[b.dataset.p]); });
+  set(PRE.vf);
+})();
 </script>
 </body>
 </html>
