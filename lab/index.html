@@ -836,6 +836,10 @@ footer a:hover{color:#fff}
 .cap-l{display:flex; justify-content:space-between; font-size:.6875rem; color:var(--g-600); margin-top:4px; position:relative}
 .cap-l span:nth-child(2){position:absolute; left:80%; transform:translateX(-50%)}
 .capx p{font-size:.8125rem!important; margin:6px 0 0}
+.ex{background:var(--g-100); border:1px solid var(--g-300); border-radius:8px; padding:10px 12px; margin:0 0 12px}
+.ex-t{display:block; font-family:var(--font-display); font-size:.6875rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ie-navy); margin-bottom:4px}
+.ex ol{margin:0; padding-left:18px; font-size:.8125rem; line-height:1.5}
+.ex li{margin:2px 0}
 
 .bands{display:grid; gap:6px; margin-bottom:10px}
 .bd{display:grid; grid-template-columns:62px 98px 1fr; grid-template-areas:"n r bar" "t t c"; gap:2px 10px; align-items:center; font-size:.8125rem;
@@ -2065,17 +2069,25 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
       <li class="fl" style="--i:2">
         <span class="fl-n">3</span>
         <h4>Small corrections</h4>
-        <p><b>Then we nudge that % up or down</b> for the shoe&rsquo;s situation, in points.</p>
+        <p><b>Take the % from step 2 and add or subtract points</b> for the shoe&rsquo;s situation. A point is one point of that %, not euros and not a % of the price: 95% minus 3 points is <b>92%</b>.</p>
         <div class="adj">
-          <span class="adj-c dn" style="--i:0"><b>&minus;3</b> in the outlet</span>
-          <span class="adj-c dn" style="--i:1"><b>&minus;3</b> from a past season</span>
-          <span class="adj-c dn" style="--i:2"><b>&minus;2</b> end of season, for every shoe</span>
-          <span class="adj-c up" style="--i:3"><b>+2</b> extended catalog: not our stock, less pressure to clear</span>
-          <span class="adj-c up" style="--i:4"><b>+3</b> online exclusive: a higher ceiling in step 4</span>
+          <span class="adj-c dn" style="--i:0"><b>&minus;3 pts</b> it&rsquo;s in the outlet</span>
+          <span class="adj-c dn" style="--i:1"><b>&minus;3 pts</b> it&rsquo;s from a past season</span>
+          <span class="adj-c dn" style="--i:2"><b>&minus;2 pts</b> it&rsquo;s end of season (applies to every shoe)</span>
+          <span class="adj-c up" style="--i:3"><b>+2 pts</b> extended catalog: not our stock, no pressure to clear it</span>
+        </div>
+        <p class="fl-note"><b>Online exclusive</b> does not change this %. It only raises the ceiling in step 4 by 3 points (for example, from 102% to 105% of the reference).</p>
+        <div class="ex">
+          <span class="ex-t">Example</span>
+          <ol>
+            <li>Low demand, high stock: step 2 says <b>95%</b>.</li>
+            <li>It&rsquo;s in the outlet (&minus;3) and it&rsquo;s end of season (&minus;2): 95 &minus; 3 &minus; 2 = <b>90%</b>.</li>
+            <li>The other shops charge <b>&euro;100</b>, so the target price is <b>&euro;90</b>.</li>
+          </ol>
         </div>
         <div class="capx"><div class="cap-bar"><span class="cap-z"></span></div>
           <div class="cap-l"><span>&minus;8</span><span>0</span><span>+2</span></div>
-          <p>All corrections added together never go beyond <b>&minus;8</b> or <b>+2</b> points.</p></div>
+          <p><b>Limit:</b> add all the corrections together. The total never goes below <b>&minus;8</b> or above <b>+2</b> points. Outlet + past season + end of season would be &minus;8, so that is the most a shoe can drop.</p></div>
       </li>
       <li class="fl" style="--i:3">
         <span class="fl-n">4</span>
