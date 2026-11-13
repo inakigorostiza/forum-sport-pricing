@@ -840,6 +840,18 @@ footer a:hover{color:#fff}
 .ex-t{display:block; font-family:var(--font-display); font-size:.6875rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ie-navy); margin-bottom:4px}
 .ex ol{margin:0; padding-left:18px; font-size:.8125rem; line-height:1.5}
 .ex li{margin:2px 0}
+.lim-steps{margin:0 0 12px; padding-left:20px; font-size:.875rem; line-height:1.5}
+.lim-steps li{margin:3px 0}
+.lr{margin:14px 4px 4px}
+.lr-t{position:relative; height:10px; border-radius:5px; background:var(--g-300)}
+.lr-ok{position:absolute; top:0; bottom:0; background:#cfe9d8; border-radius:5px}
+.lr-m{position:absolute; top:-5px; bottom:-5px; width:2px; margin-left:-1px; background:var(--ie-navy)}
+.lr-m.fl-m{background:var(--creative)}
+.lr-p{position:absolute; top:50%; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%; background:var(--accent-strong); border:2px solid var(--white)}
+.lr-l{position:relative; height:18px; margin-top:6px; font-size:.6875rem; color:var(--g-600)}
+.lr-l span{position:absolute; transform:translateX(-50%); white-space:nowrap}
+.lr-l .lr-pk{font-weight:700; color:var(--accent-strong)}
+.ex-if{font-size:.8125rem!important; margin:8px 0 0!important}
 
 .bands{display:grid; gap:6px; margin-bottom:10px}
 .bd{display:grid; grid-template-columns:62px 98px 1fr; grid-template-areas:"n r bar" "t t c"; gap:2px 10px; align-items:center; font-size:.8125rem;
@@ -848,6 +860,7 @@ footer a:hover{color:#fff}
 .bd-bar{grid-area:bar; height:8px; background:var(--g-100); border-radius:4px; overflow:hidden}
 .bd-floor{display:block; height:100%; background:var(--accent-strong); border-radius:4px; animation:grow-x 900ms var(--ease) both; animation-delay:calc(700ms + var(--i)*80ms)}
 @keyframes grow-x{from{width:0}}
+.bd-h{display:flex; justify-content:space-between; font-size:.6875rem; letter-spacing:.06em; text-transform:uppercase; color:var(--g-600); padding:0 0 4px; border-bottom:1px solid var(--g-300)}
 .bd-t{grid-area:t} .bd-c{grid-area:c; text-align:right; color:var(--g-900)}
 
 .calc{margin-top:var(--s-6); border:2px solid var(--ie-navy); border-radius:var(--radius); background:var(--white); padding:var(--s-3)}
@@ -2092,25 +2105,39 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
       <li class="fl" style="--i:3">
         <span class="fl-n">4</span>
         <h4>The shop&rsquo;s limits</h4>
-        <p><b>The price can&rsquo;t drop so low the shop stops making money, or rise far above the rivals.</b>
-          The limits depend on what the shoe costs today.</p>
-        <div class="bands"><div class="bd" style="--i:0"><div class="bd-n">Band 1</div><div class="bd-r">under €30</div>
-  <div class="bd-bar"><span class="bd-floor" style="width:78.0%"></span></div>
+        <p><b>The price from step 3 has to fit between a floor and a ceiling.</b> The floor protects the shop&rsquo;s profit. The ceiling stops us charging much more than the other shops.</p>
+        <ol class="lim-steps">
+          <li><b>Find the band.</b> Use what the shoe sells for <i>today</i> (not the original list price).</li>
+          <li><b>Floor:</b> the lowest price that still leaves both profits in its row: the % of the price <i>and</i> the euros. Whichever asks for the higher price wins.</li>
+          <li><b>Ceiling:</b> no more than the row&rsquo;s % of the reference (+3 points if it&rsquo;s an online exclusive).</li>
+        </ol>
+        <div class="bands"><div class="bd-h"><span>Band (price today)</span><span>Floor: minimum profit</span><span>Ceiling</span></div><div class="bd" style="--i:0"><div class="bd-n">Band 1</div><div class="bd-r">under €30</div>
   <div class="bd-t"><b>30%</b> and at least <b>€2</b> profit</div>
   <div class="bd-c">no more than <b>102%</b> of the reference</div></div><div class="bd" style="--i:1"><div class="bd-n">Band 2</div><div class="bd-r">€30 – €60</div>
-  <div class="bd-bar"><span class="bd-floor" style="width:70.2%"></span></div>
   <div class="bd-t"><b>27%</b> and at least <b>€8</b> profit</div>
   <div class="bd-c">no more than <b>101%</b> of the reference</div></div><div class="bd" style="--i:2"><div class="bd-n">Band 3</div><div class="bd-r">€60 – €100</div>
-  <div class="bd-bar"><span class="bd-floor" style="width:62.400000000000006%"></span></div>
   <div class="bd-t"><b>24%</b> and at least <b>€14</b> profit</div>
   <div class="bd-c">no more than <b>100%</b> of the reference</div></div><div class="bd" style="--i:3"><div class="bd-n">Band 4</div><div class="bd-r">€100 – €200</div>
-  <div class="bd-bar"><span class="bd-floor" style="width:52.0%"></span></div>
   <div class="bd-t"><b>20%</b> and at least <b>€20</b> profit</div>
   <div class="bd-c">no more than <b>99%</b> of the reference</div></div><div class="bd" style="--i:4"><div class="bd-n">Band 5</div><div class="bd-r">€200 and over</div>
-  <div class="bd-bar"><span class="bd-floor" style="width:46.800000000000004%"></span></div>
   <div class="bd-t"><b>18%</b> and at least <b>€36</b> profit</div>
   <div class="bd-c">no more than <b>98%</b> of the reference</div></div></div>
-        <p class="fl-note"><b>Never above the list price, and an outlet shoe never goes up.</b> If the floor ends up above the ceiling, <b>the margin wins</b> and the row says so. Then the price is rounded to the euro.</p>
+        <div class="ex">
+          <span class="ex-t">Example</span>
+          <ol>
+            <li>A shoe sells today for <b>&euro;95</b> and costs the shop <b>&euro;60</b>. That&rsquo;s <b>Band 3</b>.</li>
+            <li><b>Floor:</b> a 24% profit needs <b>&euro;78.95</b> (&euro;60 is 76% of it). &euro;14 of profit needs only &euro;74. The higher one wins: floor = <b>&euro;78.95</b>.</li>
+            <li><b>Ceiling:</b> the other shops charge &euro;100, and Band 3 allows 100% of that: ceiling = <b>&euro;100</b>.</li>
+            <li>Step 3 said <b>90%</b>, so &euro;90. It fits between &euro;78.95 and &euro;100, so the price is <b>&euro;90</b>.</li>
+          </ol>
+          <div class="lr" aria-hidden="true">
+            <div class="lr-t"><span class="lr-ok" style="left:25.6%;right:14.3%"></span>
+              <span class="lr-m fl-m" style="left:25.6%"></span><span class="lr-m ce-m" style="left:85.7%"></span><span class="lr-p" style="left:57.1%"></span></div>
+            <div class="lr-l"><span style="left:25.6%">floor &euro;78.95</span><span class="lr-pk" style="left:57.1%">&euro;90</span><span style="left:85.7%">ceiling &euro;100</span></div>
+          </div>
+          <p class="ex-if">If step 3 had given <b>&euro;75</b>, the price goes up to the floor: <b>&euro;79</b>.<br>If it had given <b>&euro;105</b>, it comes down to the ceiling: <b>&euro;100</b>.</p>
+        </div>
+        <p class="fl-note"><b>Two rules that always apply:</b> never above the original list price, and an outlet shoe never goes up from today&rsquo;s price.<br><b>If the floor is above the ceiling, the profit wins</b>: we use the floor and the row is marked so you can see it.<br>Finally, the price is rounded to the nearest euro, without crossing the floor or the ceiling.</p>
       </li>
     </ol>
 
@@ -2137,7 +2164,7 @@ If a fetch fails, record the failure. Never let "the request failed" and "this p
         <div class="lanes">
           <div class="ln"><span class="ln-l">Reference<em id="lv-ref"></em></span><div class="ln-t"><i class="dot ref" id="ru-ref"></i></div></div>
           <div class="ln"><span class="ln-l">Target<em id="lv-tgt"></em></span><div class="ln-t"><i class="dot tgt" id="ru-tgt"></i></div></div>
-          <div class="ln"><span class="ln-l">Allowed range<em id="lv-band"></em></span><div class="ln-t"><i class="rng" id="ru-band"></i></div></div>
+          <div class="ln"><span class="ln-l">Allowed range<em id="lv-band"></em></span><div class="ln-t"><i class="lr" id="ru-band"></i></div></div>
           <div class="ln ln-fin"><span class="ln-l">Recommended<em id="lv-fin"></em></span><div class="ln-t"><i class="dot fin" id="ru-fin"></i></div></div>
         </div>
         <div class="calc-steps" id="c-steps"></div>
