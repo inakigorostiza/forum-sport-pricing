@@ -3927,17 +3927,7 @@ function crPanel(row){
 
   const acts = document.createElement("div"); acts.className = "cr-acts";
   const busy = crJob && !["done","failed"].includes(crJob.stage);
-  if(!opToken){
-    const f = document.createElement("form"); f.className = "sc-puerta";
-    f.innerHTML = `<label class="param"><span>${t("sc.token")}</span></label>`;
-    const i = document.createElement("input"); i.type = "password"; i.autocomplete = "off"; i.className = "sc-token";
-    i.setAttribute("aria-label", t("sc.token"));
-    const b = document.createElement("button"); b.className = "chip"; b.type = "submit"; b.textContent = t("sc.entrar");
-    f.querySelector("label").append(i); f.append(b);
-    f.onsubmit = e => { e.preventDefault(); opToken = i.value.replace(/[\s"'`]/g, ""); if(!opToken) return;
-      crFallo = null; crJob = null; try{ localStorage.setItem(OP_KEY, opToken); }catch{} render(); };
-    acts.append(f);
-  } else {
+  {
     const est = document.createElement("button"); est.type = "button"; est.className = "ghost"; est.textContent = t("cr.estimar"); est.disabled = busy;
     est.onclick = async () => {
       crFallo = null; const fm = CR_FORMATS[crForm.fmt];
@@ -3954,9 +3944,7 @@ function crPanel(row){
     };
     const gen = document.createElement("button"); gen.type = "button"; gen.className = "chip cr-go"; gen.textContent = t("cr.generar"); gen.disabled = busy;
     gen.onclick = () => crRun(row);
-    const out = document.createElement("button"); out.type = "button"; out.className = "ghost"; out.textContent = t("cr.cambiarToken");
-    out.onclick = () => { crForgetToken(); crFallo = null; crJob = null; render(); };
-    acts.append(est, gen, out);
+    acts.append(est, gen);
   }
   const close = document.createElement("button"); close.type = "button"; close.className = "ghost"; close.textContent = t("cr.cerrar");
   close.onclick = () => { crSel = null; crJob = null; crCost = null; crFallo = null; render(); };

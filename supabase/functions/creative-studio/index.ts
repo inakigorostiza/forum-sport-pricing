@@ -210,9 +210,8 @@ async function prepare(body: Record<string, unknown>) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
-  const esperado = Deno.env.get("OPERATOR_TOKEN");
-  if (!esperado) return json({ error: "setup", detail: "OPERATOR_TOKEN is not set." }, 503);
-  if (!tokenValido(req.headers.get("x-operator-token") ?? "", esperado)) return json({ error: "unauthorized" }, 401);
+  // No operator token: the owner chose open access (2026-11-20). Anyone who can open
+  // the tool can generate, and every generation spends Higgsfield API balance.
   if (!hfAuth()) return json({ error: "higgsfield_setup", detail: "HIGGSFIELD_API_KEY_ID / _SECRET are not set." }, 503);
 
   let body: Record<string, unknown> = {};
